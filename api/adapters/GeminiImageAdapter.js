@@ -12,8 +12,7 @@ export class GeminiImageAdapter extends BaseImageAdapter {
     super(config);
 
     this.apiKey = config.apiKey || process.env.GEMINI_API_KEY;
-    this.model = config.model || 'gemini-2.0-flash-exp';
-    this.imageModel = 'imagen-3.0-generate-001'; // Gemini's image generation model
+    this.imageModel = config.model || 'gemini-2.5-flash-image'; // Gemini 2.5 Flash Image model
 
     if (!this.apiKey) {
       console.warn('GeminiImageAdapter: No API key provided. Image generation will fail.');
@@ -79,43 +78,29 @@ export class GeminiImageAdapter extends BaseImageAdapter {
   }
 
   /**
-   * Generate image with Gemini API
-   * NOTE: This is a placeholder implementation
-   * Actual Gemini image generation API may differ
+   * Generate image with Gemini 2.5 Flash Image
    */
   async generateWithGeminiAPI(prompt, aspectRatio) {
-    // For MVP: Return a mock response or throw error if not available
-    // In production with actual API access, implement real Gemini image generation
-
-    // Option 1: Mock implementation for testing
+    // Mock mode for testing without API calls
     if (process.env.GEMINI_MOCK_MODE === 'true') {
       return this.generateMockResponse(prompt, aspectRatio);
     }
 
-    // Option 2: Actual implementation (when API is available)
     try {
-      const model = this.genAI.getGenerativeModel({ model: this.model });
+      const model = this.genAI.getGenerativeModel({ model: this.imageModel });
 
-      // Attempt to generate image (API method may vary)
-      // This is speculative based on expected Gemini API patterns
-      const result = await model.generateContent({
-        contents: [{
-          parts: [{
-            text: `Generate an image: ${prompt}. Aspect ratio: ${aspectRatio}`
-          }]
-        }],
-        generationConfig: {
-          // Image generation specific config
-          responseModalities: ['image'],
-        }
-      });
+      // Add aspect ratio hint to prompt
+      const promptWithRatio = `${prompt}. Aspect ratio: ${aspectRatio}`;
 
-      // Extract image URL from response
-      // Actual response structure may differ
-      const imageUrl = this.extractImageUrl(result);
+      // Generate image using Gemini 2.5 Flash Image
+      const result = await model.generateContent(promptWithRatio);
+      const response = result.response;
+
+      // Extract image from response
+      const imageUrl = this.extractImageUrl(response);
 
       if (!imageUrl) {
-        throw new Error('No image URL in Gemini response');
+        throw new Error('No image data in Gemini response');
       }
 
       return {
@@ -123,10 +108,9 @@ export class GeminiImageAdapter extends BaseImageAdapter {
         raw: result
       };
     } catch (error) {
-      // If Gemini image generation is not available, provide helpful error
+      // Log helpful error messages
       if (error.message?.includes('not supported') || error.message?.includes('not available')) {
-        console.warn('Gemini image generation not available, using mock mode');
-        return this.generateMockResponse(prompt, aspectRatio);
+        console.warn('Gemini image generation not available, falling back');
       }
       throw error;
     }

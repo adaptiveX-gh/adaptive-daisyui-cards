@@ -3,6 +3,7 @@
  * Phase 1: Core card generation and rendering
  */
 
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
@@ -10,6 +11,7 @@ import { dirname, join } from 'path';
 import cardsRouter from './routes/cards.js';
 import presentationsRouter from './routes/presentations.js';
 import imagesRouter from './routes/images.js';
+import streamingRouter from './routes/streaming.js';
 import ThemeService from './services/ThemeService.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,9 +25,10 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static files - serve compiled CSS
+// Static files - serve compiled CSS and test pages
 const projectRoot = join(__dirname, '..');
 app.use('/dist', express.static(join(projectRoot, 'dist')));
+app.use('/tests', express.static(join(projectRoot, 'tests')));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -41,9 +44,15 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: '0.2.0',
-    phase: 2,
-    features: ['card-generation', 'image-generation', 'placeholder-system'],
+    version: '0.3.0',
+    phase: 3,
+    features: [
+      'card-generation',
+      'image-generation',
+      'placeholder-system',
+      'sse-streaming',
+      'progressive-assembly'
+    ],
     timestamp: new Date().toISOString()
   });
 });
@@ -52,9 +61,9 @@ app.get('/health', (req, res) => {
 app.get('/api', (req, res) => {
   res.json({
     name: 'Adaptive Cards Platform API',
-    version: '0.2.0',
-    phase: 2,
-    description: 'API-first card generation platform for responsive presentations',
+    version: '0.3.0',
+    phase: 3,
+    description: 'API-first card generation platform for responsive presentations with SSE streaming',
     endpoints: {
       cards: {
         'POST /api/cards/generate-content': 'Generate content for a single card',
@@ -67,6 +76,11 @@ app.get('/api', (req, res) => {
         'POST /api/presentations/render': 'Render presentation to HTML',
         'POST /api/presentations/export': 'Export presentation (json/html/bundle)',
         'GET /api/presentations/preview/:topic': 'Quick preview for a topic'
+      },
+      streaming: {
+        'POST /api/cards/stream': 'Stream single card generation (SSE)',
+        'POST /api/presentations/stream': 'Stream presentation generation (SSE)',
+        'GET /api/stream/demo': 'Demo SSE streaming with delays'
       },
       themes: {
         'GET /api/themes': 'List available themes',
@@ -88,6 +102,9 @@ app.get('/api', (req, res) => {
 app.use('/api/cards', cardsRouter);
 app.use('/api/presentations', presentationsRouter);
 app.use('/api/images', imagesRouter);
+
+// Mount streaming routes (Phase 3)
+app.use('/api', streamingRouter);
 
 // Theme routes
 const themeService = new ThemeService();
@@ -142,8 +159,8 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
-║   Adaptive Cards Platform API - Phase 2                   ║
-║   Version: 0.2.0 (Image Generation Integration)           ║
+║   Adaptive Cards Platform API - Phase 3                   ║
+║   Version: 0.3.0 (SSE Streaming Architecture)             ║
 ╟────────────────────────────────────────────────────────────╢
 ║   Server running on: http://localhost:${PORT}                ║
 ║   API documentation: http://localhost:${PORT}/api             ║
@@ -155,7 +172,12 @@ app.listen(PORT, () => {
 ║   • GET  /api/presentations/preview/:topic                 ║
 ║   • GET  /api/themes                                       ║
 ╟────────────────────────────────────────────────────────────╢
-║   Image Generation (NEW):                                  ║
+║   SSE Streaming (NEW - Phase 3):                           ║
+║   • POST /api/cards/stream                                 ║
+║   • POST /api/presentations/stream                         ║
+║   • GET  /api/stream/demo                                  ║
+╟────────────────────────────────────────────────────────────╢
+║   Image Generation:                                        ║
 ║   • GET  /api/images/:cardId/status                        ║
 ║   • POST /api/images/regenerate                            ║
 ║   • GET  /api/images/providers                             ║

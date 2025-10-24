@@ -1,6 +1,6 @@
-# Adaptive Cards Platform API - Phase 2
+# Adaptive Cards Platform API - Phase 3
 
-Version 0.2.0 | Phase 2 Complete - Image Generation Integration
+Version 0.3.0 | Phase 3 Complete - SSE Streaming Architecture
 
 ## Overview
 
@@ -18,7 +18,7 @@ The Adaptive Cards Platform API is a REST API for generating presentation-ready,
 - **Live Preview**: Browser-based presentation preview
 - **Deterministic Content**: Pre-built content for 3 MVP topics
 
-### Phase 2 (Current - NEW)
+### Phase 2 (Complete)
 
 - **Multi-Provider Image Generation**: Gemini AI and instant placeholders
 - **Smart Fallback Chain**: Automatic provider fallback (Gemini → Placeholder)
@@ -28,9 +28,18 @@ The Adaptive Cards Platform API is a REST API for generating presentation-ready,
 - **Status Tracking**: Real-time generation monitoring
 - **Theme-Aware Placeholders**: Placeholders match card themes
 
+### Phase 3 (Current - NEW)
+
+- **SSE Streaming Architecture**: Progressive card assembly with Server-Sent Events
+- **Stage-Based Pipeline**: 5-stage streaming (skeleton → content → style → placeholder → image)
+- **Real-Time Updates**: Stream image generation progress as it happens
+- **Connection Management**: Heartbeat, reconnection, and graceful cleanup
+- **Instant Visual Feedback**: Skeleton structure in <100ms
+- **Non-Blocking Images**: Content appears immediately, images stream when ready
+- **Resilient Clients**: Handle out-of-order messages and missing stages
+
 ### Future Phases
 
-- **Phase 3**: SSE streaming for progressive rendering
 - **Phase 4**: LLM-based intelligent content generation
 
 ## Quick Start
@@ -98,21 +107,27 @@ api/
 ├── routes/
 │   ├── cards.js                     # Card generation endpoints
 │   ├── presentations.js             # Presentation endpoints
-│   └── images.js                    # Image generation endpoints (Phase 2)
+│   ├── images.js                    # Image generation endpoints (Phase 2)
+│   └── streaming.js                 # SSE streaming endpoints (Phase 3)
 ├── services/
 │   ├── TemplateEngine.js            # Layout rendering with Handlebars
 │   ├── ContentGenerator.js          # Deterministic content mapping
 │   ├── ThemeService.js              # DaisyUI theme management
-│   ├── ImageGenerationService.js    # Image generation orchestrator (Phase 2)
+│   ├── ImageGenerationService.js    # Image generation orchestrator (Phase 2, EventEmitter in Phase 3)
 │   ├── PlaceholderService.js        # SVG placeholder generator (Phase 2)
-│   └── ImageStatusStore.js          # In-memory status tracking (Phase 2)
+│   ├── ImageStatusStore.js          # In-memory status tracking (Phase 2)
+│   ├── StreamingService.js          # SSE streaming service (Phase 3)
+│   └── ConnectionStore.js           # SSE connection management (Phase 3)
+├── middleware/
+│   └── sseSetup.js                  # SSE headers and validation (Phase 3)
 ├── adapters/                        # Image provider adapters (Phase 2)
 │   ├── BaseImageAdapter.js          # Abstract base class
 │   ├── GeminiImageAdapter.js        # Google Gemini AI
 │   ├── PlaceholderAdapter.js        # Instant placeholders
 │   └── README.md                    # Adapter documentation
 ├── utils/
-│   └── promptEnhancer.js            # Image prompt enhancement (Phase 2)
+│   ├── promptEnhancer.js            # Image prompt enhancement (Phase 2)
+│   └── sseFormatter.js              # SSE message formatting (Phase 3)
 ├── models/
 │   ├── Card.js                      # Card data model
 │   └── schemas.js                   # Layout-specific content schemas
@@ -140,7 +155,7 @@ api/
 | `/api/cards/layouts` | GET | List available layouts |
 | `/api/cards/topics` | GET | List available topics |
 
-### Image Generation Endpoints (Phase 2 - NEW)
+### Image Generation Endpoints (Phase 2)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -151,6 +166,16 @@ api/
 | `/api/images/stats` | GET | Get generation statistics |
 
 See [IMAGE-GENERATION.md](./docs/IMAGE-GENERATION.md) for comprehensive image generation guide.
+
+### SSE Streaming Endpoints (Phase 3 - NEW)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/presentations/stream` | POST | Stream presentation generation (SSE) |
+| `/api/cards/stream` | POST | Stream single card generation (SSE) |
+| `/api/stream/demo` | GET | Demo SSE streaming with configurable delays |
+
+See [SSE-STREAMING.md](./docs/SSE-STREAMING.md) for comprehensive streaming guide.
 
 ## Available Layouts
 
@@ -508,19 +533,121 @@ When adding features:
 4. Document in API-USAGE.md
 5. Maintain backward compatibility
 
+## SSE Streaming (Phase 3 - NEW)
+
+### Quick Start: Stream a Presentation
+
+```bash
+# Using curl with SSE (limited, for demo only)
+curl -N -H "Accept: text/event-stream" \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:3000/api/presentations/stream \
+  -d '{"topic":"AI in Product Discovery","cardCount":3,"includeImages":false}'
+
+# Better: Use the test client in browser
+# http://localhost:3000/tests/api/streaming-client.html
+```
+
+### JavaScript Client Example
+
+```javascript
+fetch('http://localhost:3000/api/presentations/stream', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'text/event-stream'
+  },
+  body: JSON.stringify({
+    topic: 'AI in Product Discovery',
+    cardCount: 6,
+    includeImages: true
+  })
+}).then(response => {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  function readStream() {
+    reader.read().then(({ done, value }) => {
+      if (done) return;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = JSON.parse(line.substring(6));
+          handleStage(data);
+        }
+      }
+
+      readStream();
+    });
+  }
+
+  readStream();
+});
+
+function handleStage(data) {
+  switch(data.stage) {
+    case 'skeleton':
+      renderSkeleton(data.cards);
+      break;
+    case 'content':
+      updateContent(data.cardId, data.section, data.content);
+      break;
+    case 'placeholder':
+      showPlaceholder(data.cardId, data.placeholder);
+      break;
+    case 'image':
+      swapImage(data.cardId, data.image);
+      break;
+  }
+}
+```
+
+### Streaming Stages
+
+1. **Skeleton** (50ms) - Card structure and layout
+2. **Content** (100-200ms) - Text sections
+3. **Style** (50ms) - Theme colors and classes
+4. **Placeholder** (50ms) - Image placeholders
+5. **Image** (0-30s) - Final generated images (async)
+
+**Time to Interactive**: <350ms (without images)
+
+### Test Client
+
+Open the visual test client:
+```
+http://localhost:3000/tests/api/streaming-client.html
+```
+
+Features:
+- Real-time event visualization
+- Configurable stage delays
+- Multiple presentation options
+- Network monitoring
+
+### Documentation
+
+- **[SSE-STREAMING.md](./docs/SSE-STREAMING.md)** - Complete streaming architecture guide
+- **[SSE-CLIENT-GUIDE.md](./docs/SSE-CLIENT-GUIDE.md)** - Client implementation patterns
+- **[streaming-client.html](./tests/api/streaming-client.html)** - Reference implementation
+
 ## Roadmap
 
-### Phase 2 (Weeks 3-4)
+### Phase 2 (Weeks 3-4) - COMPLETE
 - Multi-provider image generation
 - Smart placeholder system
 - Fallback chain (Gemini → patterns → geometric)
 
-### Phase 3 (Week 5)
+### Phase 3 (Week 5) - COMPLETE
 - SSE streaming endpoint
 - Progressive rendering stages
 - Real-time image updates
+- Connection management with heartbeat
 
-### Phase 4 (Weeks 6-7)
+### Phase 4 (Weeks 6-7) - UPCOMING
 - LLM integration (Gemini)
 - Context-aware content generation
 - Dynamic image prompt creation
@@ -534,6 +661,10 @@ MIT License - Same as parent project
 
 - **API Specification**: [docs/API-SPEC.md](./docs/API-SPEC.md)
 - **Usage Guide**: [docs/API-USAGE.md](./docs/API-USAGE.md)
+- **SSE Streaming**: [docs/SSE-STREAMING.md](./docs/SSE-STREAMING.md)
+- **Client Guide**: [docs/SSE-CLIENT-GUIDE.md](./docs/SSE-CLIENT-GUIDE.md)
+- **Image Generation**: [docs/IMAGE-GENERATION.md](./docs/IMAGE-GENERATION.md)
+- **Placeholder System**: [docs/PLACEHOLDER-SYSTEM.md](./docs/PLACEHOLDER-SYSTEM.md)
 - **Project README**: [CLAUDE.md](./CLAUDE.md)
 
 ## Support

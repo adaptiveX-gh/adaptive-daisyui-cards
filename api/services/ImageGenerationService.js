@@ -1,15 +1,19 @@
 /**
  * ImageGenerationService - Main service for multi-provider image generation
  * Orchestrates image generation with fallback chain and async handling
+ * Phase 3: Extended with EventEmitter for SSE streaming integration
  */
 
+import { EventEmitter } from 'events';
 import GeminiImageAdapter from '../adapters/GeminiImageAdapter.js';
 import PlaceholderAdapter from '../adapters/PlaceholderAdapter.js';
 import { imageStatusStore } from './ImageStatusStore.js';
 import { generateImagePromptFromCard, sanitizePrompt } from '../utils/promptEnhancer.js';
 
-export class ImageGenerationService {
+export class ImageGenerationService extends EventEmitter {
   constructor(config = {}) {
+    super(); // Initialize EventEmitter
+
     this.config = config;
 
     // Initialize providers
@@ -195,6 +199,13 @@ export class ImageGenerationService {
    */
   async generateInBackground(cardId, prompt, options) {
     try {
+      // Emit start event (Phase 3: SSE streaming)
+      this.emit('image:started', {
+        cardId,
+        provider: options.provider || 'gemini',
+        prompt
+      });
+
       // Generate with fallback
       const result = await this.generateWithFallback(prompt, options);
 
@@ -208,6 +219,16 @@ export class ImageGenerationService {
 
       console.log(`Background generation completed for card ${cardId}`);
 
+      // Emit complete event (Phase 3: SSE streaming)
+      this.emit('image:complete', {
+        cardId,
+        result: {
+          url: result.url,
+          provider: result.provider,
+          metadata: result.metadata
+        }
+      });
+
     } catch (error) {
       // Update status to failed
       this.statusStore.update(cardId, {
@@ -217,6 +238,15 @@ export class ImageGenerationService {
       });
 
       console.error(`Background generation failed for card ${cardId}:`, error);
+
+      // Emit failed event (Phase 3: SSE streaming)
+      this.emit('image:failed', {
+        cardId,
+        error: {
+          message: error.message,
+          provider: options.provider
+        }
+      });
     }
   }
 
