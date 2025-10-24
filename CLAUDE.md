@@ -14,13 +14,13 @@ src/
 ├── input.css          # Container queries, adaptive layouts, scalable typography
 └── app.js             # Interactive controls: resize, layout/theme switching
 
-index.html             # Demo page with all 5 layouts
+index.html             # Demo page with all 6 layouts
 dist/output.css        # Compiled Tailwind CSS (generated, do not edit)
 tests/                 # Playwright E2E and Vitest unit tests
 docs/                  # Detailed documentation and guides
 ```
 
-## 5 Adaptive Layouts
+## 6 Adaptive Layouts
 
 Each layout responds to **container width** via `@container` queries:
 
@@ -29,6 +29,7 @@ Each layout responds to **container width** via `@container` queries:
 3. **masonry-layout** - 3-col → 2-col → 1-col gallery
 4. **dashboard-layout** - Complex grid → 2-col → stack (400px, 800px)
 5. **split-layout** - 50/50 → 60/40 → stack
+6. **hero-layout** - Presentation/hero layout with extra large typography (2-4rem), full-bleed images. Supports `.image-left` variant for image placement
 
 All layouts use `.layout-card` base class for DaisyUI styling.
 
