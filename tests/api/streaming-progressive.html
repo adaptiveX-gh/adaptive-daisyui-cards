@@ -7,6 +7,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
   <style>
+    /* Layout badge styling */
+    .layout-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 10;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.375rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .streaming-card {
+      position: relative; /* For absolute positioned badge */
+    }
+
     /* Progressive card animations */
     @keyframes slideInUp {
       from {
@@ -71,6 +93,63 @@
     .card-hero .card-subtitle {
       font-size: 1.5rem;
       opacity: 0.8;
+    }
+
+    /* Hero-overlay layout - background image with overlaid text */
+    .card-hero-overlay {
+      overflow: hidden; /* Clip image to card's rounded corners */
+    }
+
+    .card-hero-overlay .card-body {
+      position: relative;
+      min-height: 500px;
+      padding: 0;
+    }
+
+    .card-hero-overlay .hero-image {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .card-hero-overlay .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-hero-overlay .hero-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+      z-index: 2;
+    }
+
+    .card-hero-overlay .hero-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 500px;
+      padding: 3rem;
+    }
+
+    .card-hero-overlay .hero-title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .card-hero-overlay .hero-subtitle {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      opacity: 0.95;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
 
     /* Split layout */
@@ -322,6 +401,54 @@
           </div>
 
           <div class="form-control">
+            <label class="label"><span class="label-text">Theme</span></label>
+            <select id="theme" class="select select-bordered">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="cupcake">Cupcake</option>
+              <option value="bumblebee">Bumblebee</option>
+              <option value="emerald">Emerald</option>
+              <option value="corporate">Corporate</option>
+              <option value="synthwave">Synthwave</option>
+              <option value="retro">Retro</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="valentine">Valentine</option>
+              <option value="halloween">Halloween</option>
+              <option value="garden">Garden</option>
+              <option value="forest">Forest</option>
+              <option value="aqua">Aqua</option>
+              <option value="lofi">Lofi</option>
+              <option value="pastel">Pastel</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="wireframe">Wireframe</option>
+              <option value="black">Black</option>
+              <option value="luxury">Luxury</option>
+              <option value="dracula">Dracula</option>
+              <option value="cmyk">CMYK</option>
+              <option value="autumn">Autumn</option>
+              <option value="business">Business</option>
+              <option value="acid">Acid</option>
+              <option value="lemonade">Lemonade</option>
+              <option value="night">Night</option>
+              <option value="coffee">Coffee</option>
+              <option value="winter">Winter</option>
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Container Width (for testing breakpoints)</span></label>
+            <select id="containerWidth" class="select select-bordered">
+              <option value="100%">Full Width (100%)</option>
+              <option value="250px">250px (Mobile Small)</option>
+              <option value="325px">325px (Mobile)</option>
+              <option value="450px">450px (Mobile Large)</option>
+              <option value="650px" selected>650px (Tablet)</option>
+              <option value="900px">900px (Desktop Small)</option>
+              <option value="1200px">1200px (Desktop)</option>
+            </select>
+          </div>
+
+          <div class="form-control">
             <label class="label"><span class="label-text">Stream Delay (ms)</span></label>
             <input type="number" id="streamDelay" class="input input-bordered" value="300" min="0" max="2000" step="100">
           </div>
@@ -399,7 +526,7 @@
     </div>
 
     <!-- Progressive Card Container -->
-    <div class="space-y-6" id="cardContainer">
+    <div class="space-y-6" id="cardContainer" style="container-type: inline-size; container-name: card-container;">
       <!-- Cards will be progressively rendered here -->
     </div>
 
@@ -467,9 +594,15 @@
       cardEl.id = `card-${card.id}`;
       cardEl.className = `streaming-card card bg-base-100 shadow-lg card-enter card-${card.layout}`;
 
+      // Format layout name for display
+      const layoutDisplayName = card.layout.split('-').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
+
       // Create skeleton based on layout
-      if (card.layout === 'hero') {
+      if (card.layout === 'hero' || card.layout === 'hero-overlay') {
         cardEl.innerHTML = `
+          <div class="layout-badge">${layoutDisplayName}</div>
           <div class="card-body">
             <div class="skeleton-loading skeleton-title"></div>
             <div class="skeleton-loading skeleton-subtitle"></div>
@@ -477,6 +610,7 @@
         `;
       } else if (card.layout === 'split') {
         cardEl.innerHTML = `
+          <div class="layout-badge">${layoutDisplayName}</div>
           <div class="card-body">
             <div>
               <div class="skeleton-loading skeleton-title"></div>
@@ -487,6 +621,7 @@
         `;
       } else {
         cardEl.innerHTML = `
+          <div class="layout-badge">${layoutDisplayName}</div>
           <div class="card-body">
             <div class="skeleton-loading skeleton-title"></div>
             <div class="skeleton-loading skeleton-body"></div>
@@ -531,48 +666,64 @@
 
     /**
      * Convert plain text content to rich HTML
+     * LAYOUT-AWARE: Applies appropriate classes based on layout and section
      */
-    function enrichContent(element, section, content) {
+    function enrichContent(element, section, content, layout = null) {
       // Add a small delay before enriching to show the transformation
       setTimeout(() => {
         element.classList.add('enriching');
 
         setTimeout(() => {
-          if (section === 'title') {
-            element.className = 'text-3xl font-bold mb-3 content-enter text-primary';
-          } else if (section === 'subtitle') {
-            element.className = 'text-xl opacity-80 mb-4 content-enter';
-          } else if (section === 'kicker') {
-            element.className = 'badge badge-primary badge-lg mb-3 content-enter';
-          } else if (section === 'intro') {
-            element.className = 'text-lg mb-4 leading-relaxed content-enter';
-          } else if (section === 'body') {
-            element.className = 'prose mb-4 content-enter';
-          } else if (section === 'items' && Array.isArray(content)) {
-            element.className = 'space-y-2 mb-4 content-enter';
-            element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
-              content.map(item => `<li class="text-base">${item}</li>`).join('') +
-              '</ul>';
-          } else if (section === 'bullets' && Array.isArray(content)) {
-            element.className = 'space-y-2 mb-4 content-enter';
-            element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
-              content.map(bullet => `<li class="text-base">${bullet}</li>`).join('') +
-              '</ul>';
-          } else if (section === 'cells' && Array.isArray(content)) {
-            element.className = 'grid grid-cols-2 gap-4 mb-4 content-enter';
-            element.innerHTML = content.map(cell => `
-              <div class="p-4 bg-base-200 rounded-lg">
-                <div class="font-bold text-lg mb-2">${cell.title || ''}</div>
-                <div class="text-sm opacity-70">${cell.body || ''}</div>
-              </div>
-            `).join('');
-          } else if (section === 'footnote') {
-            element.className = 'text-sm italic opacity-60 mt-4 content-enter';
-          } else if (section === 'imagePrompt') {
-            element.className = 'text-xs opacity-50 mt-2 font-mono content-enter';
-            element.innerHTML = `<span class="badge badge-ghost badge-sm">Image prompt:</span> ${content}`;
+          // Layout-specific styling
+          if (layout === 'hero-overlay' || layout === 'hero') {
+            if (section === 'title') {
+              element.className = 'hero-title text-white content-enter';
+              element.tagName = 'h1';
+            } else if (section === 'subtitle') {
+              element.className = 'hero-subtitle text-white content-enter';
+              element.tagName = 'p';
+            } else if (section === 'kicker') {
+              element.className = 'adaptive-text-base uppercase tracking-wider opacity-90 mb-2 text-white content-enter';
+              element.tagName = 'p';
+            }
           } else {
-            element.className = 'mb-3 content-enter';
+            // Default styling for other layouts
+            if (section === 'title') {
+              element.className = 'text-3xl font-bold mb-3 content-enter text-primary';
+            } else if (section === 'subtitle') {
+              element.className = 'text-xl opacity-80 mb-4 content-enter';
+            } else if (section === 'kicker') {
+              element.className = 'badge badge-primary badge-lg mb-3 content-enter';
+            } else if (section === 'intro') {
+              element.className = 'text-lg mb-4 leading-relaxed content-enter';
+            } else if (section === 'body') {
+              element.className = 'prose mb-4 content-enter';
+            } else if (section === 'items' && Array.isArray(content)) {
+              element.className = 'space-y-2 mb-4 content-enter';
+              element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
+                content.map(item => `<li class="text-base">${item}</li>`).join('') +
+                '</ul>';
+            } else if (section === 'bullets' && Array.isArray(content)) {
+              element.className = 'space-y-2 mb-4 content-enter';
+              element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
+                content.map(bullet => `<li class="text-base">${bullet}</li>`).join('') +
+                '</ul>';
+            } else if (section === 'cells' && Array.isArray(content)) {
+              element.className = 'grid grid-cols-2 gap-4 mb-4 content-enter';
+              element.innerHTML = content.map(cell => `
+                <div class="p-4 bg-base-200 rounded-lg">
+                  <div class="font-bold text-lg mb-2">${cell.title || ''}</div>
+                  <div class="text-sm opacity-70">${cell.body || ''}</div>
+                </div>
+              `).join('');
+            } else if (section === 'footnote') {
+              element.className = 'text-sm italic opacity-60 mt-4 content-enter';
+            } else if (section === 'imagePrompt') {
+              element.className = 'text-xs opacity-50 mt-2 font-mono content-enter';
+              element.innerHTML = `<span class="badge badge-ghost badge-sm">Image prompt:</span> ${content}`;
+            } else {
+              element.className = 'mb-3 content-enter';
+            }
           }
 
           element.classList.remove('enriching');
@@ -582,6 +733,7 @@
 
     /**
      * Add content to card progressively with typewriter effect
+     * LAYOUT-AWARE: Creates proper template structure based on layout type
      */
     async function renderCardContent(cardId, section, content) {
       const card = cards.get(cardId);
@@ -595,9 +747,41 @@
       // Remove skeleton and render actual content
       const cardBody = card.element.querySelector('.card-body');
 
-      // Clear skeleton on first content
+      // CRITICAL FIX: Clear skeleton on first content BUT preserve image container
       if (Object.keys(card.content).length === 1) {
+        // Save image container if it exists (check both .card-image and .hero-image)
+        let imageContainer = cardBody.querySelector('.card-image');
+        if (!imageContainer && (card.layout === 'hero-overlay' || card.layout === 'hero')) {
+          imageContainer = cardBody.querySelector('.hero-image');
+        }
+
+        // Clear card body
         cardBody.innerHTML = '';
+
+        // Create layout-specific structure
+        if (card.layout === 'hero-overlay' || card.layout === 'hero') {
+          // Hero layouts need specific structure
+          const heroContent = document.createElement('div');
+          heroContent.className = 'hero-content';
+          heroContent.dataset.heroContent = 'true';
+          cardBody.appendChild(heroContent);
+        }
+
+        // Restore image container if it existed
+        if (imageContainer) {
+          console.log(`[renderCardContent] Preserving image container for card ${card.id} (class: ${imageContainer.className})`);
+          cardBody.prepend(imageContainer);
+        }
+      }
+
+      // Find the right container for this content based on layout
+      let targetContainer = cardBody;
+      if (card.layout === 'hero-overlay' || card.layout === 'hero') {
+        // For hero layouts, text content goes inside .hero-content
+        const heroContent = cardBody.querySelector('[data-hero-content]');
+        if (heroContent) {
+          targetContainer = heroContent;
+        }
       }
 
       // Create element for content
@@ -605,7 +789,7 @@
       contentEl.className = 'mb-2 text-base opacity-70'; // Start as plain text
       contentEl.dataset.section = section;
 
-      cardBody.appendChild(contentEl);
+      targetContainer.appendChild(contentEl);
 
       // Convert content to display text
       let displayText = '';
@@ -631,11 +815,12 @@
       }
 
       // Transform to rich content after typewriter completes
-      enrichContent(contentEl, section, content);
+      enrichContent(contentEl, section, content, card.layout);
     }
 
     /**
      * Apply theme and styles to card
+     * CRITICAL FIX: Sets data-theme attribute for DaisyUI classes to work
      */
     function renderCardStyle(cardId, styles) {
       const card = cards.get(cardId);
@@ -646,25 +831,34 @@
       card.theme = styles.theme;
       card.element.classList.add('styled');
 
+      // CRITICAL: Set data-theme attribute so DaisyUI classes work
+      // This enables classes like "from-primary", "bg-primary", "text-primary" etc.
+      if (styles.theme && styles.theme.name) {
+        card.element.setAttribute('data-theme', styles.theme.name);
+        console.log(`[renderCardStyle] ✓ Set data-theme="${styles.theme.name}" for card ${cardId}`);
+      }
+
       // Apply theme colors if available
       if (styles.theme && styles.theme.colors) {
         const { primary, secondary, accent } = styles.theme.colors;
 
-        // Apply primary color to card
+        // Apply primary color to card as accent border
         card.element.style.borderLeft = `4px solid ${primary}`;
 
-        // Apply colors to title if exists
-        const title = card.element.querySelector('.card-title');
-        if (title) {
-          title.style.color = primary;
-        }
+        // For non-hero layouts, apply colors to title
+        if (card.layout !== 'hero-overlay' && card.layout !== 'hero') {
+          const title = card.element.querySelector('.card-title');
+          if (title) {
+            title.style.color = primary;
+          }
 
-        // Apply badge colors
-        const badges = card.element.querySelectorAll('.badge');
-        badges.forEach(badge => {
-          badge.style.backgroundColor = primary;
-          badge.style.borderColor = primary;
-        });
+          // Apply badge colors
+          const badges = card.element.querySelectorAll('.badge');
+          badges.forEach(badge => {
+            badge.style.backgroundColor = primary;
+            badge.style.borderColor = primary;
+          });
+        }
       }
     }
 
@@ -703,14 +897,26 @@
       }
       console.log(`[renderPlaceholder] ✓ CardBody found, creating image container`);
 
-      // Create NEW image container
+      // Create NEW image container - layout-aware
       const imageContainer = document.createElement('div');
-      imageContainer.className = 'card-image mb-4';
-      imageContainer.dataset.cardId = cardId; // Add data attribute for debugging
 
-      // Prepend to card body (image at top)
-      cardBody.prepend(imageContainer);
-      console.log(`[renderPlaceholder] ✓ ImageContainer prepended to card body`);
+      // For hero-overlay, create the .hero-image wrapper
+      if (card.layout === 'hero-overlay') {
+        imageContainer.className = 'hero-image';
+        imageContainer.dataset.cardId = cardId;
+
+        // Prepend to card body (image as background)
+        cardBody.prepend(imageContainer);
+        console.log(`[renderPlaceholder] ✓ Hero-image container created for hero-overlay layout`);
+      } else {
+        // Default image placement for other layouts
+        imageContainer.className = 'card-image mb-4';
+        imageContainer.dataset.cardId = cardId;
+
+        // Prepend to card body (image at top)
+        cardBody.prepend(imageContainer);
+        console.log(`[renderPlaceholder] ✓ ImageContainer prepended to card body`);
+      }
 
       // Show placeholder with progressive loading UI
       imageContainer.innerHTML = `
@@ -841,6 +1047,17 @@
       logEvent(`✨ Image ready: ${cardId.substring(0, 8)}`);
       console.log(`[renderImage] Rendering image for ${cardId}:`, imageResult);
 
+      // CRITICAL DEBUG: Check if imageResult has the url
+      if (!imageResult) {
+        console.error(`[renderImage] ✗ imageResult is null/undefined!`);
+        return;
+      }
+      if (!imageResult.url) {
+        console.error(`[renderImage] ✗ imageResult.url is missing!`, imageResult);
+        console.error(`[renderImage] Available keys:`, Object.keys(imageResult));
+        return;
+      }
+
       // Use memory reference instead of DOM query
       let imageContainer = card.imageContainer;
       if (!imageContainer) {
@@ -858,13 +1075,24 @@
 
       console.log(`[renderImage] ✓ ImageContainer exists, proceeding to render`);
       console.log(`[renderImage] Image URL:`, imageResult.url);
+      console.log(`[renderImage] Image URL length:`, imageResult.url.length);
+      console.log(`[renderImage] Image URL preview:`, imageResult.url.substring(0, 100));
       console.log(`[renderImage] Image prompt:`, imageResult.prompt);
+
+      // OPTIMIZATION: Skip fade animation if this is a placeholder image being replaced immediately
+      // Check if the current container has a placeholder (loading spinner)
+      const hasLoadingSpinner = imageContainer.querySelector('.loading-spinner');
+      const fadeDelay = hasLoadingSpinner ? 300 : 0; // Only fade if replacing loading state
 
       // Fade out placeholder
       imageContainer.style.opacity = '0';
 
       setTimeout(() => {
         console.log(`[renderImage] Inside setTimeout, about to set innerHTML`);
+        console.log(`[renderImage] Current imageContainer innerHTML length:`, imageContainer.innerHTML.length);
+        console.log(`[renderImage] ImageContainer in DOM:`, document.contains(imageContainer));
+        console.log(`[renderImage] ImageContainer parent:`, imageContainer.parentElement?.className);
+
         // Replace with actual image
         imageContainer.innerHTML = `
           <div class="relative w-full aspect-video rounded-lg overflow-hidden">
@@ -873,13 +1101,17 @@
               alt="${imageResult.prompt || 'Generated image'}"
               class="w-full h-full object-cover"
               style="animation: fadeIn 0.5s ease-in;"
+              onerror="console.error('[IMG] Failed to load image:', this.src.substring(0, 100))"
+              onload="console.log('[IMG] Image loaded successfully for ${cardId}')"
             />
           </div>
         `;
         imageContainer.style.opacity = '1';
         console.log(`[renderImage] ✓ Image rendering complete for ${cardId}`);
-      }, 300);
-      console.log(`[renderImage] setTimeout scheduled, exiting function`);
+        console.log(`[renderImage] New innerHTML length:`, imageContainer.innerHTML.length);
+        console.log(`[renderImage] Image element created:`, !!imageContainer.querySelector('img'));
+      }, fadeDelay);
+      console.log(`[renderImage] setTimeout scheduled with ${fadeDelay}ms delay, exiting function`);
     }
 
     /**
@@ -887,6 +1119,15 @@
      */
     function handleMessage(data) {
       console.log('[handleMessage] Called with stage:', data.stage, 'Has cards:', !!data.cards);
+
+      // CRITICAL FIX: Handle progress messages separately BEFORE stage routing
+      // Progress messages have stage but are NOT stage events
+      if (data.progress !== undefined && data.message) {
+        // This is a progress message, not a stage event
+        updateStatus('Streaming', data.stage);
+        logEvent(`⏳ Progress: ${data.message} (${data.progress}%)`);
+        return; // Don't process as stage event
+      }
 
       // Buffer events that need cards to exist
       if (!skeletonReceived && ['image-progress', 'placeholder', 'image'].includes(data.stage)) {
@@ -992,9 +1233,15 @@
       const topic = document.getElementById('topic').value;
       const cardCount = parseInt(document.getElementById('cardCount').value);
       const style = document.getElementById('style').value;
+      const theme = document.getElementById('theme').value;
+      const containerWidth = document.getElementById('containerWidth').value;
       const streamDelay = parseInt(document.getElementById('streamDelay').value);
       const endpointType = document.getElementById('endpointType').value;
       const mockMode = document.getElementById('mockMode').value;
+
+      // Apply container width to card container
+      cardContainer.style.width = containerWidth;
+      cardContainer.style.margin = '0 auto'; // Center the container
 
       // LLM Mode parameters
       const mode = document.getElementById('mode').value;
@@ -1035,6 +1282,7 @@
           topic,
           cardCount,
           style,
+          theme,
           includeImages,
           provider: imageProvider,
           streamDelay,
@@ -1310,6 +1558,19 @@
         imageProviderContainer.style.display = 'none';
         logEvent('🚫 Image generation disabled');
       }
+    });
+
+    // Container width toggle (dynamic resize without re-streaming)
+    document.getElementById('containerWidth').addEventListener('change', (e) => {
+      const width = e.target.value;
+      cardContainer.style.width = width;
+      cardContainer.style.margin = '0 auto';
+      logEvent(`📏 Container width changed to ${width}`);
+    });
+
+    // Theme selector (for visual reference, actual theme is sent to API)
+    document.getElementById('theme').addEventListener('change', (e) => {
+      logEvent(`🎨 Theme selected: ${e.target.value} (will apply on next stream)`);
     });
   </script>
 </body>

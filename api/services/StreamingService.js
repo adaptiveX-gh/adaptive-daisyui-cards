@@ -305,6 +305,7 @@ export class StreamingService extends EventEmitter {
     const cardId = typeof card === 'string' ? card : card.id;
 
     console.log(`StreamingService: Emitting image to ${clientId} (card: ${cardId})`);
+    console.log(`StreamingService: Image data:`, JSON.stringify(imageData).substring(0, 200));
 
     if (this.config.stageDelay > 0) {
       await this.delay(this.config.stageDelay);
@@ -312,6 +313,8 @@ export class StreamingService extends EventEmitter {
 
     const sequence = this.getNextSequence(clientId);
     const message = formatImageMessage(cardId, imageData, sequence);
+
+    console.log(`StreamingService: Formatted message:`, message.substring(0, 300));
 
     const success = this.sendToClient(clientId, message);
 
