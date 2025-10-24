@@ -542,9 +542,11 @@
       const apiUrl = 'http://localhost:3000';
       const endpoint = `${apiUrl}/api/presentations/stream`;
 
-      console.log('Starting stream with config:', { topic, cardCount, style, includeImages, streamDelay });
+      console.log('[CLIENT] ===== STARTING STREAM =====');
+      console.log('[CLIENT] Config:', { topic, cardCount, style, includeImages, streamDelay });
       updateStatus('Connecting', '-');
 
+      console.log('[CLIENT] Starting fetch request...');
       fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -559,59 +561,88 @@
           streamDelay
         })
       }).then(response => {
+        console.log('[CLIENT] Response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        console.log('Stream connected, reading data...');
+        console.log('[CLIENT] Response OK, getting reader...');
         updateStatus('Connected', 'waiting');
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
+        let readCount = 0;
+
+        console.log('[CLIENT] Reader obtained, starting read loop...');
 
         function readStream() {
+          readCount++;
+          console.log(`[CLIENT] Calling reader.read() #${readCount}...`);
+
           reader.read().then(({ done, value }) => {
+            console.log(`[CLIENT] Read result #${readCount}:`, {
+              done,
+              valueLength: value ? value.length : 0,
+              bufferLength: buffer.length
+            });
+
             if (done) {
-              console.log('Stream complete');
+              console.log('[CLIENT] ⚠️ Stream marked as DONE - connection closed');
+              console.log('[CLIENT] Total reads:', readCount);
               updateStatus('Complete', 'finished');
               return;
             }
 
             // Decode chunk and add to buffer
-            buffer += decoder.decode(value, { stream: true });
+            const chunk = decoder.decode(value, { stream: true });
+            console.log('[CLIENT] Decoded chunk:', chunk.substring(0, 100), chunk.length > 100 ? '...' : '');
+            buffer += chunk;
 
             // Split by newlines
             const lines = buffer.split('\n');
 
             // Keep the last incomplete line in the buffer
             buffer = lines.pop() || '';
+            console.log('[CLIENT] Processing', lines.length, 'lines, buffer size:', buffer.length);
 
             // Process complete lines
             for (const line of lines) {
               if (line.startsWith('data: ')) {
+                console.log('[CLIENT] Parsing data line:', line.substring(0, 80) + '...');
                 try {
                   const data = JSON.parse(line.substring(6));
+                  console.log('[CLIENT] ✓ Parsed event:', data.stage || data.type || 'unknown');
                   handleMessage(data);
                 } catch (e) {
-                  console.error('Failed to parse SSE data:', line, e);
+                  console.error('[CLIENT] ✗ Parse error:', e, 'Line:', line);
                 }
               } else if (line.startsWith(':')) {
-                // Heartbeat comment, ignore
-                console.log('Heartbeat received');
+                console.log('[CLIENT] ❤️ Heartbeat received');
+              } else if (line.trim()) {
+                console.log('[CLIENT] Non-data line:', line);
               }
             }
 
+            console.log('[CLIENT] Scheduling next read...');
             readStream();
           }).catch(error => {
-            console.error('Stream read error:', error);
+            console.error('[CLIENT] ✗ Read error:', error);
+            console.error('[CLIENT] Error stack:', error.stack);
             updateStatus('Error', 'read failed');
           });
         }
 
+        console.log('[CLIENT] Starting read loop...');
         readStream();
       }).catch(error => {
-        console.error('Stream error:', error);
+        console.error('[CLIENT] ✗ Fetch error:', error);
+        console.error('[CLIENT] Error stack:', error.stack);
         updateStatus('Error', error.message);
         alert(`Failed to start stream: ${error.message}\n\nMake sure the API server is running at http://localhost:3000`);
       });
@@ -702,7 +733,11 @@
             data.cards.forEach(card => {
               updateCard(card.id, {
                 layout: card.layout,
-                type: card.type
+                type: card.type,
+                sections: {
+                  'Layout': card.layout,
+                  'Type': card.type
+                }
               });
             });
           }

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progressive Card Streaming - Gamma-Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
+  <style>
+    /* Progressive card animations */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .card-enter {
+      animation: slideInUp 0.6s ease-out;
+    }
+
+    .content-enter {
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .skeleton-loading {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+      border-radius: 0.5rem;
+    }
+
+    .streaming-card {
+      transition: all 0.3s ease;
+    }
+
+    .streaming-card.styled {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Hero layout */
+    .card-hero {
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+    }
+
+    .card-hero .card-title {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .card-hero .card-subtitle {
+      font-size: 1.5rem;
+      opacity: 0.8;
+    }
+
+    /* Split layout */
+    .card-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 2rem;
+      min-height: 300px;
+    }
+
+    .card-split .card-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    /* Content skeleton placeholders */
+    .skeleton-title {
+      height: 2.5rem;
+      width: 70%;
+      margin-bottom: 1rem;
+    }
+
+    .skeleton-subtitle {
+      height: 1.5rem;
+      width: 50%;
+    }
+
+    .skeleton-body {
+      height: 1rem;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-base-200 min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Progressive Card Streaming</h1>
+      <p class="text-lg opacity-70">Watch cards build up in real-time, Gamma AI style</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Streaming Controls</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="form-control">
+            <label class="label"><span class="label-text">Topic</span></label>
+            <select id="topic" class="select select-bordered">
+              <option value="AI in Product Discovery">AI in Product Discovery</option>
+              <option value="Digital Marketing Trends 2025">Digital Marketing Trends 2025</option>
+              <option value="Remote Team Management">Remote Team Management</option>
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Number of Cards</span></label>
+            <input type="number" id="cardCount" class="input input-bordered" value="4" min="2" max="8">
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Style</span></label>
+            <select id="style" class="select select-bordered">
+              <option value="professional">Professional</option>
+              <option value="creative">Creative</option>
+              <option value="minimal">Minimal</option>
+              <option value="bold">Bold</option>
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Stream Delay (ms)</span></label>
+            <input type="number" id="streamDelay" class="input input-bordered" value="300" min="0" max="2000" step="100">
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="startStream()" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Start Streaming
+          </button>
+          <button onclick="clearCards()" class="btn btn-outline">Clear Cards</button>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="stats shadow mt-4">
+          <div class="stat">
+            <div class="stat-title">Connection</div>
+            <div class="stat-value text-lg" id="connectionStatus">Idle</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Current Stage</div>
+            <div class="stat-value text-lg" id="currentStage">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Events Received</div>
+            <div class="stat-value text-lg" id="eventsReceived">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Cards Rendered</div>
+            <div class="stat-value text-lg" id="cardsRendered">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progressive Card Container -->
+    <div class="space-y-6" id="cardContainer">
+      <!-- Cards will be progressively rendered here -->
+    </div>
+
+    <!-- Event Log (collapsible) -->
+    <div class="collapse collapse-arrow bg-base-100 shadow-xl mt-8">
+      <input type="checkbox" />
+      <div class="collapse-title text-xl font-medium">
+        Event Log (Debug)
+      </div>
+      <div class="collapse-content">
+        <div id="eventLog" class="font-mono text-xs max-h-96 overflow-y-auto bg-base-200 p-4 rounded"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cardContainer = document.getElementById('cardContainer');
+    const eventLog = document.getElementById('eventLog');
+    const cards = new Map(); // cardId -> card data
+    let eventCount = 0;
+
+    function updateStatus(connection, stage) {
+      document.getElementById('connectionStatus').textContent = connection;
+      document.getElementById('currentStage').textContent = stage;
+    }
+
+    function updateStats() {
+      document.getElementById('eventsReceived').textContent = eventCount;
+      document.getElementById('cardsRendered').textContent = cards.size;
+    }
+
+    function logEvent(message) {
+      eventCount++;
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.className = 'mb-2';
+      logEntry.innerHTML = `<span class="opacity-50">[${timestamp}]</span> ${message}`;
+      eventLog.prepend(logEntry);
+      updateStats();
+    }
+
+    function clearCards() {
+      cardContainer.innerHTML = '';
+      eventLog.innerHTML = '';
+      cards.clear();
+      eventCount = 0;
+      updateStats();
+      updateStatus('Idle', '-');
+    }
+
+    /**
+     * Create card skeleton in DOM
+     */
+    function renderCardSkeleton(card) {
+      logEvent(`📦 Skeleton: ${card.id} (${card.layout})`);
+
+      const cardEl = document.createElement('div');
+      cardEl.id = `card-${card.id}`;
+      cardEl.className = `streaming-card card bg-base-100 shadow-lg card-enter card-${card.layout}`;
+
+      // Create skeleton based on layout
+      if (card.layout === 'hero') {
+        cardEl.innerHTML = `
+          <div class="card-body">
+            <div class="skeleton-loading skeleton-title"></div>
+            <div class="skeleton-loading skeleton-subtitle"></div>
+          </div>
+        `;
+      } else if (card.layout === 'split') {
+        cardEl.innerHTML = `
+          <div class="card-body">
+            <div>
+              <div class="skeleton-loading skeleton-title"></div>
+              <div class="skeleton-loading skeleton-body"></div>
+              <div class="skeleton-loading skeleton-body" style="width: 80%"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        cardEl.innerHTML = `
+          <div class="card-body">
+            <div class="skeleton-loading skeleton-title"></div>
+            <div class="skeleton-loading skeleton-body"></div>
+            <div class="skeleton-loading skeleton-body" style="width: 90%"></div>
+          </div>
+        `;
+      }
+
+      cardContainer.appendChild(cardEl);
+
+      // Store card reference
+      cards.set(card.id, {
+        ...card,
+        element: cardEl,
+        content: {},
+        theme: null
+      });
+
+      // Update stats
+      updateStats();
+    }
+
+    /**
+     * Add content to card progressively
+     */
+    function renderCardContent(cardId, section, content) {
+      const card = cards.get(cardId);
+      if (!card) return;
+
+      logEvent(`📝 Content: ${section} → ${cardId.substring(0, 8)}`);
+
+      // Store content
+      card.content[section] = content;
+
+      // Remove skeleton and render actual content
+      const cardBody = card.element.querySelector('.card-body');
+
+      // Clear skeleton on first content
+      if (Object.keys(card.content).length === 1) {
+        cardBody.innerHTML = '';
+      }
+
+      // Render based on section
+      const contentEl = document.createElement('div');
+      contentEl.className = 'content-enter';
+
+      if (section === 'title') {
+        contentEl.className = 'card-title content-enter';
+        contentEl.textContent = content;
+      } else if (section === 'subtitle') {
+        contentEl.className = 'card-subtitle content-enter';
+        contentEl.textContent = content;
+      } else if (section === 'body') {
+        contentEl.className = 'prose content-enter';
+        contentEl.textContent = content;
+      } else if (section === 'kicker') {
+        contentEl.className = 'badge badge-primary mb-2 content-enter';
+        contentEl.textContent = content;
+      } else {
+        contentEl.className = 'mb-2 content-enter';
+        contentEl.innerHTML = `<strong>${section}:</strong> ${typeof content === 'string' ? content : JSON.stringify(content)}`;
+      }
+
+      cardBody.appendChild(contentEl);
+    }
+
+    /**
+     * Apply theme and styles to card
+     */
+    function renderCardStyle(cardId, styles) {
+      const card = cards.get(cardId);
+      if (!card) return;
+
+      logEvent(`🎨 Style: ${cardId.substring(0, 8)}`);
+
+      card.theme = styles.theme;
+      card.element.classList.add('styled');
+
+      // Apply theme colors if available
+      if (styles.theme && styles.theme.colors) {
+        const { primary, secondary, accent } = styles.theme.colors;
+
+        // Apply primary color to card
+        card.element.style.borderLeft = `4px solid ${primary}`;
+
+        // Apply colors to title if exists
+        const title = card.element.querySelector('.card-title');
+        if (title) {
+          title.style.color = primary;
+        }
+
+        // Apply badge colors
+        const badges = card.element.querySelectorAll('.badge');
+        badges.forEach(badge => {
+          badge.style.backgroundColor = primary;
+          badge.style.borderColor = primary;
+        });
+      }
+    }
+
+    /**
+     * Handle streaming messages
+     */
+    function handleMessage(data) {
+      switch (data.stage) {
+        case 'skeleton':
+          updateStatus('Streaming', 'skeleton');
+          if (data.cards) {
+            data.cards.forEach(card => renderCardSkeleton(card));
+          }
+          break;
+
+        case 'content':
+          updateStatus('Streaming', 'content');
+          if (data.cardId && data.section) {
+            renderCardContent(data.cardId, data.section, data.content);
+          }
+          break;
+
+        case 'style':
+          updateStatus('Streaming', 'style');
+          if (data.cardId && data.styles) {
+            renderCardStyle(data.cardId, data.styles);
+          }
+          break;
+
+        case 'complete':
+          updateStatus('Complete', 'finished');
+          logEvent(`✅ Complete: ${data.cardCount} cards in ${data.stages} stages`);
+          break;
+
+        case 'progress':
+          updateStatus('Streaming', data.stage);
+          logEvent(`⏳ Progress: ${data.message} (${data.progress}%)`);
+          break;
+
+        case 'error':
+          updateStatus('Error', data.errorStage || 'unknown');
+          logEvent(`❌ Error: ${data.message}`);
+          break;
+      }
+    }
+
+    /**
+     * Start streaming
+     */
+    function startStream() {
+      clearCards();
+
+      const topic = document.getElementById('topic').value;
+      const cardCount = parseInt(document.getElementById('cardCount').value);
+      const style = document.getElementById('style').value;
+      const streamDelay = parseInt(document.getElementById('streamDelay').value);
+
+      updateStatus('Connecting', '-');
+      logEvent(`🚀 Starting stream: ${topic} (${cardCount} cards)`);
+
+      const apiUrl = 'http://localhost:3000';
+      const endpoint = `${apiUrl}/api/presentations/stream`;
+
+      console.log('[CLIENT] ===== STARTING FETCH =====');
+      console.log('[CLIENT] Endpoint:', endpoint);
+      console.log('[CLIENT] Request:', { topic, cardCount, style, streamDelay });
+
+      // Add global error handler to catch any uncaught errors
+      window.addEventListener('error', (e) => {
+        console.error('[CLIENT] ✗ Global error:', e.error);
+        logEvent(`❌ Global error: ${e.error?.message || e.message}`);
+      });
+
+      window.addEventListener('unhandledrejection', (e) => {
+        console.error('[CLIENT] ✗ Unhandled rejection:', e.reason);
+        logEvent(`❌ Unhandled rejection: ${e.reason?.message || e.reason}`);
+      });
+
+      const abortController = new AbortController();
+
+      // Debug: Log if abort is called
+      const originalAbort = abortController.abort.bind(abortController);
+      abortController.abort = function(...args) {
+        console.error('[CLIENT] ⚠️ AbortController.abort() called!');
+        console.trace('[CLIENT] Abort stack trace:');
+        return originalAbort(...args);
+      };
+
+      fetch(endpoint, {
+        signal: abortController.signal,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify({
+          topic,
+          cardCount,
+          style,
+          includeImages: false,
+          streamDelay
+        })
+      }).then(response => {
+        console.log('[CLIENT] Response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        logEvent(`✓ Connected to stream`);
+        updateStatus('Connected', 'initializing');
+
+        if (!response.body) {
+          throw new Error('Response body is null - streaming not supported');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let readCount = 0;
+
+        console.log('[CLIENT] Starting to read stream...');
+
+        function readStream() {
+          readCount++;
+          console.log(`[CLIENT] Calling reader.read() #${readCount}...`);
+
+          reader.read().then(({ done, value }) => {
+            console.log(`[CLIENT] ✓ Read promise resolved for #${readCount}`);
+
+            console.log(`[CLIENT] Read result #${readCount}:`, {
+              done,
+              valueLength: value ? value.length : 0,
+              bufferLength: buffer.length
+            });
+
+            if (done) {
+              console.log('[CLIENT] ⚠️ Stream marked as DONE');
+              logEvent(`🏁 Stream ended`);
+              updateStatus('Complete', 'closed');
+              return;
+            }
+
+            // Decode chunk
+            const chunk = decoder.decode(value, { stream: true });
+            console.log(`[CLIENT] Chunk #${readCount}:`, chunk.substring(0, 100) + (chunk.length > 100 ? '...' : ''));
+            buffer += chunk;
+
+            // Process complete SSE messages (separated by double newline)
+            const messages = buffer.split('\n\n');
+            buffer = messages.pop() || ''; // Keep incomplete message in buffer
+
+            console.log(`[CLIENT] Processing ${messages.length} complete messages from chunk #${readCount}`);
+
+            for (const message of messages) {
+              try {
+                if (!message.trim()) continue;
+
+                // Parse SSE message fields
+                const lines = message.split('\n');
+                let eventType = 'message'; // default
+                let data = null;
+                let id = null;
+
+                for (const line of lines) {
+                  if (line.startsWith('event: ')) {
+                    eventType = line.substring(7).trim();
+                  } else if (line.startsWith('data: ')) {
+                    try {
+                      data = JSON.parse(line.substring(6));
+                    } catch (e) {
+                      console.error('[CLIENT] ✗ JSON parse error:', e, line);
+                      logEvent(`❌ Parse error: ${e.message}`);
+                    }
+                  } else if (line.startsWith('id: ')) {
+                    id = line.substring(4).trim();
+                  } else if (line.startsWith(':')) {
+                    console.log('[CLIENT] ❤️ Heartbeat received');
+                    logEvent(`❤️ Heartbeat`);
+                  }
+                }
+
+                // Handle parsed message
+                if (data) {
+                  console.log('[CLIENT] ✓ Parsed SSE:', { eventType, id, stage: data.stage || 'unknown' });
+
+                  // Route message based on data.stage if present, otherwise use eventType
+                  // This handles both 'message' events (which have data.stage) and
+                  // 'progress'/'complete'/'error' events (where eventType is the stage)
+
+                  if (data.stage) {
+                    // Stage is explicitly set in data - use it (covers 'message' events and progress with stage)
+                    handleMessage(data);
+                  } else if (eventType === 'complete') {
+                    handleMessage({ stage: 'complete', ...data });
+                  } else if (eventType === 'error') {
+                    handleMessage({ stage: 'error', ...data });
+                  } else if (eventType === 'progress') {
+                    handleMessage({ stage: 'progress', ...data });
+                  } else {
+                    console.log('[CLIENT] Unhandled event type:', eventType, data);
+                  }
+                }
+              } catch (messageError) {
+                console.error('[CLIENT] ✗ Error processing message:', messageError);
+                console.error('[CLIENT] Error stack:', messageError.stack);
+                logEvent(`❌ Message processing error: ${messageError.message}`);
+                // Don't break the loop - continue processing other messages
+              }
+            }
+
+            // Continue reading
+            readStream();
+          }).catch(error => {
+            console.error('[CLIENT] ✗ Read error:', error);
+            console.error('[CLIENT] Error stack:', error.stack);
+            logEvent(`❌ Read error: ${error.message}`);
+            updateStatus('Error', 'read failed');
+          });
+        }
+
+        readStream();
+      }).catch(error => {
+        console.error('[CLIENT] ✗ Fetch error:', error);
+        console.error('[CLIENT] Error stack:', error.stack);
+        logEvent(`❌ Fetch error: ${error.message}`);
+        updateStatus('Error', error.message);
+        alert(`Failed to start stream: ${error.message}\n\nMake sure the API server is running at http://localhost:3000`);
+      });
+    }
+  </script>
+</body>
+</html>

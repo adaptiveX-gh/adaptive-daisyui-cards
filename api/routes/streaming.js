@@ -94,8 +94,12 @@ router.post('/cards/stream', sseMiddleware, async (req, res) => {
       streamingService.removeClient(clientId);
     });
 
-    // Stream stages
-    await streamCard(clientId, card, includeImages);
+    // Stream stages asynchronously
+    // Don't await here - let it run in background while connection stays open
+    streamCard(clientId, card, includeImages).catch(error => {
+      console.error('Error during streaming:', error);
+      streamingService.emitError(clientId, 'streaming', error);
+    });
 
     // Keep connection alive - wait for client to disconnect
     await new Promise((resolve) => {
@@ -124,6 +128,15 @@ router.post('/cards/stream', sseMiddleware, async (req, res) => {
  */
 router.post('/presentations/stream', sseMiddleware, async (req, res) => {
   const clientId = generateClientId();
+  const startTime = Date.now();
+
+  console.log('[ROUTE] ===== NEW CLIENT CONNECTED =====');
+  console.log('[ROUTE] Client ID:', clientId);
+  console.log('[ROUTE] Response state:', {
+    writable: res.writable,
+    finished: res.finished,
+    headersSent: res.headersSent
+  });
 
   try {
     const {
@@ -136,6 +149,8 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       theme,
       streamDelay
     } = req.body;
+
+    console.log('[ROUTE] Request params:', { topic, cardCount, style, includeImages, streamDelay });
 
     // Validate required fields
     if (!topic) {
@@ -152,6 +167,8 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
         message: 'Field "cardCount" must be between 1 and 20'
       });
     }
+
+    console.log('[ROUTE] Generating presentation content...');
 
     // Generate presentation
     const presentationData = contentGenerator.generatePresentation({
@@ -189,22 +206,46 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       return card;
     });
 
+    console.log('[ROUTE] Generated', cards.length, 'cards');
+
     // Add client to streaming service
+    console.log('[ROUTE] Adding client to streaming service...');
     streamingService.addClient(res, clientId, {
       cards: cards.map(c => c.id),
       topic,
       cardCount: cards.length,
       startedAt: new Date().toISOString()
     });
+    console.log('[ROUTE] Client added to streaming service');
 
     // Apply custom stage delay if provided
     if (streamDelay !== undefined) {
       streamingService.config.stageDelay = parseInt(streamDelay) || 0;
     }
 
+    // Track connection state
+    let connectionClosed = false;
+
     // Setup cleanup on disconnect
+    console.log('[ROUTE] Setting up disconnect handlers...');
     req.on('close', () => {
+      connectionClosed = true;
+      const duration = Date.now() - startTime;
+      console.log(`[ROUTE] ⚠️ Request close event fired for ${clientId}`);
+      console.log(`[ROUTE] Connection duration: ${duration}ms`);
       streamingService.removeClient(clientId);
+    });
+
+    req.on('error', (error) => {
+      console.error('[ROUTE] ✗ Request error for', clientId, error);
+    });
+
+    res.on('finish', () => {
+      console.log('[ROUTE] Response finish event for', clientId);
+    });
+
+    res.on('close', () => {
+      console.log('[ROUTE] Response close event for', clientId);
     });
 
     // Setup image generation listener
@@ -212,17 +253,40 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       setupImageListener(clientId, cards);
     }
 
-    // Stream all stages
-    await streamPresentation(clientId, cards, includeImages);
+    // Stream all stages asynchronously
+    // Don't await here - let it run in background while connection stays open
+    console.log('[ROUTE] Starting streamPresentation (non-blocking)...');
+    streamPresentation(clientId, cards, includeImages).catch(error => {
+      console.error('[ROUTE] ✗ Error during streaming:', error);
+      streamingService.emitError(clientId, 'streaming', error);
+    });
+    console.log('[ROUTE] streamPresentation started in background');
 
     // Keep connection alive - wait for client to disconnect
-    // This prevents Express from automatically closing the response
+    // The connection is kept open by heartbeats and the SSE middleware
+    // This just prevents the route handler from ending prematurely
+    console.log('[ROUTE] Waiting for client disconnect (Promise pending)...');
     await new Promise((resolve) => {
-      req.on('close', resolve);
+      const closeHandler = () => {
+        console.log('[ROUTE] Promise resolved - connection closing');
+        resolve();
+      };
+      req.on('close', closeHandler);
+
+      // Safety timeout (10 minutes)
+      setTimeout(() => {
+        if (!connectionClosed) {
+          console.log('[ROUTE] ⏱️ Safety timeout reached for', clientId);
+          resolve();
+        }
+      }, 600000);
     });
 
+    console.log('[ROUTE] Exiting route handler for', clientId);
+
   } catch (error) {
-    console.error('Error in /api/presentations/stream:', error);
+    console.error('[ROUTE] ✗ Error in /api/presentations/stream:', error);
+    console.error('[ROUTE] Error stack:', error.stack);
 
     if (streamingService.connectionStore.get(clientId)) {
       streamingService.emitError(clientId, 'generation', error);
@@ -284,11 +348,17 @@ router.get('/stream/demo', sseMiddleware, async (req, res) => {
     const originalDelay = streamingService.config.stageDelay;
     streamingService.config.stageDelay = parseInt(delay);
 
-    // Stream with delays
-    await streamPresentation(clientId, demoCards, false);
-
-    // Restore original delay
-    streamingService.config.stageDelay = originalDelay;
+    // Stream with delays asynchronously
+    streamPresentation(clientId, demoCards, false)
+      .then(() => {
+        // Restore original delay after streaming completes
+        streamingService.config.stageDelay = originalDelay;
+      })
+      .catch(error => {
+        console.error('Error during demo streaming:', error);
+        streamingService.emitError(clientId, 'demo', error);
+        streamingService.config.stageDelay = originalDelay;
+      });
 
     // Keep connection alive - wait for client to disconnect
     await new Promise((resolve) => {
@@ -348,25 +418,43 @@ async function streamCard(clientId, card, includeImages = false) {
  * @param {boolean} includeImages - Whether to include image stages
  */
 async function streamPresentation(clientId, cards, includeImages = false) {
+  console.log('[STREAM-PRES] ===== STARTING FOR', clientId, '=====');
+  console.log('[STREAM-PRES] Cards:', cards.length, 'Include images:', includeImages);
+
   try {
     // Stage 1: Skeleton
+    console.log('[STREAM-PRES] Stage 1: Emitting skeleton...');
     streamingService.emitProgress(clientId, 'skeleton', 10, 'Generating card structure');
     await streamingService.emitSkeleton(clientId, cards);
+    console.log('[STREAM-PRES] ✓ Skeleton emitted successfully');
+
+    // Add small delay to test timing
+    console.log('[STREAM-PRES] Waiting 500ms before content...');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('[STREAM-PRES] Delay complete, starting content emission');
 
     // Stage 2: Content (for each card)
+    console.log('[STREAM-PRES] Stage 2: Emitting content for', cards.length, 'cards...');
     streamingService.emitProgress(clientId, 'content', 30, 'Generating content');
-    for (const card of cards) {
-      await streamingService.emitCardContent(clientId, card);
+    for (let i = 0; i < cards.length; i++) {
+      console.log(`[STREAM-PRES] Emitting content for card ${i + 1}/${cards.length} (${cards[i].id})`);
+      await streamingService.emitCardContent(clientId, cards[i]);
+      console.log(`[STREAM-PRES] ✓ Card ${i + 1} content emitted`);
     }
+    console.log('[STREAM-PRES] ✓ All content emitted');
 
     // Stage 3: Styles (for each card)
+    console.log('[STREAM-PRES] Stage 3: Emitting styles for', cards.length, 'cards...');
     streamingService.emitProgress(clientId, 'style', 60, 'Applying styles');
-    for (const card of cards) {
-      await streamingService.emitStyle(clientId, card);
+    for (let i = 0; i < cards.length; i++) {
+      console.log(`[STREAM-PRES] Emitting styles for card ${i + 1}/${cards.length}`);
+      await streamingService.emitStyle(clientId, cards[i]);
     }
+    console.log('[STREAM-PRES] ✓ All styles emitted');
 
     // Stage 4: Placeholders (if images requested)
     if (includeImages) {
+      console.log('[STREAM-PRES] Stage 4: Emitting placeholders...');
       streamingService.emitProgress(clientId, 'placeholder', 80, 'Loading image placeholders');
       for (const card of cards) {
         if (card.image) {
@@ -374,16 +462,21 @@ async function streamPresentation(clientId, cards, includeImages = false) {
         }
       }
       streamingService.emitProgress(clientId, 'image', 90, 'Generating images (this may take a moment)');
+      console.log('[STREAM-PRES] ✓ Placeholders emitted');
     }
 
     // Emit completion
+    console.log('[STREAM-PRES] Emitting completion event...');
     streamingService.emitComplete(clientId, {
       cardCount: cards.length,
       stages: includeImages ? 5 : 3,
       includeImages
     });
+    console.log('[STREAM-PRES] ✓✓✓ STREAMING COMPLETE FOR', clientId, '✓✓✓');
 
   } catch (error) {
+    console.error('[STREAM-PRES] ✗ Error for', clientId, ':', error);
+    console.error('[STREAM-PRES] Error stack:', error.stack);
     streamingService.emitError(clientId, 'streaming', error);
   }
 }
