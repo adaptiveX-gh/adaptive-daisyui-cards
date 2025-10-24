@@ -132,9 +132,9 @@ export class ImageGenerationService extends EventEmitter {
    *
    * @param {Object} card - Card object
    * @param {Object} options - Generation options
-   * @returns {Object} - Immediate response with placeholder
+   * @returns {Promise<Object>} - Immediate response with placeholder
    */
-  generateImageAsync(card, options = {}) {
+  async generateImageAsync(card, options = {}) {
     const {
       provider = 'gemini',
       aspectRatio = '16:9',
@@ -144,9 +144,9 @@ export class ImageGenerationService extends EventEmitter {
     // Generate prompt from card content if not provided
     const prompt = options.prompt || generateImagePromptFromCard(card);
 
-    // Get placeholder immediately
+    // Get placeholder immediately (await to get actual data, not Promise)
     const placeholderProvider = this.providers.placeholder;
-    const placeholderResult = placeholderProvider.generate({
+    const placeholderResult = await placeholderProvider.generate({
       prompt,
       aspectRatio,
       style,
@@ -206,8 +206,40 @@ export class ImageGenerationService extends EventEmitter {
         prompt
       });
 
+      // Emit progress at 25%
+      this.emit('image:progress', {
+        cardId,
+        progress: 25,
+        stage: 'initializing',
+        message: 'Initializing image generation...'
+      });
+      console.log(`Image generation progress for card ${cardId}: 25% (initializing)`);
+
+      // Small delay to simulate real progress
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Emit progress at 50%
+      this.emit('image:progress', {
+        cardId,
+        progress: 50,
+        stage: 'generating',
+        message: 'Generating image...'
+      });
+      console.log(`Image generation progress for card ${cardId}: 50% (generating)`);
+
       // Generate with fallback
       const result = await this.generateWithFallback(prompt, options);
+
+      // Emit progress at 75%
+      this.emit('image:progress', {
+        cardId,
+        progress: 75,
+        stage: 'processing',
+        message: 'Processing image...'
+      });
+      console.log(`Image generation progress for card ${cardId}: 75% (processing)`);
+
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Update status to ready
       this.statusStore.update(cardId, {
@@ -217,6 +249,15 @@ export class ImageGenerationService extends EventEmitter {
         completedAt: new Date().toISOString()
       });
 
+      // Emit progress at 100%
+      this.emit('image:progress', {
+        cardId,
+        progress: 100,
+        stage: 'complete',
+        message: 'Image ready!'
+      });
+      console.log(`Image generation progress for card ${cardId}: 100% (complete)`);
+
       console.log(`Background generation completed for card ${cardId}`);
 
       // Emit complete event (Phase 3: SSE streaming)
@@ -225,7 +266,8 @@ export class ImageGenerationService extends EventEmitter {
         result: {
           url: result.url,
           provider: result.provider,
-          metadata: result.metadata
+          metadata: result.metadata,
+          prompt
         }
       });
 

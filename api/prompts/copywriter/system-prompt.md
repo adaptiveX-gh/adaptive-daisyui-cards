@@ -88,6 +88,7 @@ Return a JSON object:
   "body": "Main content text OR array of bullet points",
   "kicker": "Optional closing line (use null if not needed)",
   "speaker_notes": "Talking points for presenter (not shown on slide)",
+  "image_prompt": "Optional AI image generation prompt that matches the layout and message (use null if not needed)",
   "revision_rationale": "Brief explanation of key copywriting decisions (2-3 sentences)",
   "word_count": {
     "total": 45,
@@ -101,6 +102,23 @@ Return a JSON object:
   ]
 }
 ```
+
+## Image Prompt Guidelines (Optional)
+
+When generating `image_prompt`, consider the layout type:
+- **hero-layout**: "Dramatic wide hero image for [topic], cinematic composition, bold visual impact"
+- **hero-layout.overlay**: "Atmospheric background for [topic], dark subtle gradient, perfect for white text overlay"
+- **split-layout**: "Vertical composition representing [topic], clean edges for split-screen layout"
+- **sidebar-layout**: "Icon-style image for [topic], simple clean composition, works at small size"
+- **feature-layout**: "Minimal feature icon for [topic], clean simple design, modern flat style"
+- **dashboard-layout**: "Abstract data visualization pattern for [topic], geometric shapes, tech aesthetic"
+- **masonry-layout**: "Artistic image for [topic], creative composition, works in varied sizes"
+
+**Image prompts should**:
+- Be concise (10-20 words)
+- Match the content and tone
+- Consider the layout's visual requirements
+- Avoid text/words in images (text should be in copy, not images)
 
 ## Copywriting Techniques
 

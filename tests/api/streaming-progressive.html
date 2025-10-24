@@ -133,6 +133,67 @@
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0; }
     }
+
+    /* Progressive image loading animations */
+    @keyframes progressiveSharpen {
+      from {
+        filter: blur(20px);
+        opacity: 0.5;
+      }
+      to {
+        filter: blur(0px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes progressFill {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .image-loading-low {
+      filter: blur(15px);
+      opacity: 0.6;
+      transition: all 0.5s ease-out;
+    }
+
+    .image-loading-medium {
+      filter: blur(8px);
+      opacity: 0.75;
+      transition: all 0.5s ease-out;
+    }
+
+    .image-loading-high {
+      filter: blur(3px);
+      opacity: 0.9;
+      transition: all 0.5s ease-out;
+    }
+
+    .image-loading-complete {
+      filter: blur(0);
+      opacity: 1;
+      animation: progressiveSharpen 0.6s ease-out;
+    }
+
+    .progress-bar-animated {
+      transform-origin: left;
+      animation: progressFill 0.4s ease-out;
+    }
+
+    /* Gradient overlay for loading states */
+    .image-loading-overlay {
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(139, 92, 246, 0.1) 50%,
+        rgba(236, 72, 153, 0.1) 100%
+      );
+      animation: shimmer 2s infinite;
+    }
   </style>
 </head>
 <body class="bg-base-200 min-h-screen p-8">
@@ -360,6 +421,10 @@
     const cards = new Map(); // cardId -> card data
     let eventCount = 0;
 
+    // Event buffering for out-of-order events
+    const eventBuffer = []; // Buffer for events that arrive before skeleton
+    let skeletonReceived = false;
+
     function updateStatus(connection, stage) {
       document.getElementById('connectionStatus').textContent = connection;
       document.getElementById('currentStage').textContent = stage;
@@ -385,6 +450,8 @@
       eventLog.innerHTML = '';
       cards.clear();
       eventCount = 0;
+      eventBuffer.length = 0; // Clear buffered events
+      skeletonReceived = false; // Reset skeleton flag
       updateStats();
       updateStatus('Idle', '-');
     }
@@ -394,6 +461,7 @@
      */
     function renderCardSkeleton(card) {
       logEvent(`📦 Skeleton: ${card.id} (${card.layout})`);
+      console.log(`[renderCardSkeleton] Creating skeleton for card:`, card.id);
 
       const cardEl = document.createElement('div');
       cardEl.id = `card-${card.id}`;
@@ -436,6 +504,9 @@
         content: {},
         theme: null
       });
+
+      console.log(`[renderCardSkeleton] ✓ Skeleton created for ${card.id}`);
+      console.log(`[renderCardSkeleton] 🎨 Layout: ${card.layout || 'unknown'} | Type: ${card.type || 'unknown'}`);
 
       // Update stats
       updateStats();
@@ -599,34 +670,162 @@
 
     /**
      * Render placeholder image while waiting for generation
+     * Uses progressive enhancement approach
      */
-    function renderPlaceholder(cardId, imageData) {
+    function renderPlaceholder(cardId, placeholderData) {
+      console.log(`[renderPlaceholder] Called for ${cardId}`);
       const card = cards.get(cardId);
-      if (!card) return;
+      if (!card) {
+        console.warn(`[renderPlaceholder] Card ${cardId} not found in cards Map (size: ${cards.size})`);
+        return;
+      }
+      console.log(`[renderPlaceholder] ✓ Card found:`, card.element ? 'has element' : 'NO element');
+
+      // CRITICAL FIX: Check if placeholder already exists in memory reference
+      if (card.imageContainer) {
+        console.log(`[renderPlaceholder] Placeholder already exists for ${cardId}, skipping duplicate creation`);
+        // Reset progress bar to 0 if it exists
+        const progressBar = document.getElementById(`img-progress-${cardId}`);
+        if (progressBar) {
+          progressBar.value = 0;
+        }
+        return;
+      }
 
       logEvent(`🖼️ Placeholder: ${cardId.substring(0, 8)}`);
+      console.log(`[renderPlaceholder] Creating NEW placeholder for ${cardId}`);
 
       // Create image container
       const cardBody = card.element.querySelector('.card-body');
-      let imageContainer = card.element.querySelector('.card-image');
-
-      if (!imageContainer) {
-        imageContainer = document.createElement('div');
-        imageContainer.className = 'card-image mb-4';
-        cardBody.prepend(imageContainer);
+      if (!cardBody) {
+        console.error(`[renderPlaceholder] No .card-body found in card element for ${cardId}`);
+        return;
       }
+      console.log(`[renderPlaceholder] ✓ CardBody found, creating image container`);
 
-      // Show placeholder with skeleton loading
+      // Create NEW image container
+      const imageContainer = document.createElement('div');
+      imageContainer.className = 'card-image mb-4';
+      imageContainer.dataset.cardId = cardId; // Add data attribute for debugging
+
+      // Prepend to card body (image at top)
+      cardBody.prepend(imageContainer);
+      console.log(`[renderPlaceholder] ✓ ImageContainer prepended to card body`);
+
+      // Show placeholder with progressive loading UI
       imageContainer.innerHTML = `
         <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-base-300">
-          <div class="skeleton-loading w-full h-full flex items-center justify-center">
-            <div class="loading loading-spinner loading-lg"></div>
-          </div>
-          <div class="absolute bottom-2 left-2 right-2 text-center">
-            <span class="badge badge-sm badge-ghost">Generating image...</span>
+          <!-- Stage 1: Blurred gradient background (simulates ultra-low-res preview) -->
+          <div class="absolute inset-0 bg-gradient-to-br from-primary/30 via-secondary/30 to-accent/30 image-loading-low image-loading-overlay"></div>
+
+          <!-- Stage 2: Skeleton shimmer overlay -->
+          <div class="absolute inset-0 skeleton-loading opacity-40"></div>
+
+          <!-- Stage 3: Loading indicator with progress -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
+            <div class="loading loading-spinner loading-lg text-primary"></div>
+
+            <!-- Progress bar -->
+            <div class="w-full max-w-xs">
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-semibold" id="progress-label-${cardId}">Starting generation...</span>
+                <span id="progress-percent-${cardId}">0%</span>
+              </div>
+              <progress
+                class="progress progress-primary w-full"
+                value="0"
+                max="100"
+                id="img-progress-${cardId}">
+              </progress>
+            </div>
+
+            <!-- Stage indicator -->
+            <div class="badge badge-ghost badge-sm" id="progress-stage-${cardId}">
+              Initializing
+            </div>
           </div>
         </div>
       `;
+
+      // CRITICAL: Store reference IMMEDIATELY to prevent duplicates
+      card.imageContainer = imageContainer;
+      console.log(`[renderPlaceholder] ✓ Placeholder created and stored for ${cardId}`);
+    }
+
+    /**
+     * Handle progressive image loading updates
+     * Updates visual feedback as image generates
+     */
+    function handleImageProgress(cardId, progress, details = {}) {
+      const card = cards.get(cardId);
+      if (!card) {
+        console.warn(`[handleImageProgress] Card ${cardId} not found, skipping progress update`);
+        return;
+      }
+
+      logEvent(`📊 Image progress: ${cardId.substring(0, 8)} → ${progress}%`);
+
+      // REMOVED AUTO-CREATE LOGIC - placeholder should be created by explicit placeholder event
+      // This prevents duplicate placeholders from being created
+
+      // Only update if placeholder exists
+      if (!card.imageContainer) {
+        console.warn(`[handleImageProgress] No placeholder for ${cardId}, skipping progress update`);
+        return;
+      }
+
+      // Update progress bar
+      const progressBar = document.getElementById(`img-progress-${cardId}`);
+      const progressPercent = document.getElementById(`progress-percent-${cardId}`);
+      const progressLabel = document.getElementById(`progress-label-${cardId}`);
+      const progressStage = document.getElementById(`progress-stage-${cardId}`);
+
+      if (progressBar) {
+        progressBar.value = progress;
+
+        // Add animation class
+        progressBar.classList.add('progress-bar-animated');
+        setTimeout(() => progressBar.classList.remove('progress-bar-animated'), 400);
+      }
+
+      if (progressPercent) {
+        progressPercent.textContent = `${progress}%`;
+      }
+
+      if (progressLabel && details.message) {
+        progressLabel.textContent = details.message;
+      }
+
+      if (progressStage && details.stage) {
+        progressStage.textContent = details.stage;
+      }
+
+      // Update background blur based on progress
+      const backgroundOverlay = card.imageContainer.querySelector('.image-loading-overlay');
+      if (backgroundOverlay) {
+        // Remove existing classes
+        backgroundOverlay.classList.remove('image-loading-low', 'image-loading-medium', 'image-loading-high');
+
+        // Apply progressive sharpening
+        if (progress < 40) {
+          backgroundOverlay.classList.add('image-loading-low');
+        } else if (progress < 70) {
+          backgroundOverlay.classList.add('image-loading-medium');
+        } else if (progress < 100) {
+          backgroundOverlay.classList.add('image-loading-high');
+        } else {
+          backgroundOverlay.classList.add('image-loading-complete');
+        }
+      }
+
+      // Visual feedback for milestones
+      if (progress === 25 || progress === 50 || progress === 75) {
+        // Add subtle pulse animation
+        card.imageContainer.style.transform = 'scale(1.02)';
+        setTimeout(() => {
+          card.imageContainer.style.transform = 'scale(1)';
+        }, 200);
+      }
     }
 
     /**
@@ -634,17 +833,38 @@
      */
     function renderImage(cardId, imageResult) {
       const card = cards.get(cardId);
-      if (!card) return;
+      if (!card) {
+        console.error(`[renderImage] ✗ Card ${cardId} not found!`);
+        return;
+      }
 
       logEvent(`✨ Image ready: ${cardId.substring(0, 8)}`);
+      console.log(`[renderImage] Rendering image for ${cardId}:`, imageResult);
 
-      const imageContainer = card.element.querySelector('.card-image');
-      if (!imageContainer) return;
+      // Use memory reference instead of DOM query
+      let imageContainer = card.imageContainer;
+      if (!imageContainer) {
+        console.error(`[renderImage] No image container for ${cardId} - placeholder was never created!`);
+        console.warn(`[renderImage] Creating placeholder now as fallback...`);
+        renderPlaceholder(cardId, { type: 'placeholder' });
+        // Use the stored reference
+        imageContainer = card.imageContainer;
+      }
+
+      if (!imageContainer) {
+        console.error(`[renderImage] Failed to create image container for ${cardId}`);
+        return;
+      }
+
+      console.log(`[renderImage] ✓ ImageContainer exists, proceeding to render`);
+      console.log(`[renderImage] Image URL:`, imageResult.url);
+      console.log(`[renderImage] Image prompt:`, imageResult.prompt);
 
       // Fade out placeholder
       imageContainer.style.opacity = '0';
 
       setTimeout(() => {
+        console.log(`[renderImage] Inside setTimeout, about to set innerHTML`);
         // Replace with actual image
         imageContainer.innerHTML = `
           <div class="relative w-full aspect-video rounded-lg overflow-hidden">
@@ -657,7 +877,9 @@
           </div>
         `;
         imageContainer.style.opacity = '1';
+        console.log(`[renderImage] ✓ Image rendering complete for ${cardId}`);
       }, 300);
+      console.log(`[renderImage] setTimeout scheduled, exiting function`);
     }
 
     /**
@@ -666,6 +888,13 @@
     function handleMessage(data) {
       console.log('[handleMessage] Called with stage:', data.stage, 'Has cards:', !!data.cards);
 
+      // Buffer events that need cards to exist
+      if (!skeletonReceived && ['image-progress', 'placeholder', 'image'].includes(data.stage)) {
+        console.log('[handleMessage] Buffering event until skeleton arrives:', data.stage);
+        eventBuffer.push(data);
+        return;
+      }
+
       switch (data.stage) {
         case 'skeleton':
           console.log('[handleMessage] SKELETON case hit!');
@@ -673,6 +902,13 @@
           if (data.cards) {
             console.log('[handleMessage] Rendering', data.cards.length, 'skeleton cards');
             data.cards.forEach(card => renderCardSkeleton(card));
+            skeletonReceived = true;
+
+            // Replay buffered events
+            console.log(`[handleMessage] Replaying ${eventBuffer.length} buffered events`);
+            const buffered = [...eventBuffer];
+            eventBuffer.length = 0;
+            buffered.forEach(bufferedData => handleMessage(bufferedData));
           } else {
             console.error('[handleMessage] ✗ Skeleton event received but NO cards array!');
           }
@@ -694,15 +930,39 @@
 
         case 'placeholder':
           updateStatus('Streaming', 'placeholder');
-          if (data.cardId && data.image) {
-            renderPlaceholder(data.cardId, data.image);
+          if (data.cardId && data.placeholder) {
+            renderPlaceholder(data.cardId, data.placeholder);
+          }
+          break;
+
+        // NEW: Handle progressive image updates
+        case 'image-progress':
+          updateStatus('Streaming', `image (${data.progress}%)`);
+          if (data.cardId) {
+            handleImageProgress(data.cardId, data.progress, {
+              stage: data.stage,
+              message: data.message
+            });
           }
           break;
 
         case 'image':
           updateStatus('Streaming', 'image');
-          if (data.cardId && data.result) {
-            renderImage(data.cardId, data.result);
+          console.log('[handleMessage] IMAGE case hit! Data:', {
+            hasCardId: !!data.cardId,
+            hasImage: !!data.image,
+            cardId: data.cardId,
+            imageKeys: data.image ? Object.keys(data.image) : 'N/A',
+            fullData: data
+          });
+          if (data.cardId && data.image) {
+            console.log('[handleMessage] ✓ Calling renderImage for', data.cardId);
+            renderImage(data.cardId, data.image);
+          } else {
+            console.error('[handleMessage] ✗ Missing cardId or image data!', {
+              cardId: data.cardId,
+              image: data.image
+            });
           }
           break;
 
@@ -963,6 +1223,8 @@
 
                 if (effectiveType === 'progress') {
                   handleMessage({ stage: 'progress', ...data });
+                } else if (effectiveType === 'image-progress') {  // NEW
+                  handleMessage({ stage: 'image-progress', ...data });
                 } else if (effectiveType === 'complete') {
                   handleMessage({ stage: 'complete', ...data });
                 } else if (effectiveType === 'error') {

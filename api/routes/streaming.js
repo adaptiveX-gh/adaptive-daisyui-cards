@@ -76,7 +76,7 @@ router.post('/cards/stream', sseMiddleware, async (req, res) => {
 
     // Generate image if requested
     if (includeImages) {
-      const imageResult = imageGenerationService.generateImageAsync(card, {
+      const imageResult = await imageGenerationService.generateImageAsync(card, {
         provider,
         aspectRatio: '16:9',
         style
@@ -206,7 +206,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
           : themeService.getThemeByStyle(style);
 
         // Convert LLM cards to Card objects
-        cards = presentation.cards.map(cardData => {
+        cards = await Promise.all(presentation.cards.map(async (cardData) => {
           const card = new Card({
             type: cardData.type,
             layout: cardData.layout,
@@ -216,7 +216,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
 
           // Generate images if requested
           if (includeImages) {
-            const imageResult = imageGenerationService.generateImageAsync(card, {
+            const imageResult = await imageGenerationService.generateImageAsync(card, {
               provider,
               aspectRatio: '16:9',
               style
@@ -225,7 +225,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
           }
 
           return card;
-        });
+        }));
 
       } catch (error) {
         console.error('[ROUTE] ✗ Smart mode failed, falling back to fast mode:', error.message);
@@ -243,7 +243,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
           ? themeService.normalizeTheme(theme)
           : themeService.getThemeByStyle(style);
 
-        cards = presentationData.cards.map(cardData => {
+        cards = await Promise.all(presentationData.cards.map(async (cardData) => {
           const card = new Card({
             type: cardData.type,
             layout: cardData.layout,
@@ -253,7 +253,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
 
           // Generate images if requested (fallback path)
           if (includeImages) {
-            const imageResult = imageGenerationService.generateImageAsync(card, {
+            const imageResult = await imageGenerationService.generateImageAsync(card, {
               provider,
               aspectRatio: '16:9',
               style
@@ -262,7 +262,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
           }
 
           return card;
-        });
+        }));
       }
 
     } else {
@@ -283,7 +283,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
         : themeService.getThemeByStyle(style);
 
       // Create Card objects
-      cards = presentationData.cards.map(cardData => {
+      cards = await Promise.all(presentationData.cards.map(async (cardData) => {
         const card = new Card({
           type: cardData.type,
           layout: cardData.layout,
@@ -293,7 +293,7 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
 
         // Generate images if requested
         if (includeImages) {
-          const imageResult = imageGenerationService.generateImageAsync(card, {
+          const imageResult = await imageGenerationService.generateImageAsync(card, {
             provider,
             aspectRatio: '16:9',
             style
@@ -302,10 +302,14 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
         }
 
         return card;
-      });
+      }));
     }
 
     console.log('[ROUTE] Generated', cards.length, 'cards');
+    console.log('[ROUTE] Layout distribution:');
+    cards.forEach((card, i) => {
+      console.log(`  Card ${i + 1}: ${card.layout} (type: ${card.type})`);
+    });
 
     // Add client to streaming service
     console.log('[ROUTE] Adding client to streaming service...');
@@ -591,15 +595,42 @@ async function streamPresentation(clientId, cards, includeImages = false) {
  */
 function setupImageListener(clientId, cards) {
   const cardIds = new Set(cards.map(c => c.id));
+  console.log(`[IMAGE-LISTENER] Setting up listeners for client ${clientId} with ${cardIds.size} card IDs:`, Array.from(cardIds));
+
+  // Listen for image progress updates
+  const onImageProgress = ({ cardId, progress, stage, message }) => {
+    console.log(`[IMAGE-LISTENER] onImageProgress called - cardId: ${cardId}, has: ${cardIds.has(cardId)}, active: ${streamingService.connectionStore.isActive(clientId)}`);
+    if (cardIds.has(cardId)) {
+      if (streamingService.connectionStore.isActive(clientId)) {
+        console.log(`[IMAGE-LISTENER] ✓ Emitting progress update for card ${cardId}: ${progress}% (${stage})`);
+        streamingService.emitImageProgress(clientId, cardId, progress, {
+          stage,
+          message
+        });
+      } else {
+        console.warn(`[IMAGE-LISTENER] Client ${clientId} not active, skipping progress`);
+      }
+    } else {
+      console.warn(`[IMAGE-LISTENER] Card ${cardId} not in cardIds set!`);
+    }
+  };
 
   // Listen for image completion
   const onImageComplete = ({ cardId, result }) => {
+    console.log(`[IMAGE-LISTENER] onImageComplete called - cardId: ${cardId}, has: ${cardIds.has(cardId)}, active: ${streamingService.connectionStore.isActive(clientId)}`);
     // Check if this image is for one of our cards
     if (cardIds.has(cardId)) {
       // Check if client is still connected
       if (streamingService.connectionStore.isActive(clientId)) {
+        console.log(`[IMAGE-LISTENER] ✓✓✓ Image complete for card ${cardId}, emitting to client`);
+        console.log(`[IMAGE-LISTENER] Result URL:`, result.url.substring(0, 50));
         streamingService.emitImage(clientId, cardId, result);
+        console.log(`[IMAGE-LISTENER] ✓ emitImage called successfully`);
+      } else {
+        console.warn(`[IMAGE-LISTENER] Client ${clientId} not active, cannot emit image`);
       }
+    } else {
+      console.warn(`[IMAGE-LISTENER] Card ${cardId} not in cardIds set! Available:`, Array.from(cardIds));
     }
   };
 
@@ -607,6 +638,7 @@ function setupImageListener(clientId, cards) {
   const onImageFailed = ({ cardId, error }) => {
     if (cardIds.has(cardId)) {
       if (streamingService.connectionStore.isActive(clientId)) {
+        console.log(`[IMAGE-LISTENER] Image failed for card ${cardId}`);
         streamingService.emitError(clientId, 'image', {
           message: `Image generation failed for card ${cardId}`,
           ...error,
@@ -617,6 +649,7 @@ function setupImageListener(clientId, cards) {
   };
 
   // Attach listeners
+  imageGenerationService.on('image:progress', onImageProgress);
   imageGenerationService.on('image:complete', onImageComplete);
   imageGenerationService.on('image:failed', onImageFailed);
 
@@ -624,6 +657,8 @@ function setupImageListener(clientId, cards) {
   const connection = streamingService.connectionStore.get(clientId);
   if (connection) {
     connection.res.on('close', () => {
+      console.log(`[IMAGE-LISTENER] Cleaning up listeners for client ${clientId}`);
+      imageGenerationService.off('image:progress', onImageProgress);
       imageGenerationService.off('image:complete', onImageComplete);
       imageGenerationService.off('image:failed', onImageFailed);
     });

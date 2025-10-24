@@ -129,7 +129,8 @@ export class Copywriter {
           title: copy.title,
           subtitle: copy.subtitle || null,
           body: copy.body,
-          kicker: copy.kicker || null
+          kicker: copy.kicker || null,
+          imagePrompt: copy.image_prompt || null // LLM-generated image prompt (layout-aware!)
         },
 
         // Metadata
@@ -249,7 +250,8 @@ ${userRequest}`;
       body: json.body || '',
       kicker: json.kicker || null,
       speaker_notes: json.speaker_notes || '',
-      word_count: json.word_count || { total: 0 }
+      word_count: json.word_count || { total: 0 },
+      image_prompt: json.image_prompt || null // Optional: LLM can suggest image prompts
     };
   }
 

@@ -323,6 +323,40 @@ export class StreamingService extends EventEmitter {
   }
 
   /**
+   * Emit image generation progress
+   *
+   * @param {string} clientId - Client identifier
+   * @param {string} cardId - Card ID
+   * @param {number} progress - Progress percentage (0-100)
+   * @param {Object} details - Additional details
+   * @returns {boolean}
+   */
+  emitImageProgress(clientId, cardId, progress, details = {}) {
+    console.log(`StreamingService: Emitting image progress to ${clientId} (card: ${cardId}, progress: ${progress}%)`);
+
+    const sequence = this.getNextSequence(clientId);
+
+    // Create SSE message for image progress
+    const data = {
+      cardId,
+      progress,
+      stage: details.stage || 'generating',
+      message: details.message || `Generating image... ${progress}%`,
+      timestamp: new Date().toISOString()
+    };
+
+    const message = `event: image-progress\ndata: ${JSON.stringify(data)}\nid: ${sequence}\n\n`;
+
+    const success = this.sendToClient(clientId, message);
+
+    if (success) {
+      this.emit('stage:image-progress', { clientId, cardId, progress });
+    }
+
+    return success;
+  }
+
+  /**
    * Emit progress update
    *
    * @param {string} clientId - Client identifier

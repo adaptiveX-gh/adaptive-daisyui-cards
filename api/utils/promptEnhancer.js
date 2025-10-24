@@ -133,7 +133,7 @@ function extractContentEnhancements(prompt) {
 
 /**
  * Generate image prompt from card content
- * Creates contextual prompts based on card type and content
+ * Creates contextual prompts based on card type, layout, and content
  *
  * @param {Object} card - Card object
  * @returns {string} - Generated prompt
@@ -146,7 +146,16 @@ export function generateImagePromptFromCard(card) {
     return content.imagePrompt;
   }
 
-  // Generate prompt based on card type and content
+  // Generate prompt based on layout (LAYOUT-AWARE!)
+  // Layout determines visual structure, so it should drive image composition
+  if (layout) {
+    const layoutPrompt = generateLayoutAwarePrompt(layout, content, type);
+    if (layoutPrompt) {
+      return layoutPrompt;
+    }
+  }
+
+  // Fallback: Generate prompt based on card type
   switch (type) {
     case 'title':
     case 'hero':
@@ -164,6 +173,56 @@ export function generateImagePromptFromCard(card) {
 
     default:
       return generateGenericPrompt(content);
+  }
+}
+
+/**
+ * Generate layout-aware image prompts
+ * Each layout has specific visual requirements
+ *
+ * @param {string} layout - Layout type
+ * @param {Object} content - Card content
+ * @param {string} type - Card type
+ * @returns {string|null} - Layout-specific prompt or null
+ */
+function generateLayoutAwarePrompt(layout, content, type) {
+  const title = content.title || content.kicker || content.heading || 'presentation';
+  const context = content.body || content.intro || title;
+
+  switch (layout) {
+    case 'hero-layout':
+      // Hero needs dramatic, full-width visuals
+      return `Dramatic wide hero image for "${title}", cinematic composition, bold visual impact, suitable for large text overlay`;
+
+    case 'hero-layout.overlay':
+      // Overlay variant needs darker, more muted backgrounds
+      return `Atmospheric background image for "${title}", dark subtle gradient, perfect for white text overlay, moody and professional`;
+
+    case 'split-layout':
+      // Split layout: image on one side, text on other
+      // Image should be portrait-oriented or vertical composition
+      return `Vertical composition image representing "${title}", clean edges for split-screen layout, professional and focused`;
+
+    case 'sidebar-layout':
+      // Sidebar: small image alongside content
+      // Image should be iconic, simple, recognizable
+      return `Icon-style image for "${title}", simple clean composition, works at small size, professional illustration style`;
+
+    case 'feature-layout':
+      // Feature grid: multiple small images
+      // Each should be distinct, minimal, icon-like
+      return `Minimal feature icon representing "${title}", clean simple design, works in grid layout, modern flat style`;
+
+    case 'dashboard-layout':
+      // Dashboard: data-focused, abstract patterns
+      return `Abstract data visualization pattern for "${title}", geometric shapes, modern tech aesthetic, subtle and professional`;
+
+    case 'masonry-layout':
+      // Masonry: varied sizes, artistic
+      return `Artistic image for "${title}", creative composition, works in varied sizes, visually interesting`;
+
+    default:
+      return null; // Fall back to type-based generation
   }
 }
 
