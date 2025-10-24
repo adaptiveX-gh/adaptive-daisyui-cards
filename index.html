@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adaptive DaisyUI Card System - Container Queries Demo</title>
+  <link rel="stylesheet" href="./dist/output.css">
+</head>
+<body class="bg-base-200 min-h-screen">
+
+  <!-- Main Container -->
+  <div class="container mx-auto px-4 py-8">
+
+    <!-- Header Section -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Adaptive DaisyUI Card System</h1>
+      <p class="text-lg opacity-70">CSS Container Queries with Scalable Typography</p>
+      <p class="text-sm opacity-60 mt-2">Cards adapt to container size, not viewport width</p>
+    </header>
+
+    <!-- Control Panel -->
+    <div class="bg-base-100 rounded-lg shadow-lg p-6 mb-8" role="region" aria-label="Controls">
+
+      <!-- Layout and Theme Selectors -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+        <!-- Layout Switcher -->
+        <div class="form-control">
+          <label class="label" for="layout-select">
+            <span class="label-text font-semibold">Layout Type</span>
+          </label>
+          <select id="layout-select" class="select select-bordered select-primary w-full" aria-label="Select layout type">
+            <option value="sidebar">Sidebar Layout</option>
+            <option value="feature">Feature Layout</option>
+            <option value="masonry">Masonry Layout</option>
+            <option value="dashboard">Dashboard Layout</option>
+            <option value="split">Split Layout</option>
+          </select>
+        </div>
+
+        <!-- DaisyUI Theme Switcher -->
+        <div class="form-control">
+          <label class="label" for="theme-select">
+            <span class="label-text font-semibold">DaisyUI Theme</span>
+          </label>
+          <select id="theme-select" class="select select-bordered select-secondary w-full" aria-label="Select theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="cupcake">Cupcake</option>
+            <option value="bumblebee">Bumblebee</option>
+            <option value="emerald">Emerald</option>
+            <option value="corporate">Corporate</option>
+            <option value="synthwave">Synthwave</option>
+            <option value="retro">Retro</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="valentine">Valentine</option>
+            <option value="halloween">Halloween</option>
+            <option value="garden">Garden</option>
+            <option value="forest">Forest</option>
+            <option value="aqua">Aqua</option>
+            <option value="lofi">Lofi</option>
+            <option value="pastel">Pastel</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="wireframe">Wireframe</option>
+            <option value="black">Black</option>
+            <option value="luxury">Luxury</option>
+            <option value="dracula">Dracula</option>
+            <option value="cmyk">CMYK</option>
+            <option value="autumn">Autumn</option>
+            <option value="business">Business</option>
+            <option value="acid">Acid</option>
+            <option value="lemonade">Lemonade</option>
+            <option value="night">Night</option>
+            <option value="coffee">Coffee</option>
+            <option value="winter">Winter</option>
+          </select>
+        </div>
+
+        <!-- Container Width Display -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Container Width</span>
+          </label>
+          <div class="flex items-center gap-2 h-12">
+            <span id="width-display" class="dimension-badge" aria-live="polite" aria-atomic="true">800px</span>
+            <button id="reset-width" class="btn btn-sm btn-outline" aria-label="Reset container width">
+              Reset
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Preset Width Buttons -->
+      <div>
+        <label class="label">
+          <span class="label-text font-semibold">Test Breakpoints</span>
+        </label>
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Preset width buttons">
+          <button class="btn btn-sm btn-outline preset-width" data-width="250">250px</button>
+          <button class="btn btn-sm btn-outline preset-width" data-width="325">325px</button>
+          <button class="btn btn-sm btn-outline preset-width" data-width="450">450px</button>
+          <button class="btn btn-sm btn-outline preset-width" data-width="650">650px</button>
+          <button class="btn btn-sm btn-outline preset-width" data-width="900">900px</button>
+          <button class="btn btn-sm btn-outline preset-width" data-width="1200">1200px</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resizable Demo Container -->
+    <div class="flex justify-center mb-8">
+      <div id="resizable-wrapper" class="resizable-container" style="width: 800px;" role="region" aria-label="Resizable card container">
+
+        <!-- Resize Handle -->
+        <div id="resize-handle" class="resize-handle" role="slider" aria-label="Resize container" aria-valuemin="200" aria-valuemax="1200" aria-valuenow="800" tabindex="0"></div>
+
+        <!-- Card Container with Container Query Context -->
+        <div class="card-container">
+
+          <!-- LAYOUT 1: SIDEBAR LAYOUT -->
+          <div id="sidebar-layout" class="sidebar-layout" data-layout="sidebar">
+            <img src="https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&h=600&fit=crop"
+                 alt="Modern workspace with laptop and coffee"
+                 class="sidebar-image">
+            <div class="sidebar-content">
+              <h2 class="adaptive-text-2xl font-bold mb-2">Product Showcase</h2>
+              <p class="adaptive-text-base opacity-70 mb-4">
+                Experience adaptive design that responds to container size, not just viewport.
+                This sidebar layout intelligently reorganizes from vertical stacking to horizontal
+                side-by-side arrangement.
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="badge badge-primary adaptive-text-sm">Responsive</span>
+                <span class="badge badge-secondary adaptive-text-sm">Container Queries</span>
+                <span class="badge badge-accent adaptive-text-sm">DaisyUI</span>
+              </div>
+              <div class="card-actions justify-end mt-auto">
+                <button class="btn btn-primary btn-sm adaptive-text-sm">Learn More</button>
+                <button class="btn btn-ghost btn-sm adaptive-text-sm">Details</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 2: FEATURE LAYOUT -->
+          <div id="feature-layout" class="feature-layout hidden" data-layout="feature">
+            <div class="feature-header">
+              <h2 class="adaptive-text-2xl font-bold mb-2">Key Features</h2>
+              <p class="adaptive-text-base opacity-70">
+                Grid layout that adapts from 1 column to 3 columns based on container width
+              </p>
+            </div>
+            <div class="feature-grid">
+              <div class="feature-item">
+                <div class="text-3xl mb-2">🎯</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Precision</h3>
+                <p class="adaptive-text-sm opacity-70">Container-aware layouts for perfect responsive design</p>
+              </div>
+              <div class="feature-item">
+                <div class="text-3xl mb-2">⚡</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Performance</h3>
+                <p class="adaptive-text-sm opacity-70">CSS-native queries with 60fps smooth transitions</p>
+              </div>
+              <div class="feature-item">
+                <div class="text-3xl mb-2">🎨</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Theming</h3>
+                <p class="adaptive-text-sm opacity-70">Works seamlessly with all 29 DaisyUI themes</p>
+              </div>
+              <div class="feature-item">
+                <div class="text-3xl mb-2">♿</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Accessible</h3>
+                <p class="adaptive-text-sm opacity-70">ARIA labels and keyboard navigation included</p>
+              </div>
+              <div class="feature-item">
+                <div class="text-3xl mb-2">📱</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Mobile-First</h3>
+                <p class="adaptive-text-sm opacity-70">Responsive at every container size breakpoint</p>
+              </div>
+              <div class="feature-item">
+                <div class="text-3xl mb-2">🔧</div>
+                <h3 class="adaptive-text-lg font-bold mb-1">Customizable</h3>
+                <p class="adaptive-text-sm opacity-70">Extend with your own container query breakpoints</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 3: MASONRY LAYOUT -->
+          <div id="masonry-layout" class="masonry-layout hidden" data-layout="masonry">
+            <h2 class="adaptive-text-2xl font-bold mb-4">Image Gallery</h2>
+            <div class="masonry-grid">
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=400&h=300&fit=crop"
+                     alt="Mountain landscape at sunset">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">Mountain Vista</h3>
+                  <p class="adaptive-text-sm opacity-70">Breathtaking views</p>
+                </div>
+              </div>
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=400&h=500&fit=crop"
+                     alt="Urban architecture">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">City Architecture</h3>
+                  <p class="adaptive-text-sm opacity-70">Modern design</p>
+                </div>
+              </div>
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687220208-22d7a2543e88?w=400&h=350&fit=crop"
+                     alt="Ocean waves">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">Ocean Waves</h3>
+                  <p class="adaptive-text-sm opacity-70">Coastal beauty</p>
+                </div>
+              </div>
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687221038-404cb8830901?w=400&h=450&fit=crop"
+                     alt="Forest pathway">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">Forest Path</h3>
+                  <p class="adaptive-text-sm opacity-70">Nature trails</p>
+                </div>
+              </div>
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=400&h=300&fit=crop"
+                     alt="Workspace setup">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">Workspace</h3>
+                  <p class="adaptive-text-sm opacity-70">Creative environment</p>
+                </div>
+              </div>
+              <div class="masonry-item">
+                <img src="https://images.unsplash.com/photo-1682687221073-3fc817e27a1e?w=400&h=400&fit=crop"
+                     alt="Abstract patterns">
+                <div class="masonry-item-content">
+                  <h3 class="adaptive-text-base font-bold">Abstract Art</h3>
+                  <p class="adaptive-text-sm opacity-70">Geometric patterns</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 4: DASHBOARD LAYOUT -->
+          <div id="dashboard-layout" class="dashboard-layout hidden" data-layout="dashboard">
+            <div class="dashboard-header">
+              <h2 class="adaptive-text-xl font-bold">Dashboard Overview</h2>
+              <p class="adaptive-text-sm opacity-70">Real-time metrics and analytics</p>
+            </div>
+
+            <div class="dashboard-sidebar">
+              <h3 class="adaptive-text-base font-bold mb-2">Navigation</h3>
+              <ul class="menu menu-compact adaptive-text-sm">
+                <li><a>Dashboard</a></li>
+                <li><a>Analytics</a></li>
+                <li><a>Reports</a></li>
+                <li><a>Settings</a></li>
+              </ul>
+            </div>
+
+            <div class="dashboard-main">
+              <div class="dashboard-widget">
+                <h3 class="adaptive-text-lg font-bold mb-2">Total Users</h3>
+                <p class="adaptive-text-3xl font-bold text-primary">12,543</p>
+                <p class="adaptive-text-sm opacity-70 mt-1">+12.5% from last month</p>
+              </div>
+              <div class="dashboard-widget">
+                <h3 class="adaptive-text-lg font-bold mb-2">Revenue</h3>
+                <p class="adaptive-text-3xl font-bold text-secondary">$45.2K</p>
+                <p class="adaptive-text-sm opacity-70 mt-1">+8.3% from last month</p>
+              </div>
+              <div class="dashboard-widget">
+                <h3 class="adaptive-text-lg font-bold mb-2">Active Sessions</h3>
+                <p class="adaptive-text-3xl font-bold text-accent">1,234</p>
+                <p class="adaptive-text-sm opacity-70 mt-1">Currently online</p>
+              </div>
+              <div class="dashboard-widget">
+                <h3 class="adaptive-text-lg font-bold mb-2">Conversion Rate</h3>
+                <p class="adaptive-text-3xl font-bold text-success">3.24%</p>
+                <p class="adaptive-text-sm opacity-70 mt-1">+0.5% from last month</p>
+              </div>
+            </div>
+
+            <div class="dashboard-footer">
+              <p class="adaptive-text-sm opacity-70 text-center">Last updated: Just now</p>
+            </div>
+          </div>
+
+          <!-- LAYOUT 5: SPLIT LAYOUT -->
+          <div id="split-layout" class="split-layout hidden" data-layout="split">
+            <div class="split-left">
+              <h2 class="adaptive-text-2xl font-bold mb-4">User Profile</h2>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="avatar">
+                  <div class="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User avatar" />
+                  </div>
+                </div>
+                <div>
+                  <h3 class="adaptive-text-lg font-bold">Sarah Johnson</h3>
+                  <p class="adaptive-text-sm opacity-70">Product Designer</p>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div>
+                  <span class="adaptive-text-sm font-semibold">Email:</span>
+                  <p class="adaptive-text-sm opacity-70">sarah.johnson@example.com</p>
+                </div>
+                <div>
+                  <span class="adaptive-text-sm font-semibold">Location:</span>
+                  <p class="adaptive-text-sm opacity-70">San Francisco, CA</p>
+                </div>
+                <div>
+                  <span class="adaptive-text-sm font-semibold">Member Since:</span>
+                  <p class="adaptive-text-sm opacity-70">January 2023</p>
+                </div>
+              </div>
+            </div>
+            <div class="split-right">
+              <h3 class="adaptive-text-lg font-bold mb-3">Recent Activity</h3>
+              <div class="space-y-3">
+                <div class="flex items-start gap-2">
+                  <div class="badge badge-primary badge-sm mt-1">NEW</div>
+                  <div>
+                    <p class="adaptive-text-sm font-semibold">Posted a new design</p>
+                    <p class="adaptive-text-xs opacity-70">2 hours ago</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="badge badge-secondary badge-sm mt-1">UPDATE</div>
+                  <div>
+                    <p class="adaptive-text-sm font-semibold">Updated portfolio</p>
+                    <p class="adaptive-text-xs opacity-70">1 day ago</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="badge badge-accent badge-sm mt-1">COMMENT</div>
+                  <div>
+                    <p class="adaptive-text-sm font-semibold">Left a comment</p>
+                    <p class="adaptive-text-xs opacity-70">3 days ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+      <!-- Breakpoint Reference -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h3 class="card-title">Container Breakpoints</h3>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Breakpoint</th>
+                  <th>Width</th>
+                  <th>Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-mono">xs</td>
+                  <td>&lt; 250px</td>
+                  <td>Minimal layout</td>
+                </tr>
+                <tr>
+                  <td class="font-mono">sm</td>
+                  <td>&lt; 400px</td>
+                  <td>Single column</td>
+                </tr>
+                <tr>
+                  <td class="font-mono">md</td>
+                  <td>400px - 600px</td>
+                  <td>2 columns / 60-40 split</td>
+                </tr>
+                <tr>
+                  <td class="font-mono">lg</td>
+                  <td>600px - 800px</td>
+                  <td>3 columns / 50-50 split</td>
+                </tr>
+                <tr>
+                  <td class="font-mono">xl</td>
+                  <td>&gt; 800px</td>
+                  <td>Full layout with sidebar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features List -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h3 class="card-title">System Features</h3>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>CSS Container Queries for true component-level responsiveness</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>Scalable typography using clamp() and cqw units</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>Fluid spacing that adapts to container size</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>5 distinct layout patterns with multiple breakpoints</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>Smooth 300ms transitions between layout states</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>Full accessibility with ARIA labels and keyboard support</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success mt-1">✓</span>
+              <span>Compatible with all 29 DaisyUI themes</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center opacity-60 py-8">
+      <p>Built with Tailwind CSS v3.4+, DaisyUI v4+, and @tailwindcss/container-queries</p>
+      <p class="mt-2">Resize the container or try different layouts to see adaptive design in action</p>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript for Interactivity -->
+  <script src="./src/app.js"></script>
+
+</body>
+</html>
