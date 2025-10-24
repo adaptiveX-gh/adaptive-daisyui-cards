@@ -1,0 +1,28 @@
+<div class="layout-card split-layout" data-layout="split" data-card-id="{{id}}">
+  <div class="split-left">
+    <h2 class="adaptive-text-2xl mb-4">{{title}}</h2>
+    {{#if bodyArray}}
+    <ul class="space-y-2">
+      {{#each body}}
+      <li class="adaptive-text-base flex items-start">
+        <span class="mr-2">•</span>
+        <span>{{this}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p class="adaptive-text-base">{{body}}</p>
+    {{/if}}
+  </div>
+  <div class="split-right bg-base-200 flex items-center justify-center">
+    {{#if imageUrl}}
+    <img src="{{imageUrl}}" alt="{{title}}" class="w-full h-full object-cover" />
+    {{else}}
+    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
+      <svg class="w-24 h-24 opacity-30" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    {{/if}}
+  </div>
+</div>

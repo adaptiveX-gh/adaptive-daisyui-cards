@@ -2,6 +2,8 @@
 
 A demonstration of adaptive card layouts using CSS Container Queries with DaisyUI and Tailwind CSS.
 
+**NEW**: Now includes a REST API for programmatic card generation! See [API Documentation](#-api-phase-1) below.
+
 ## 🚀 Quick Start
 
 1. **Install dependencies**
@@ -128,10 +130,19 @@ slideo/
 ## 📝 Available Scripts
 
 ```bash
+# Frontend Demo
 npm run dev        # Start development server
 npm run build      # Build for production
+npm run preview    # Preview production build
+
+# API Server (Phase 1)
+npm run api        # Start API server (port 3000)
+npm run api:dev    # Start API with auto-reload
+
+# Testing
 npm test           # Run all tests
 npm run test:e2e   # Run end-to-end tests
+npm run test:coverage  # Run tests with coverage
 ```
 
 ## 🌐 Browser Support
@@ -142,11 +153,70 @@ Container Queries are supported in:
 - Firefox 110+
 - Edge 105+
 
+## 🔌 API (Phase 1)
+
+The Adaptive Cards Platform now includes a REST API for generating presentations programmatically!
+
+### Quick Start
+
+```bash
+# Start API server
+npm run api
+
+# Generate a presentation
+curl -X POST http://localhost:3000/api/presentations/generate \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "AI in Product Discovery", "cardCount": 6}'
+
+# Preview in browser
+open http://localhost:3000/api/presentations/preview/AI%20in%20Product%20Discovery
+```
+
+### Key Features
+
+- **2 Core Endpoints**: Generate single cards or complete presentations
+- **5 Layouts**: split, numbered-list, grid, hero, hero-overlay, content-bullets
+- **13+ Themes**: All DaisyUI themes supported
+- **3 MVP Topics**: AI in Product Discovery, Digital Marketing Trends 2025, Remote Team Management
+- **Export Options**: JSON and HTML export
+- **Live Preview**: Browser-based presentation rendering
+
+### API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/cards/generate-content` | Generate single card |
+| `POST /api/presentations/generate` | Generate complete presentation |
+| `GET /api/presentations/preview/:topic` | Live browser preview |
+| `GET /api/themes` | List all themes |
+| `GET /api/cards/layouts` | List all layouts |
+
+### Example: Generate Presentation
+
+```bash
+curl -X POST http://localhost:3000/api/presentations/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "AI in Product Discovery",
+    "cardCount": 6,
+    "style": "professional",
+    "theme": {"name": "corporate"}
+  }'
+```
+
+### Documentation
+
+- **[API README](./API-README.md)** - Complete API overview
+- **[API Usage Guide](./docs/API-USAGE.md)** - Detailed endpoint documentation
+- **[API Specification](./docs/API-SPEC.md)** - Full technical specification
+- **[Example Requests](./docs/API-EXAMPLES.sh)** - Curl examples
+
 ## 📚 Documentation
 
 - [Quick Start Guide](./docs/QUICK_START.md)
 - [Testing Guide](./docs/TESTING.md)
 - [Implementation Details](./docs/IMPLEMENTATION_SUMMARY.md)
+- [API Documentation](./API-README.md) - NEW!
 
 ## 📄 License
 
