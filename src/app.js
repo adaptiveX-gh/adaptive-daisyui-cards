@@ -33,7 +33,8 @@ const elements = {
     feature: document.getElementById('feature-layout'),
     masonry: document.getElementById('masonry-layout'),
     dashboard: document.getElementById('dashboard-layout'),
-    split: document.getElementById('split-layout')
+    split: document.getElementById('split-layout'),
+    hero: document.getElementById('hero-layout')
   }
 };
 
@@ -43,7 +44,7 @@ const elements = {
 
 /**
  * Switches between different layout types
- * @param {string} layoutType - The layout to switch to (sidebar, feature, masonry, dashboard, split)
+ * @param {string} layoutType - The layout to switch to (sidebar, feature, masonry, dashboard, split, hero)
  */
 function switchLayout(layoutType) {
   state.currentLayout = layoutType;
