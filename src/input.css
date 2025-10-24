@@ -329,13 +329,10 @@
 
   .hero-layout {
     display: grid;
-    gap: 0;
-    min-height: 400px;
-  }
-
-  /* Default: Image on right */
-  .hero-layout {
     grid-template-columns: 1fr 1fr;
+    gap: 0;
+    overflow: hidden;
+    min-height: 400px;
   }
 
   /* Image on left variant */
@@ -418,20 +415,6 @@
 
     .hero-layout.image-left .hero-image {
       order: 1;
-    }
-  }
-
-  /* Medium containers: maintain side-by-side but smaller */
-  @container card (min-width: 600px) and (max-width: 799px) {
-    .hero-layout {
-      grid-template-columns: 45% 55%;
-    }
-  }
-
-  /* Large containers: balanced 50/50 */
-  @container card (min-width: 800px) {
-    .hero-layout {
-      grid-template-columns: 50% 50%;
     }
   }
 }
