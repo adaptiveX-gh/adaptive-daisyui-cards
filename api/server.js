@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cardsRouter from './routes/cards.js';
 import presentationsRouter from './routes/presentations.js';
+import imagesRouter from './routes/images.js';
 import ThemeService from './services/ThemeService.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,8 +41,9 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: '0.1.0',
-    phase: 1,
+    version: '0.2.0',
+    phase: 2,
+    features: ['card-generation', 'image-generation', 'placeholder-system'],
     timestamp: new Date().toISOString()
   });
 });
@@ -50,8 +52,8 @@ app.get('/health', (req, res) => {
 app.get('/api', (req, res) => {
   res.json({
     name: 'Adaptive Cards Platform API',
-    version: '0.1.0',
-    phase: 1,
+    version: '0.2.0',
+    phase: 2,
     description: 'API-first card generation platform for responsive presentations',
     endpoints: {
       cards: {
@@ -69,6 +71,13 @@ app.get('/api', (req, res) => {
       themes: {
         'GET /api/themes': 'List available themes',
         'GET /api/themes/:name': 'Get theme details'
+      },
+      images: {
+        'GET /api/images/:cardId/status': 'Get image generation status',
+        'POST /api/images/regenerate': 'Regenerate image with different provider',
+        'DELETE /api/images/:cardId': 'Cancel image generation',
+        'GET /api/images/providers': 'Get provider statuses',
+        'GET /api/images/stats': 'Get image generation statistics'
       }
     },
     documentation: 'See docs/API-SPEC.md for full specification'
@@ -78,6 +87,7 @@ app.get('/api', (req, res) => {
 // Mount routes
 app.use('/api/cards', cardsRouter);
 app.use('/api/presentations', presentationsRouter);
+app.use('/api/images', imagesRouter);
 
 // Theme routes
 const themeService = new ThemeService();
@@ -132,18 +142,23 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
-║   Adaptive Cards Platform API - Phase 1                   ║
-║   Version: 0.1.0                                           ║
+║   Adaptive Cards Platform API - Phase 2                   ║
+║   Version: 0.2.0 (Image Generation Integration)           ║
 ╟────────────────────────────────────────────────────────────╢
 ║   Server running on: http://localhost:${PORT}                ║
 ║   API documentation: http://localhost:${PORT}/api             ║
 ║   Health check: http://localhost:${PORT}/health               ║
 ╟────────────────────────────────────────────────────────────╢
-║   Available Endpoints:                                     ║
+║   Core Endpoints:                                          ║
 ║   • POST /api/cards/generate-content                       ║
 ║   • POST /api/presentations/generate                       ║
 ║   • GET  /api/presentations/preview/:topic                 ║
 ║   • GET  /api/themes                                       ║
+╟────────────────────────────────────────────────────────────╢
+║   Image Generation (NEW):                                  ║
+║   • GET  /api/images/:cardId/status                        ║
+║   • POST /api/images/regenerate                            ║
+║   • GET  /api/images/providers                             ║
 ╚════════════════════════════════════════════════════════════╝
   `);
 });

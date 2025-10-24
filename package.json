@@ -24,10 +24,16 @@
     "test:debug": "playwright test --debug",
     "test:report": "playwright show-report"
   },
-  "keywords": ["tailwind", "daisyui", "container-queries", "adaptive-cards"],
+  "keywords": [
+    "tailwind",
+    "daisyui",
+    "container-queries",
+    "adaptive-cards"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "axe-core": "^4.8.3",
     "cors": "^2.8.5",
     "daisyui": "^4.0.0",

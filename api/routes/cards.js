@@ -8,6 +8,7 @@ import { validateContent } from '../models/schemas.js';
 import ContentGenerator from '../services/ContentGenerator.js';
 import ThemeService from '../services/ThemeService.js';
 import TemplateEngine from '../services/TemplateEngine.js';
+import { imageGenerationService } from '../services/ImageGenerationService.js';
 
 const router = express.Router();
 
@@ -19,10 +20,21 @@ const templateEngine = new TemplateEngine();
 /**
  * POST /api/cards/generate-content
  * Generate content for a single card
+ * Phase 2: Added image generation support
  */
 router.post('/generate-content', (req, res) => {
   try {
-    const { topic, layoutType, tone, contentSections, style, theme } = req.body;
+    const {
+      topic,
+      layoutType,
+      tone,
+      contentSections,
+      style,
+      theme,
+      generateImage = false,
+      imagePrompt = null,
+      imageProvider = 'gemini'
+    } = req.body;
 
     // Validate required fields
     if (!topic) {
@@ -96,6 +108,18 @@ router.post('/generate-content', (req, res) => {
         message: 'Card validation failed',
         details: cardValidation.errors
       });
+    }
+
+    // Generate image if requested (Phase 2)
+    if (generateImage) {
+      const imageResult = imageGenerationService.generateImageAsync(card, {
+        prompt: imagePrompt,
+        provider: imageProvider,
+        aspectRatio: '16:9',
+        style: style || 'professional-presentation'
+      });
+
+      card.image = imageResult.image;
     }
 
     // Return card

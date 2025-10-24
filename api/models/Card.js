@@ -19,9 +19,40 @@ export class Card {
     this.layout = layout;
     this.content = content;
     this.theme = theme;
-    this.image = image;
+    this.image = this.normalizeImage(image);
     this.placeholders = placeholders;
     this.metadata = metadata;
+  }
+
+  /**
+   * Normalize image field to proper structure
+   */
+  normalizeImage(image) {
+    if (!image) {
+      return null;
+    }
+
+    // If image is a string (URL), convert to object
+    if (typeof image === 'string') {
+      return {
+        status: 'ready',
+        url: image,
+        provider: 'external',
+        placeholder: null,
+        error: null,
+        generatedAt: new Date().toISOString()
+      };
+    }
+
+    // If image is already an object, ensure all fields exist
+    return {
+      status: image.status || 'ready',
+      url: image.url || null,
+      provider: image.provider || 'unknown',
+      placeholder: image.placeholder || null,
+      error: image.error || null,
+      generatedAt: image.generatedAt || new Date().toISOString()
+    };
   }
 
   /**

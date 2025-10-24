@@ -7,6 +7,7 @@ import { Card } from '../models/Card.js';
 import ContentGenerator from '../services/ContentGenerator.js';
 import ThemeService from '../services/ThemeService.js';
 import TemplateEngine from '../services/TemplateEngine.js';
+import { imageGenerationService } from '../services/ImageGenerationService.js';
 
 const router = express.Router();
 
@@ -79,6 +80,16 @@ router.post('/generate', (req, res) => {
         image: cardData.image || null,
         placeholders: cardData.placeholders || null
       });
+
+      // Generate images if requested (Phase 2)
+      if (includeImages) {
+        const imageResult = imageGenerationService.generateImageAsync(card, {
+          provider: provider || 'gemini',
+          aspectRatio: '16:9',
+          style
+        });
+        card.image = imageResult.image;
+      }
 
       return card.toJSON();
     });

@@ -1,6 +1,6 @@
-# Adaptive Cards Platform API - Phase 1
+# Adaptive Cards Platform API - Phase 2
 
-Version 0.1.0 | Phase 1 Complete
+Version 0.2.0 | Phase 2 Complete - Image Generation Integration
 
 ## Overview
 
@@ -8,7 +8,7 @@ The Adaptive Cards Platform API is a REST API for generating presentation-ready,
 
 ## Features
 
-### Phase 1 (Current)
+### Phase 1 (Complete)
 
 - **Card Generation API**: Generate single cards with layout-specific content
 - **Presentation Generation**: Create complete 4-8 card presentations for topics
@@ -18,9 +18,18 @@ The Adaptive Cards Platform API is a REST API for generating presentation-ready,
 - **Live Preview**: Browser-based presentation preview
 - **Deterministic Content**: Pre-built content for 3 MVP topics
 
+### Phase 2 (Current - NEW)
+
+- **Multi-Provider Image Generation**: Gemini AI and instant placeholders
+- **Smart Fallback Chain**: Automatic provider fallback (Gemini → Placeholder)
+- **Async Image Processing**: Non-blocking background generation
+- **Instant Placeholders**: Beautiful SVG placeholders (geometric, pattern, solid)
+- **Prompt Enhancement**: Context-aware prompt optimization
+- **Status Tracking**: Real-time generation monitoring
+- **Theme-Aware Placeholders**: Placeholders match card themes
+
 ### Future Phases
 
-- **Phase 2**: Multi-provider image generation (Gemini, DALL-E, Stable Diffusion)
 - **Phase 3**: SSE streaming for progressive rendering
 - **Phase 4**: LLM-based intelligent content generation
 
@@ -34,6 +43,19 @@ npm install
 
 # Build CSS assets
 npm run build
+```
+
+### Configure Environment (Phase 2 - NEW)
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env and add your Gemini API key (optional)
+GEMINI_API_KEY=your_api_key_here
+
+# Or use mock mode for testing
+GEMINI_MOCK_MODE=true
 ```
 
 ### Start API Server
@@ -72,29 +94,40 @@ http://localhost:3000/api/presentations/preview/AI%20in%20Product%20Discovery?th
 
 ```
 api/
-├── server.js                  # Express server entry point
+├── server.js                         # Express server entry point
 ├── routes/
-│   ├── cards.js              # Card generation endpoints
-│   └── presentations.js      # Presentation endpoints
+│   ├── cards.js                     # Card generation endpoints
+│   ├── presentations.js             # Presentation endpoints
+│   └── images.js                    # Image generation endpoints (Phase 2)
 ├── services/
-│   ├── TemplateEngine.js     # Layout rendering with Handlebars
-│   ├── ContentGenerator.js   # Deterministic content mapping
-│   └── ThemeService.js       # DaisyUI theme management
+│   ├── TemplateEngine.js            # Layout rendering with Handlebars
+│   ├── ContentGenerator.js          # Deterministic content mapping
+│   ├── ThemeService.js              # DaisyUI theme management
+│   ├── ImageGenerationService.js    # Image generation orchestrator (Phase 2)
+│   ├── PlaceholderService.js        # SVG placeholder generator (Phase 2)
+│   └── ImageStatusStore.js          # In-memory status tracking (Phase 2)
+├── adapters/                        # Image provider adapters (Phase 2)
+│   ├── BaseImageAdapter.js          # Abstract base class
+│   ├── GeminiImageAdapter.js        # Google Gemini AI
+│   ├── PlaceholderAdapter.js        # Instant placeholders
+│   └── README.md                    # Adapter documentation
+├── utils/
+│   └── promptEnhancer.js            # Image prompt enhancement (Phase 2)
 ├── models/
-│   ├── Card.js               # Card data model
-│   └── schemas.js            # Layout-specific content schemas
+│   ├── Card.js                      # Card data model
+│   └── schemas.js                   # Layout-specific content schemas
 └── templates/
-    ├── split.html            # Split layout template
-    ├── numbered-list.html    # Numbered list template
-    ├── grid.html             # Grid layout template
-    ├── hero.html             # Hero layout template
-    ├── hero-overlay.html     # Hero overlay template
-    └── content-bullets.html  # Content bullets template
+    ├── split.html                   # Split layout template
+    ├── numbered-list.html           # Numbered list template
+    ├── grid.html                    # Grid layout template
+    ├── hero.html                    # Hero layout template
+    ├── hero-overlay.html            # Hero overlay template
+    └── content-bullets.html         # Content bullets template
 ```
 
 ## API Endpoints
 
-### Core Endpoints
+### Core Endpoints (Phase 1)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -107,7 +140,17 @@ api/
 | `/api/cards/layouts` | GET | List available layouts |
 | `/api/cards/topics` | GET | List available topics |
 
-See [API-USAGE.md](./docs/API-USAGE.md) for detailed documentation and examples.
+### Image Generation Endpoints (Phase 2 - NEW)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/images/:cardId/status` | GET | Get image generation status |
+| `/api/images/regenerate` | POST | Regenerate image with different provider |
+| `/api/images/:cardId` | DELETE | Cancel image generation |
+| `/api/images/providers` | GET | Get all provider statuses |
+| `/api/images/stats` | GET | Get generation statistics |
+
+See [IMAGE-GENERATION.md](./docs/IMAGE-GENERATION.md) for comprehensive image generation guide.
 
 ## Available Layouts
 
@@ -119,6 +162,81 @@ See [API-USAGE.md](./docs/API-USAGE.md) for detailed documentation and examples.
 6. **content-bullets** - Title with bulleted list
 
 All layouts are fully responsive using CSS Container Queries.
+
+## Image Generation (Phase 2 - NEW)
+
+### Quick Start: Generate Card with Image
+
+```bash
+curl -X POST http://localhost:3000/api/cards/generate-content \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "AI in Product Discovery",
+    "layoutType": "hero",
+    "style": "professional",
+    "generateImage": true,
+    "imageProvider": "gemini"
+  }'
+```
+
+Response includes placeholder immediately:
+
+```json
+{
+  "card": {
+    "id": "uuid...",
+    "image": {
+      "status": "generating",
+      "provider": "gemini",
+      "placeholder": {
+        "type": "geometric",
+        "url": "data:image/svg+xml;base64,...",
+        "loadingState": true
+      }
+    }
+  }
+}
+```
+
+### Check Image Status
+
+```bash
+curl http://localhost:3000/api/images/{cardId}/status
+```
+
+### Generate Presentation with Images
+
+```bash
+curl -X POST http://localhost:3000/api/presentations/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Digital Marketing Trends 2025",
+    "cardCount": 6,
+    "includeImages": true,
+    "provider": "gemini"
+  }'
+```
+
+### Available Providers
+
+- **gemini**: Google Gemini AI (requires API key or mock mode)
+- **placeholder**: Instant SVG placeholders (always available)
+
+### Placeholder Types
+
+Three beautiful placeholder patterns:
+
+1. **Geometric**: Triangles, circles, polygons, diagonal stripes
+2. **Pattern**: Dots, lines, waves, grids
+3. **Solid**: Gradient backgrounds
+
+All placeholders are:
+- Deterministic (same content = same placeholder)
+- Theme-aware (use card theme colors)
+- Instant (<50ms generation)
+- Lightweight (2-10KB SVG)
+
+See [PLACEHOLDER-SYSTEM.md](./docs/PLACEHOLDER-SYSTEM.md) for details.
 
 ## MVP Topics (Phase 1)
 
@@ -151,6 +269,18 @@ Deterministic content is available for:
 - Renders cards with layout-specific logic
 - Generates complete HTML pages with theme support
 - Exports presentations in multiple formats
+
+**ImageGenerationService** (`services/ImageGenerationService.js`) - Phase 2
+- Orchestrates multi-provider image generation
+- Manages fallback chain (Gemini → Placeholder)
+- Handles async background processing
+- Tracks generation status in memory
+
+**PlaceholderService** (`services/PlaceholderService.js`) - Phase 2
+- Generates SVG placeholders (geometric, pattern, solid)
+- Deterministic selection based on content hash
+- Theme-aware color extraction
+- Instant generation (<50ms)
 
 **ContentGenerator** (`services/ContentGenerator.js`)
 - Maps topics to structured content
