@@ -130,24 +130,20 @@ export class GeminiImageAdapter extends BaseImageAdapter {
   }
 
   /**
-   * Extract image URL from Gemini response
-   * Response structure is speculative - adjust based on actual API
+   * Extract image URL from Gemini 2.5 Flash Image response
    */
-  extractImageUrl(result) {
-    // Method 1: Direct URL in response
-    if (result.response?.image?.url) {
-      return result.response.image.url;
-    }
+  extractImageUrl(response) {
+    // Check candidates for inline image data
+    if (response?.candidates && response.candidates.length > 0) {
+      const parts = response.candidates[0].content?.parts || [];
 
-    // Method 2: Base64 image data
-    if (result.response?.image?.data) {
-      return `data:image/png;base64,${result.response.image.data}`;
-    }
-
-    // Method 3: From candidates
-    if (result.response?.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
-      const inlineData = result.response.candidates[0].content.parts[0].inlineData;
-      return `data:${inlineData.mimeType};base64,${inlineData.data}`;
+      // Find the part with inlineData (image)
+      for (const part of parts) {
+        if (part.inlineData) {
+          // Return as data URL for inline use
+          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        }
+      }
     }
 
     return null;
@@ -179,7 +175,7 @@ export class GeminiImageAdapter extends BaseImageAdapter {
       timeout: this.timeout,
       retries: this.retries,
       mockMode: process.env.GEMINI_MOCK_MODE === 'true',
-      description: 'Google Gemini AI image generation'
+      description: 'Gemini 2.5 Flash Image generation'
     };
   }
 

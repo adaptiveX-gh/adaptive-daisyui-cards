@@ -97,6 +97,11 @@ router.post('/cards/stream', sseMiddleware, async (req, res) => {
     // Stream stages
     await streamCard(clientId, card, includeImages);
 
+    // Keep connection alive - wait for client to disconnect
+    await new Promise((resolve) => {
+      req.on('close', resolve);
+    });
+
   } catch (error) {
     console.error('Error in /api/cards/stream:', error);
 
@@ -109,6 +114,8 @@ router.post('/cards/stream', sseMiddleware, async (req, res) => {
       });
     }
   }
+
+  // Note: Response is kept open for SSE
 });
 
 /**
@@ -208,6 +215,12 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
     // Stream all stages
     await streamPresentation(clientId, cards, includeImages);
 
+    // Keep connection alive - wait for client to disconnect
+    // This prevents Express from automatically closing the response
+    await new Promise((resolve) => {
+      req.on('close', resolve);
+    });
+
   } catch (error) {
     console.error('Error in /api/presentations/stream:', error);
 
@@ -220,6 +233,8 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       });
     }
   }
+
+  // Note: Response is kept open for SSE, not ended here
 });
 
 /**
@@ -275,10 +290,17 @@ router.get('/stream/demo', sseMiddleware, async (req, res) => {
     // Restore original delay
     streamingService.config.stageDelay = originalDelay;
 
+    // Keep connection alive - wait for client to disconnect
+    await new Promise((resolve) => {
+      req.on('close', resolve);
+    });
+
   } catch (error) {
     console.error('Error in /api/stream/demo:', error);
     streamingService.emitError(clientId, 'demo', error);
   }
+
+  // Note: Response is kept open for SSE
 });
 
 /**
