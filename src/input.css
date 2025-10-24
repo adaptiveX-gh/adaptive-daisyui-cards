@@ -3,6 +3,100 @@
 @tailwind utilities;
 
 /* =================================================================
+   THEME-SPECIFIC TYPOGRAPHY SYSTEM
+   Typography variables that adapt to each DaisyUI theme's personality
+   ================================================================= */
+
+@layer base {
+
+  /* DEFAULT: Classic/Professional Typography (light, dark, corporate, business, emerald, forest, winter) */
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"],
+  [data-theme="corporate"],
+  [data-theme="business"],
+  [data-theme="emerald"],
+  [data-theme="forest"],
+  [data-theme="winter"] {
+    --typo-heading-weight: 700;
+    --typo-heading-spacing: -0.02em;
+    --typo-heading-transform: none;
+    --typo-heading-line-height: 1.2;
+
+    --typo-body-weight: 400;
+    --typo-body-spacing: 0;
+    --typo-body-line-height: 1.6;
+
+    --typo-emphasis-weight: 600;
+    --typo-scale-adjust: 1;
+  }
+
+  /* BOLD/FUTURISTIC: Heavy, wide spacing, uppercase tendencies (cyberpunk, synthwave, dracula, night, black, luxury) */
+  [data-theme="cyberpunk"],
+  [data-theme="synthwave"],
+  [data-theme="dracula"],
+  [data-theme="night"],
+  [data-theme="black"],
+  [data-theme="luxury"] {
+    --typo-heading-weight: 900;
+    --typo-heading-spacing: 0.05em;
+    --typo-heading-transform: uppercase;
+    --typo-heading-line-height: 1.1;
+
+    --typo-body-weight: 500;
+    --typo-body-spacing: 0.02em;
+    --typo-body-line-height: 1.5;
+
+    --typo-emphasis-weight: 700;
+    --typo-scale-adjust: 1.05;
+  }
+
+  /* SOFT/PASTEL: Light weights, tight spacing, rounded feel (cupcake, pastel, valentine, fantasy, garden, lemonade) */
+  [data-theme="cupcake"],
+  [data-theme="pastel"],
+  [data-theme="valentine"],
+  [data-theme="fantasy"],
+  [data-theme="garden"],
+  [data-theme="lemonade"] {
+    --typo-heading-weight: 600;
+    --typo-heading-spacing: 0;
+    --typo-heading-transform: none;
+    --typo-heading-line-height: 1.3;
+
+    --typo-body-weight: 400;
+    --typo-body-spacing: 0;
+    --typo-body-line-height: 1.7;
+
+    --typo-emphasis-weight: 500;
+    --typo-scale-adjust: 0.97;
+  }
+
+  /* QUIRKY/RETRO: Varied weights, playful spacing, expressive (retro, acid, halloween, bumblebee, aqua, cmyk, autumn, coffee, lofi, wireframe) */
+  [data-theme="retro"],
+  [data-theme="acid"],
+  [data-theme="halloween"],
+  [data-theme="bumblebee"],
+  [data-theme="aqua"],
+  [data-theme="cmyk"],
+  [data-theme="autumn"],
+  [data-theme="coffee"],
+  [data-theme="lofi"],
+  [data-theme="wireframe"] {
+    --typo-heading-weight: 800;
+    --typo-heading-spacing: -0.01em;
+    --typo-heading-transform: none;
+    --typo-heading-line-height: 1.15;
+
+    --typo-body-weight: 400;
+    --typo-body-spacing: 0.01em;
+    --typo-body-line-height: 1.6;
+
+    --typo-emphasis-weight: 700;
+    --typo-scale-adjust: 1.02;
+  }
+}
+
+/* =================================================================
    ADAPTIVE CARD SYSTEM - Base Styles
    Cards that scale based on their container size using Container Queries
    ================================================================= */
@@ -29,36 +123,58 @@
   }
 
   /* =================================================================
-     SCALABLE TYPOGRAPHY
+     SCALABLE TYPOGRAPHY WITH THEME-AWARE STYLES
      Font sizes scale proportionally with container width
+     Typography characteristics adapt to theme personality
      ================================================================= */
 
   .adaptive-text-xs {
-    font-size: clamp(0.75rem, 1.5cqw, 0.875rem);
+    font-size: calc(clamp(0.75rem, 1.5cqw, 0.875rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-body-weight);
+    letter-spacing: var(--typo-body-spacing);
+    line-height: var(--typo-body-line-height);
   }
 
   .adaptive-text-sm {
-    font-size: clamp(0.875rem, 2cqw, 1rem);
+    font-size: calc(clamp(0.875rem, 2cqw, 1rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-body-weight);
+    letter-spacing: var(--typo-body-spacing);
+    line-height: var(--typo-body-line-height);
   }
 
   .adaptive-text-base {
-    font-size: clamp(1rem, 2.5cqw, 1.125rem);
+    font-size: calc(clamp(1rem, 2.5cqw, 1.125rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-body-weight);
+    letter-spacing: var(--typo-body-spacing);
+    line-height: var(--typo-body-line-height);
   }
 
   .adaptive-text-lg {
-    font-size: clamp(1.125rem, 3cqw, 1.25rem);
+    font-size: calc(clamp(1.125rem, 3cqw, 1.25rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-emphasis-weight);
+    letter-spacing: var(--typo-heading-spacing);
+    line-height: var(--typo-heading-line-height);
   }
 
   .adaptive-text-xl {
-    font-size: clamp(1.25rem, 3.5cqw, 1.5rem);
+    font-size: calc(clamp(1.25rem, 3.5cqw, 1.5rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-emphasis-weight);
+    letter-spacing: var(--typo-heading-spacing);
+    line-height: var(--typo-heading-line-height);
   }
 
   .adaptive-text-2xl {
-    font-size: clamp(1.5rem, 4cqw, 2rem);
+    font-size: calc(clamp(1.5rem, 4cqw, 2rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-heading-weight);
+    letter-spacing: var(--typo-heading-spacing);
+    line-height: var(--typo-heading-line-height);
   }
 
   .adaptive-text-3xl {
-    font-size: clamp(1.875rem, 5cqw, 2.5rem);
+    font-size: calc(clamp(1.875rem, 5cqw, 2.5rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-heading-weight);
+    letter-spacing: var(--typo-heading-spacing);
+    line-height: var(--typo-heading-line-height);
   }
 
   /* =================================================================
@@ -348,6 +464,44 @@
     order: 1;
   }
 
+  /* Overlay variant - content on top of image */
+  .hero-layout.overlay {
+    display: block;
+    position: relative;
+  }
+
+  .hero-layout.overlay .hero-image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .hero-layout.overlay .hero-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%);
+  }
+
+  .hero-layout.overlay .hero-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-layout.overlay .hero-title,
+  .hero-layout.overlay .hero-subtitle,
+  .hero-layout.overlay .hero-description {
+    opacity: 1;
+  }
+
   /* Content section */
   .hero-layout .hero-content {
     padding: clamp(2rem, 6cqw, 4rem);
@@ -373,23 +527,28 @@
     left: 0;
   }
 
-  /* Presentation typography - extra large and bold */
+  /* Presentation typography - extra large and theme-aware */
   .hero-layout .hero-title {
-    font-size: clamp(2rem, 7cqw, 4rem);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-size: calc(clamp(2rem, 7cqw, 4rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-heading-weight);
+    line-height: var(--typo-heading-line-height);
+    letter-spacing: var(--typo-heading-spacing);
+    text-transform: var(--typo-heading-transform);
   }
 
   .hero-layout .hero-subtitle {
-    font-size: clamp(1rem, 3cqw, 1.5rem);
-    line-height: 1.6;
+    font-size: calc(clamp(1rem, 3cqw, 1.5rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-emphasis-weight);
+    line-height: var(--typo-body-line-height);
+    letter-spacing: var(--typo-body-spacing);
     opacity: 0.8;
   }
 
   .hero-layout .hero-description {
-    font-size: clamp(0.875rem, 2.5cqw, 1.125rem);
-    line-height: 1.7;
+    font-size: calc(clamp(0.875rem, 2.5cqw, 1.125rem) * var(--typo-scale-adjust));
+    font-weight: var(--typo-body-weight);
+    line-height: var(--typo-body-line-height);
+    letter-spacing: var(--typo-body-spacing);
     opacity: 0.7;
   }
 
@@ -488,5 +647,102 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+  }
+
+  /* =================================================================
+     TYPOGRAPHY OVERRIDE UTILITIES
+     Manual control over typography personality across any theme
+     ================================================================= */
+
+  /* Force Bold/Futuristic typography */
+  .typography-bold,
+  .typography-bold * {
+    --typo-heading-weight: 900 !important;
+    --typo-heading-spacing: 0.05em !important;
+    --typo-heading-transform: uppercase !important;
+    --typo-heading-line-height: 1.1 !important;
+    --typo-body-weight: 500 !important;
+    --typo-body-spacing: 0.02em !important;
+    --typo-body-line-height: 1.5 !important;
+    --typo-emphasis-weight: 700 !important;
+    --typo-scale-adjust: 1.05 !important;
+  }
+
+  /* Force Soft/Pastel typography */
+  .typography-soft,
+  .typography-soft * {
+    --typo-heading-weight: 600 !important;
+    --typo-heading-spacing: 0 !important;
+    --typo-heading-transform: none !important;
+    --typo-heading-line-height: 1.3 !important;
+    --typo-body-weight: 400 !important;
+    --typo-body-spacing: 0 !important;
+    --typo-body-line-height: 1.7 !important;
+    --typo-emphasis-weight: 500 !important;
+    --typo-scale-adjust: 0.97 !important;
+  }
+
+  /* Force Classic/Professional typography */
+  .typography-classic,
+  .typography-classic * {
+    --typo-heading-weight: 700 !important;
+    --typo-heading-spacing: -0.02em !important;
+    --typo-heading-transform: none !important;
+    --typo-heading-line-height: 1.2 !important;
+    --typo-body-weight: 400 !important;
+    --typo-body-spacing: 0 !important;
+    --typo-body-line-height: 1.6 !important;
+    --typo-emphasis-weight: 600 !important;
+    --typo-scale-adjust: 1 !important;
+  }
+
+  /* Force Quirky/Retro typography */
+  .typography-quirky,
+  .typography-quirky * {
+    --typo-heading-weight: 800 !important;
+    --typo-heading-spacing: -0.01em !important;
+    --typo-heading-transform: none !important;
+    --typo-heading-line-height: 1.15 !important;
+    --typo-body-weight: 400 !important;
+    --typo-body-spacing: 0.01em !important;
+    --typo-body-line-height: 1.6 !important;
+    --typo-emphasis-weight: 700 !important;
+    --typo-scale-adjust: 1.02 !important;
+  }
+
+  /* Enhanced overlay contrast for varying font weights */
+  .hero-layout.overlay .hero-image::after {
+    /* Stronger gradient for bold themes to ensure contrast */
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+  }
+
+  /* Extra strong overlay for futuristic themes with heavy text */
+  [data-theme="cyberpunk"] .hero-layout.overlay .hero-image::after,
+  [data-theme="synthwave"] .hero-layout.overlay .hero-image::after,
+  [data-theme="dracula"] .hero-layout.overlay .hero-image::after,
+  [data-theme="night"] .hero-layout.overlay .hero-image::after,
+  [data-theme="black"] .hero-layout.overlay .hero-image::after,
+  [data-theme="luxury"] .hero-layout.overlay .hero-image::after {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 100%);
+  }
+
+  /* Enhanced text shadow for overlay text based on theme weight */
+  [data-theme="cyberpunk"] .hero-layout.overlay .hero-content,
+  [data-theme="synthwave"] .hero-layout.overlay .hero-content,
+  [data-theme="dracula"] .hero-layout.overlay .hero-content,
+  [data-theme="night"] .hero-layout.overlay .hero-content,
+  [data-theme="black"] .hero-layout.overlay .hero-content,
+  [data-theme="luxury"] .hero-layout.overlay .hero-content {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Lighter shadow for soft themes */
+  [data-theme="cupcake"] .hero-layout.overlay .hero-content,
+  [data-theme="pastel"] .hero-layout.overlay .hero-content,
+  [data-theme="valentine"] .hero-layout.overlay .hero-content,
+  [data-theme="fantasy"] .hero-layout.overlay .hero-content,
+  [data-theme="garden"] .hero-layout.overlay .hero-content,
+  [data-theme="lemonade"] .hero-layout.overlay .hero-content {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 }

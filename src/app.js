@@ -34,7 +34,8 @@ const elements = {
     masonry: document.getElementById('masonry-layout'),
     dashboard: document.getElementById('dashboard-layout'),
     split: document.getElementById('split-layout'),
-    hero: document.getElementById('hero-layout')
+    hero: document.getElementById('hero-layout'),
+    'hero-overlay': document.getElementById('hero-overlay')
   }
 };
 

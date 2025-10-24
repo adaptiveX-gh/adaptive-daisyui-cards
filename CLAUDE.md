@@ -20,7 +20,7 @@ tests/                 # Playwright E2E and Vitest unit tests
 docs/                  # Detailed documentation and guides
 ```
 
-## 6 Adaptive Layouts
+## 7 Adaptive Layouts
 
 Each layout responds to **container width** via `@container` queries:
 
@@ -30,6 +30,7 @@ Each layout responds to **container width** via `@container` queries:
 4. **dashboard-layout** - Complex grid → 2-col → stack (400px, 800px)
 5. **split-layout** - 50/50 → 60/40 → stack
 6. **hero-layout** - Presentation/hero layout with extra large typography (2-4rem), full-bleed images. Supports `.image-left` variant for image placement
+7. **hero-layout.overlay** - Content overlays full-bleed background image with gradient overlay for readability. Perfect for card-style presentation slides.
 
 All layouts use `.layout-card` base class for DaisyUI styling.
 

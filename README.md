@@ -21,7 +21,7 @@ A demonstration of adaptive card layouts using CSS Container Queries with DaisyU
 
 ## ✨ Features
 
-- **6 Responsive Layouts**: Sidebar, Feature, Masonry, Dashboard, Split, Hero/Presentation
+- **7 Responsive Layouts**: Sidebar, Feature, Masonry, Dashboard, Split, Hero/Presentation, Hero Overlay
 - **Container Queries**: Cards adapt to their container size, not viewport
 - **Scalable Typography**: Text sizes scale proportionally with clamp() and cqw units
 - **29 DaisyUI Themes**: Full theme support
@@ -72,11 +72,16 @@ A demonstration of adaptive card layouts using CSS Container Queries with DaisyU
 
 ### 6. Hero/Presentation Layout
 - **Large**: 50/50 split with full-bleed image
-- **Medium**: 45/55 split
 - **Small**: Vertical stack with image on top
 - **Typography**: Extra large, bold titles optimized for presentations
 - **Variants**: Supports image-left or image-right placement
 - **Use case**: Presentation slides, hero sections, landing pages
+
+### 7. Hero Overlay Layout
+- **All sizes**: Content overlays full-bleed background image
+- **Features**: Gradient overlay for text readability, white text with shadow
+- **Typography**: Same presentation-optimized typography as hero layout
+- **Use case**: Card-style presentation slides, feature highlights, call-to-action cards
 
 ## 🛠️ Tech Stack
 
