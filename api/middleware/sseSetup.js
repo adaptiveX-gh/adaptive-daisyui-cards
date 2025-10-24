@@ -30,6 +30,12 @@ export function setupSSE(req, res, next) {
   // Set response status
   res.status(200);
 
+  // CRITICAL: Flush headers immediately to establish SSE connection
+  // Without this, the browser doesn't know it's a stream and may close the connection
+  if (typeof res.flushHeaders === 'function') {
+    res.flushHeaders();
+  }
+
   // Disable default Express timeout
   req.setTimeout(0);
   res.setTimeout(0);

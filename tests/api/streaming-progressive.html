@@ -120,6 +120,40 @@
       <div class="card-body">
         <h2 class="card-title">Streaming Controls</h2>
 
+        <!-- Endpoint Selection -->
+        <div class="alert alert-info mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div>
+            <h3 class="font-bold">Endpoint Selection</h3>
+            <div class="text-sm">Choose between real API or mock server for testing</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-base-200 rounded-lg">
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <span class="label-text font-semibold">API Endpoint</span>
+            </label>
+            <select id="endpointType" class="select select-bordered select-primary">
+              <option value="real">Real API (localhost:3000)</option>
+              <option value="mock">Mock Server (localhost:3001)</option>
+            </select>
+          </div>
+
+          <div class="form-control" id="mockModeContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Mock Server Mode</span>
+            </label>
+            <select id="mockMode" class="select select-bordered">
+              <option value="chunked">Chunked (realistic)</option>
+              <option value="multiline">Multi-line JSON</option>
+              <option value="crlf">CRLF Line Endings</option>
+              <option value="error">Error Mid-Stream</option>
+              <option value="fast">Fast (no delays)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div class="form-control">
             <label class="label"><span class="label-text">Topic</span></label>
@@ -369,11 +403,17 @@
      * Handle streaming messages
      */
     function handleMessage(data) {
+      console.log('[handleMessage] Called with stage:', data.stage, 'Has cards:', !!data.cards);
+
       switch (data.stage) {
         case 'skeleton':
+          console.log('[handleMessage] SKELETON case hit!');
           updateStatus('Streaming', 'skeleton');
           if (data.cards) {
+            console.log('[handleMessage] Rendering', data.cards.length, 'skeleton cards');
             data.cards.forEach(card => renderCardSkeleton(card));
+          } else {
+            console.error('[handleMessage] ✗ Skeleton event received but NO cards array!');
           }
           break;
 
@@ -418,16 +458,43 @@
       const cardCount = parseInt(document.getElementById('cardCount').value);
       const style = document.getElementById('style').value;
       const streamDelay = parseInt(document.getElementById('streamDelay').value);
+      const endpointType = document.getElementById('endpointType').value;
+      const mockMode = document.getElementById('mockMode').value;
 
       updateStatus('Connecting', '-');
       logEvent(`🚀 Starting stream: ${topic} (${cardCount} cards)`);
 
-      const apiUrl = 'http://localhost:3000';
-      const endpoint = `${apiUrl}/api/presentations/stream`;
+      // Determine endpoint based on selection
+      let endpoint, requestMethod, requestBody;
+
+      if (endpointType === 'mock') {
+        // Mock server endpoint (GET with query params)
+        const params = new URLSearchParams({
+          delay: streamDelay,
+          cards: cardCount,
+          mode: mockMode
+        });
+        endpoint = `http://localhost:3001/mock/stream?${params}`;
+        requestMethod = 'GET';
+        logEvent(`🔧 Using MOCK server (mode: ${mockMode})`);
+      } else {
+        // Real API endpoint (POST with JSON body)
+        endpoint = 'http://localhost:3000/api/presentations/stream';
+        requestMethod = 'POST';
+        requestBody = JSON.stringify({
+          topic,
+          cardCount,
+          style,
+          includeImages: false,
+          streamDelay
+        });
+        logEvent(`🌐 Using REAL API`);
+      }
 
       console.log('[CLIENT] ===== STARTING FETCH =====');
       console.log('[CLIENT] Endpoint:', endpoint);
-      console.log('[CLIENT] Request:', { topic, cardCount, style, streamDelay });
+      console.log('[CLIENT] Method:', requestMethod);
+      console.log('[CLIENT] Request:', { topic, cardCount, style, streamDelay, endpointType, mockMode });
 
       // Add global error handler to catch any uncaught errors
       window.addEventListener('error', (e) => {
@@ -450,21 +517,22 @@
         return originalAbort(...args);
       };
 
-      fetch(endpoint, {
+      // Build fetch options based on method
+      const fetchOptions = {
         signal: abortController.signal,
-        method: 'POST',
+        method: requestMethod,
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'text/event-stream'
-        },
-        body: JSON.stringify({
-          topic,
-          cardCount,
-          style,
-          includeImages: false,
-          streamDelay
-        })
-      }).then(response => {
+        }
+      };
+
+      // Add body and Content-Type only for POST requests
+      if (requestMethod === 'POST') {
+        fetchOptions.headers['Content-Type'] = 'application/json';
+        fetchOptions.body = requestBody;
+      }
+
+      fetch(endpoint, fetchOptions).then(response => {
         console.log('[CLIENT] Response received:', {
           status: response.status,
           statusText: response.statusText,
@@ -487,6 +555,18 @@
         const decoder = new TextDecoder();
         let buffer = '';
         let readCount = 0;
+        let firstSkeletonReceived = false;
+        let bytesTotal = 0;
+
+        // If no skeleton arrives quickly, surface buffered diagnostics
+        setTimeout(() => {
+          if (!firstSkeletonReceived) {
+            console.warn('[CLIENT] ⏱️ No skeleton received within 2000ms. Dumping buffer diagnostics.');
+            logEvent(`⚠️ No skeleton after 2s. Buffer=${buffer.length} bytes. Showing tail…`);
+            const tail = buffer.slice(Math.max(0, buffer.length - 400));
+            console.warn('[CLIENT] Buffer tail (up to 400 chars):', tail);
+          }
+        }, 2000);
 
         console.log('[CLIENT] Starting to read stream...');
 
@@ -512,62 +592,92 @@
 
             // Decode chunk
             const chunk = decoder.decode(value, { stream: true });
-            console.log(`[CLIENT] Chunk #${readCount}:`, chunk.substring(0, 100) + (chunk.length > 100 ? '...' : ''));
+            bytesTotal += value.byteLength;
+            console.log(`[CLIENT] Chunk #${readCount} (${value.byteLength} bytes, total ${bytesTotal}):`, chunk.substring(0, 120) + (chunk.length > 120 ? '…' : ''));
             buffer += chunk;
 
-            // Process complete SSE messages (separated by double newline)
-            const messages = buffer.split('\n\n');
+            // Process complete SSE messages (robust split on CRLF or LF)
+            const messages = buffer.split(/\r?\n\r?\n/);
             buffer = messages.pop() || ''; // Keep incomplete message in buffer
 
-            console.log(`[CLIENT] Processing ${messages.length} complete messages from chunk #${readCount}`);
+            console.log(`[CLIENT] Processing ${messages.length} complete message(s) from chunk #${readCount}`);
 
-            for (const message of messages) {
+            for (const rawMessage of messages) {
               try {
-                if (!message.trim()) continue;
+                const message = rawMessage.trim();
+                if (!message) continue;
 
-                // Parse SSE message fields
-                const lines = message.split('\n');
-                let eventType = 'message'; // default
-                let data = null;
+                // Parse SSE message fields robustly
+                const lines = message.split(/\r?\n/);
+                let sseEvent = 'message'; // default
                 let id = null;
+                const dataLines = [];
 
-                for (const line of lines) {
-                  if (line.startsWith('event: ')) {
-                    eventType = line.substring(7).trim();
-                  } else if (line.startsWith('data: ')) {
-                    try {
-                      data = JSON.parse(line.substring(6));
-                    } catch (e) {
-                      console.error('[CLIENT] ✗ JSON parse error:', e, line);
-                      logEvent(`❌ Parse error: ${e.message}`);
-                    }
-                  } else if (line.startsWith('id: ')) {
-                    id = line.substring(4).trim();
-                  } else if (line.startsWith(':')) {
+                for (let rawLine of lines) {
+                  if (!rawLine) continue;
+                  // Heartbeat/comment
+                  if (rawLine.startsWith(':')) {
                     console.log('[CLIENT] ❤️ Heartbeat received');
-                    logEvent(`❤️ Heartbeat`);
+                    logEvent('❤️ Heartbeat');
+                    continue;
+                  }
+
+                  const idx = rawLine.indexOf(':');
+                  const field = idx === -1 ? rawLine : rawLine.slice(0, idx);
+                  const value = idx === -1 ? '' : rawLine.slice(idx + 1).replace(/^\s*/, ''); // trim only leading space per spec
+
+                  switch (field) {
+                    case 'event':
+                      sseEvent = value.trim();
+                      break;
+                    case 'id':
+                      id = value.trim();
+                      break;
+                    case 'data':
+                      // Support multi-line data
+                      dataLines.push(value.replace(/\r$/, ''));
+                      break;
+                    case 'retry':
+                      // Ignored client-side for now
+                      break;
+                    default:
+                      // Unknown fields ignored
+                      break;
                   }
                 }
 
-                // Handle parsed message
-                if (data) {
-                  console.log('[CLIENT] ✓ Parsed SSE:', { eventType, id, stage: data.stage || 'unknown' });
+                const rawData = dataLines.join('\n');
+                if (!rawData) continue;
 
-                  // Route message based on data.stage if present, otherwise use eventType
-                  // This handles both 'message' events (which have data.stage) and
-                  // 'progress'/'complete'/'error' events (where eventType is the stage)
+                let data;
+                try {
+                  data = JSON.parse(rawData);
+                } catch (e) {
+                  console.error('[CLIENT] ✗ JSON parse error:', e, rawData);
+                  logEvent(`❌ Parse error: ${e.message}`);
+                  continue;
+                }
 
+                console.log('[CLIENT] ✓ Parsed SSE:', { event: sseEvent, id, stage: data.stage || 'unknown', eventType: data.eventType });
+                // Determine effective event routing key: prefer SSE event name, then data.eventType
+                const effectiveType = sseEvent !== 'message' ? sseEvent : (data.eventType || data.event || data.type || 'message');
+
+                if (effectiveType === 'progress') {
+                  handleMessage({ stage: 'progress', ...data });
+                } else if (effectiveType === 'complete') {
+                  handleMessage({ stage: 'complete', ...data });
+                } else if (effectiveType === 'error') {
+                  handleMessage({ stage: 'error', ...data });
+                } else {
+                  // Treat as stage event if stage is present
                   if (data.stage) {
-                    // Stage is explicitly set in data - use it (covers 'message' events and progress with stage)
+                    if (data.stage === 'skeleton' && Array.isArray(data.cards) && data.cards.length) {
+                      firstSkeletonReceived = true;
+                      console.log('[CLIENT] → SKELETON EVENT FOUND! Cards:', data.cards.length);
+                    }
                     handleMessage(data);
-                  } else if (eventType === 'complete') {
-                    handleMessage({ stage: 'complete', ...data });
-                  } else if (eventType === 'error') {
-                    handleMessage({ stage: 'error', ...data });
-                  } else if (eventType === 'progress') {
-                    handleMessage({ stage: 'progress', ...data });
                   } else {
-                    console.log('[CLIENT] Unhandled event type:', eventType, data);
+                    console.log('[CLIENT] ⚠️ Unhandled event:', { sseEvent, data });
                   }
                 }
               } catch (messageError) {
@@ -597,6 +707,17 @@
         alert(`Failed to start stream: ${error.message}\n\nMake sure the API server is running at http://localhost:3000`);
       });
     }
+    // Event Listeners
+    document.getElementById('endpointType').addEventListener('change', (e) => {
+      const mockModeContainer = document.getElementById('mockModeContainer');
+      if (e.target.value === 'mock') {
+        mockModeContainer.style.display = 'block';
+        logEvent('🔧 Switched to Mock Server mode');
+      } else {
+        mockModeContainer.style.display = 'none';
+        logEvent('🌐 Switched to Real API mode');
+      }
+    });
   </script>
 </body>
 </html>

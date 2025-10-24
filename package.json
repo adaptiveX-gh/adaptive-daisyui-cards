@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "api": "node api/server.js",
     "api:dev": "nodemon api/server.js",
+    "api:mock": "node tests/api/mock-sse-server.js",
+    "api:mock:dev": "nodemon tests/api/mock-sse-server.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
@@ -22,7 +24,8 @@
     "test:container": "playwright test --grep @container",
     "test:ci": "npm run test:coverage && npm run test:e2e",
     "test:debug": "playwright test --debug",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "test:sse": "node tests/api/mock-sse-server.js"
   },
   "keywords": [
     "tailwind",
