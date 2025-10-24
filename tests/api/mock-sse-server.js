@@ -24,7 +24,12 @@ import cors from 'cors';
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+// Enhanced CORS configuration for SSE streaming
+app.use(cors({
+  origin: '*', // Allow all origins for testing
+  credentials: true,
+  exposedHeaders: ['Content-Type', 'Cache-Control', 'X-Accel-Buffering']
+}));
 app.use(express.json());
 
 /**
@@ -43,6 +48,7 @@ app.get('/mock/stream', (req, res) => {
   const useHeartbeat = includeHeartbeat === 'true';
 
   console.log(`[MOCK] Starting stream: ${cardCount} cards, ${chunkDelay}ms delay, mode=${mode}`);
+  console.log(`[MOCK] Request from origin: ${req.headers.origin || 'none'}`);
 
   // Set SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
@@ -50,20 +56,62 @@ app.get('/mock/stream', (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
 
+  // Additional CORS headers for SSE
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+
   // Flush headers immediately
   res.flushHeaders?.();
+
+  // Connection monitoring
+  let connectionClosed = false;
+
+  req.on('close', () => {
+    connectionClosed = true;
+    console.log('[MOCK] ⚠️ Client disconnected early!');
+    console.log('[MOCK] Connection state when closed:', {
+      writableEnded: res.writableEnded,
+      writableFinished: res.writableFinished,
+      destroyed: res.destroyed
+    });
+  });
+
+  req.on('error', (err) => {
+    console.error('[MOCK] ✗ Request error:', err);
+  });
+
+  res.on('error', (err) => {
+    console.error('[MOCK] ✗ Response error:', err);
+  });
+
+  res.on('close', () => {
+    console.log('[MOCK] Response closed');
+  });
 
   const lineEnding = mode === 'crlf' ? '\r\n' : '\n';
   let messageId = 0;
 
   const writeEvent = (event, data, id = null) => {
+    if (connectionClosed) {
+      console.log('[MOCK] ⚠️ Skipping write - connection closed');
+      return false;
+    }
+
     const idLine = id ? `id: ${id}${lineEnding}` : '';
     const eventLine = event ? `event: ${event}${lineEnding}` : '';
     const dataLine = `data: ${JSON.stringify(data)}${lineEnding}`;
     const message = `${idLine}${eventLine}${dataLine}${lineEnding}`;
 
     console.log(`[MOCK] Sending: ${event || 'message'} (${data.stage || 'N/A'})`);
-    res.write(message);
+    try {
+      const result = res.write(message);
+      console.log(`[MOCK] Write result: ${result}`);
+      return result;
+    } catch (err) {
+      console.error('[MOCK] ✗ Write failed:', err);
+      return false;
+    }
   };
 
   const writeMultilineEvent = (event, data, id = null) => {

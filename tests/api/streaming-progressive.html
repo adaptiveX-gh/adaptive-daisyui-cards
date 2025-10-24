@@ -105,6 +105,34 @@
       width: 100%;
       margin-bottom: 0.5rem;
     }
+
+    /* Typewriter and enrichment effects */
+    .enriching {
+      animation: pulse 0.3s ease-in-out;
+      transform: scale(1.02);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Smooth transitions for content enrichment */
+    [data-section] {
+      transition: all 0.3s ease-out;
+    }
+
+    /* Blinking cursor effect during typewriter */
+    .typing::after {
+      content: '|';
+      animation: blink 0.7s infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
   </style>
 </head>
 <body class="bg-base-200 min-h-screen p-8">
@@ -154,6 +182,59 @@
           </div>
         </div>
 
+        <!-- LLM Mode Selection -->
+        <div class="alert alert-success mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div>
+            <h3 class="font-bold">Content Generation Mode</h3>
+            <div class="text-sm">Choose between fast template-based or smart LLM-powered generation</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-base-200 rounded-lg">
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <span class="label-text font-semibold">Generation Mode</span>
+            </label>
+            <select id="mode" class="select select-bordered select-success">
+              <option value="fast">Fast Mode (Template-based)</option>
+              <option value="smart">Smart Mode (LLM-powered)</option>
+            </select>
+          </div>
+
+          <div class="form-control" id="presentationTypeContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Presentation Type</span>
+            </label>
+            <select id="presentationType" class="select select-bordered">
+              <option value="education">Education</option>
+              <option value="pitch">Pitch</option>
+              <option value="report">Report</option>
+              <option value="workshop">Workshop</option>
+              <option value="story">Story</option>
+            </select>
+          </div>
+
+          <div class="form-control" id="audienceContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Target Audience</span>
+            </label>
+            <input type="text" id="audience" class="input input-bordered" value="general" placeholder="e.g., executives, students, developers">
+          </div>
+
+          <div class="form-control" id="toneContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Content Tone</span>
+            </label>
+            <select id="tone" class="select select-bordered">
+              <option value="professional">Professional</option>
+              <option value="creative">Creative</option>
+              <option value="minimal">Minimal</option>
+              <option value="inspirational">Inspirational</option>
+            </select>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div class="form-control">
             <label class="label"><span class="label-text">Topic</span></label>
@@ -182,6 +263,45 @@
           <div class="form-control">
             <label class="label"><span class="label-text">Stream Delay (ms)</span></label>
             <input type="number" id="streamDelay" class="input input-bordered" value="300" min="0" max="2000" step="100">
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Typewriter Speed</span></label>
+            <select id="typewriterSpeed" class="select select-bordered">
+              <option value="0">Instant (No effect)</option>
+              <option value="3">Very Fast</option>
+              <option value="5" selected>Fast (Gamma-like)</option>
+              <option value="10">Medium</option>
+              <option value="20">Slow</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Image Generation Options -->
+        <div class="alert alert-warning mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div>
+            <h3 class="font-bold">AI Image Generation</h3>
+            <div class="text-sm">Enable to generate images using AI (requires API key configuration)</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-base-200 rounded-lg">
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <span class="label-text font-semibold">Generate Images</span>
+              <input type="checkbox" id="includeImages" class="toggle toggle-primary" />
+            </label>
+          </div>
+
+          <div class="form-control" id="imageProviderContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Image Provider</span>
+            </label>
+            <select id="imageProvider" class="select select-bordered">
+              <option value="gemini">Google Gemini (Imagen)</option>
+              <option value="placeholder">Placeholder Images</option>
+            </select>
           </div>
         </div>
 
@@ -322,9 +442,77 @@
     }
 
     /**
-     * Add content to card progressively
+     * Typewriter effect for streaming text
      */
-    function renderCardContent(cardId, section, content) {
+    async function typewriterEffect(element, text, speed = 10) {
+      element.textContent = '';
+      element.classList.add('typing');
+
+      for (let i = 0; i < text.length; i++) {
+        element.textContent += text[i];
+        // Vary speed slightly for more natural feel
+        const variance = Math.random() * 3;
+        await new Promise(resolve => setTimeout(resolve, speed + variance));
+      }
+
+      element.classList.remove('typing');
+    }
+
+    /**
+     * Convert plain text content to rich HTML
+     */
+    function enrichContent(element, section, content) {
+      // Add a small delay before enriching to show the transformation
+      setTimeout(() => {
+        element.classList.add('enriching');
+
+        setTimeout(() => {
+          if (section === 'title') {
+            element.className = 'text-3xl font-bold mb-3 content-enter text-primary';
+          } else if (section === 'subtitle') {
+            element.className = 'text-xl opacity-80 mb-4 content-enter';
+          } else if (section === 'kicker') {
+            element.className = 'badge badge-primary badge-lg mb-3 content-enter';
+          } else if (section === 'intro') {
+            element.className = 'text-lg mb-4 leading-relaxed content-enter';
+          } else if (section === 'body') {
+            element.className = 'prose mb-4 content-enter';
+          } else if (section === 'items' && Array.isArray(content)) {
+            element.className = 'space-y-2 mb-4 content-enter';
+            element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
+              content.map(item => `<li class="text-base">${item}</li>`).join('') +
+              '</ul>';
+          } else if (section === 'bullets' && Array.isArray(content)) {
+            element.className = 'space-y-2 mb-4 content-enter';
+            element.innerHTML = '<ul class="list-disc list-inside space-y-2">' +
+              content.map(bullet => `<li class="text-base">${bullet}</li>`).join('') +
+              '</ul>';
+          } else if (section === 'cells' && Array.isArray(content)) {
+            element.className = 'grid grid-cols-2 gap-4 mb-4 content-enter';
+            element.innerHTML = content.map(cell => `
+              <div class="p-4 bg-base-200 rounded-lg">
+                <div class="font-bold text-lg mb-2">${cell.title || ''}</div>
+                <div class="text-sm opacity-70">${cell.body || ''}</div>
+              </div>
+            `).join('');
+          } else if (section === 'footnote') {
+            element.className = 'text-sm italic opacity-60 mt-4 content-enter';
+          } else if (section === 'imagePrompt') {
+            element.className = 'text-xs opacity-50 mt-2 font-mono content-enter';
+            element.innerHTML = `<span class="badge badge-ghost badge-sm">Image prompt:</span> ${content}`;
+          } else {
+            element.className = 'mb-3 content-enter';
+          }
+
+          element.classList.remove('enriching');
+        }, 300);
+      }, 200);
+    }
+
+    /**
+     * Add content to card progressively with typewriter effect
+     */
+    async function renderCardContent(cardId, section, content) {
       const card = cards.get(cardId);
       if (!card) return;
 
@@ -341,28 +529,38 @@
         cardBody.innerHTML = '';
       }
 
-      // Render based on section
+      // Create element for content
       const contentEl = document.createElement('div');
-      contentEl.className = 'content-enter';
-
-      if (section === 'title') {
-        contentEl.className = 'card-title content-enter';
-        contentEl.textContent = content;
-      } else if (section === 'subtitle') {
-        contentEl.className = 'card-subtitle content-enter';
-        contentEl.textContent = content;
-      } else if (section === 'body') {
-        contentEl.className = 'prose content-enter';
-        contentEl.textContent = content;
-      } else if (section === 'kicker') {
-        contentEl.className = 'badge badge-primary mb-2 content-enter';
-        contentEl.textContent = content;
-      } else {
-        contentEl.className = 'mb-2 content-enter';
-        contentEl.innerHTML = `<strong>${section}:</strong> ${typeof content === 'string' ? content : JSON.stringify(content)}`;
-      }
+      contentEl.className = 'mb-2 text-base opacity-70'; // Start as plain text
+      contentEl.dataset.section = section;
 
       cardBody.appendChild(contentEl);
+
+      // Convert content to display text
+      let displayText = '';
+      if (typeof content === 'string') {
+        displayText = content;
+      } else if (Array.isArray(content)) {
+        displayText = content.join('; ');
+      } else if (typeof content === 'object' && content !== null) {
+        displayText = JSON.stringify(content, null, 2);
+      } else {
+        displayText = String(content);
+      }
+
+      // Get typewriter speed from controls
+      const typewriterSpeed = parseInt(document.getElementById('typewriterSpeed')?.value || 5);
+
+      // Stream text with typewriter effect
+      if (typewriterSpeed > 0) {
+        await typewriterEffect(contentEl, displayText, typewriterSpeed);
+      } else {
+        // Instant display (no typewriter effect)
+        contentEl.textContent = displayText;
+      }
+
+      // Transform to rich content after typewriter completes
+      enrichContent(contentEl, section, content);
     }
 
     /**
@@ -400,6 +598,69 @@
     }
 
     /**
+     * Render placeholder image while waiting for generation
+     */
+    function renderPlaceholder(cardId, imageData) {
+      const card = cards.get(cardId);
+      if (!card) return;
+
+      logEvent(`🖼️ Placeholder: ${cardId.substring(0, 8)}`);
+
+      // Create image container
+      const cardBody = card.element.querySelector('.card-body');
+      let imageContainer = card.element.querySelector('.card-image');
+
+      if (!imageContainer) {
+        imageContainer = document.createElement('div');
+        imageContainer.className = 'card-image mb-4';
+        cardBody.prepend(imageContainer);
+      }
+
+      // Show placeholder with skeleton loading
+      imageContainer.innerHTML = `
+        <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-base-300">
+          <div class="skeleton-loading w-full h-full flex items-center justify-center">
+            <div class="loading loading-spinner loading-lg"></div>
+          </div>
+          <div class="absolute bottom-2 left-2 right-2 text-center">
+            <span class="badge badge-sm badge-ghost">Generating image...</span>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Render final generated image
+     */
+    function renderImage(cardId, imageResult) {
+      const card = cards.get(cardId);
+      if (!card) return;
+
+      logEvent(`✨ Image ready: ${cardId.substring(0, 8)}`);
+
+      const imageContainer = card.element.querySelector('.card-image');
+      if (!imageContainer) return;
+
+      // Fade out placeholder
+      imageContainer.style.opacity = '0';
+
+      setTimeout(() => {
+        // Replace with actual image
+        imageContainer.innerHTML = `
+          <div class="relative w-full aspect-video rounded-lg overflow-hidden">
+            <img
+              src="${imageResult.url}"
+              alt="${imageResult.prompt || 'Generated image'}"
+              class="w-full h-full object-cover"
+              style="animation: fadeIn 0.5s ease-in;"
+            />
+          </div>
+        `;
+        imageContainer.style.opacity = '1';
+      }, 300);
+    }
+
+    /**
      * Handle streaming messages
      */
     function handleMessage(data) {
@@ -428,6 +689,20 @@
           updateStatus('Streaming', 'style');
           if (data.cardId && data.styles) {
             renderCardStyle(data.cardId, data.styles);
+          }
+          break;
+
+        case 'placeholder':
+          updateStatus('Streaming', 'placeholder');
+          if (data.cardId && data.image) {
+            renderPlaceholder(data.cardId, data.image);
+          }
+          break;
+
+        case 'image':
+          updateStatus('Streaming', 'image');
+          if (data.cardId && data.result) {
+            renderImage(data.cardId, data.result);
           }
           break;
 
@@ -461,8 +736,21 @@
       const endpointType = document.getElementById('endpointType').value;
       const mockMode = document.getElementById('mockMode').value;
 
+      // LLM Mode parameters
+      const mode = document.getElementById('mode').value;
+      const presentationType = document.getElementById('presentationType').value;
+      const audience = document.getElementById('audience').value;
+      const tone = document.getElementById('tone').value;
+
+      // Image generation parameters
+      const includeImages = document.getElementById('includeImages').checked;
+      const imageProvider = document.getElementById('imageProvider').value;
+
       updateStatus('Connecting', '-');
-      logEvent(`🚀 Starting stream: ${topic} (${cardCount} cards)`);
+      logEvent(`🚀 Starting stream: ${topic} (${cardCount} cards, ${mode} mode)`);
+      if (includeImages) {
+        logEvent(`🖼️ Image generation enabled (provider: ${imageProvider})`);
+      }
 
       // Determine endpoint based on selection
       let endpoint, requestMethod, requestBody;
@@ -474,21 +762,32 @@
           cards: cardCount,
           mode: mockMode
         });
-        endpoint = `http://localhost:3001/mock/stream?${params}`;
+        // Use relative URL to leverage Vite proxy and avoid CORS issues
+        endpoint = `/mock/stream?${params}`;
         requestMethod = 'GET';
         logEvent(`🔧 Using MOCK server (mode: ${mockMode})`);
       } else {
         // Real API endpoint (POST with JSON body)
-        endpoint = 'http://localhost:3000/api/presentations/stream';
+        // Use relative URL to leverage Vite proxy and avoid CORS issues
+        endpoint = '/api/presentations/stream';
         requestMethod = 'POST';
         requestBody = JSON.stringify({
           topic,
           cardCount,
           style,
-          includeImages: false,
-          streamDelay
+          includeImages,
+          provider: imageProvider,
+          streamDelay,
+          // Phase 4: LLM parameters
+          mode,
+          presentationType,
+          audience,
+          tone
         });
-        logEvent(`🌐 Using REAL API`);
+        logEvent(`🌐 Using REAL API (${mode} mode)`);
+        if (mode === 'smart') {
+          logEvent(`🤖 LLM Config: ${presentationType} for ${audience}, tone: ${tone}`);
+        }
       }
 
       console.log('[CLIENT] ===== STARTING FETCH =====');
@@ -716,6 +1015,38 @@
       } else {
         mockModeContainer.style.display = 'none';
         logEvent('🌐 Switched to Real API mode');
+      }
+    });
+
+    // LLM Mode toggle
+    document.getElementById('mode').addEventListener('change', (e) => {
+      const presentationTypeContainer = document.getElementById('presentationTypeContainer');
+      const audienceContainer = document.getElementById('audienceContainer');
+      const toneContainer = document.getElementById('toneContainer');
+
+      if (e.target.value === 'smart') {
+        presentationTypeContainer.style.display = 'block';
+        audienceContainer.style.display = 'block';
+        toneContainer.style.display = 'block';
+        logEvent('🤖 Switched to Smart Mode (LLM-powered)');
+      } else {
+        presentationTypeContainer.style.display = 'none';
+        audienceContainer.style.display = 'none';
+        toneContainer.style.display = 'none';
+        logEvent('⚡ Switched to Fast Mode (template-based)');
+      }
+    });
+
+    // Image generation toggle
+    document.getElementById('includeImages').addEventListener('change', (e) => {
+      const imageProviderContainer = document.getElementById('imageProviderContainer');
+
+      if (e.target.checked) {
+        imageProviderContainer.style.display = 'block';
+        logEvent('🖼️ Image generation enabled');
+      } else {
+        imageProviderContainer.style.display = 'none';
+        logEvent('🚫 Image generation disabled');
       }
     });
   </script>

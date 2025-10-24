@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adaptive DaisyUI Card System - Container Queries Demo</title>
-  <link rel="stylesheet" href="./dist/output.css">
+  <link rel="stylesheet" href="/src/input.css">
 </head>
 <body class="bg-base-200 min-h-screen">
 
@@ -16,6 +16,14 @@
       <h1 class="text-4xl font-bold mb-2">Adaptive DaisyUI Card System</h1>
       <p class="text-lg opacity-70">CSS Container Queries with Scalable Typography</p>
       <p class="text-sm opacity-60 mt-2">Cards adapt to container size, not viewport width</p>
+      <div class="mt-4">
+        <a href="./tests/api/streaming-progressive.html" class="btn btn-primary btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          Try Progressive Streaming Demo
+        </a>
+      </div>
     </header>
 
     <!-- Control Panel -->
@@ -468,7 +476,7 @@
   </div>
 
   <!-- JavaScript for Interactivity -->
-  <script src="./src/app.js"></script>
+  <script type="module" src="./src/app.js"></script>
 
 </body>
 </html>

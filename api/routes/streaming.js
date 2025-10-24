@@ -243,12 +243,26 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
           ? themeService.normalizeTheme(theme)
           : themeService.getThemeByStyle(style);
 
-        cards = presentationData.cards.map(cardData => new Card({
-          type: cardData.type,
-          layout: cardData.layout,
-          content: cardData.content,
-          theme: presentationTheme
-        }));
+        cards = presentationData.cards.map(cardData => {
+          const card = new Card({
+            type: cardData.type,
+            layout: cardData.layout,
+            content: cardData.content,
+            theme: presentationTheme
+          });
+
+          // Generate images if requested (fallback path)
+          if (includeImages) {
+            const imageResult = imageGenerationService.generateImageAsync(card, {
+              provider,
+              aspectRatio: '16:9',
+              style
+            });
+            card.image = imageResult.image;
+          }
+
+          return card;
+        });
       }
 
     } else {
@@ -541,13 +555,16 @@ async function streamPresentation(clientId, cards, includeImages = false) {
     if (includeImages) {
       console.log('[STREAM-PRES] Stage 4: Emitting placeholders...');
       streamingService.emitProgress(clientId, 'placeholder', 80, 'Loading image placeholders');
+
+      // Emit placeholders for ALL cards when images are enabled
+      // This shows the loading state immediately while images generate
       for (const card of cards) {
-        if (card.image) {
-          await streamingService.emitPlaceholder(clientId, card);
-        }
+        console.log(`[STREAM-PRES] Emitting placeholder for card ${card.id}`);
+        await streamingService.emitPlaceholder(clientId, card);
       }
+
       streamingService.emitProgress(clientId, 'image', 90, 'Generating images (this may take a moment)');
-      console.log('[STREAM-PRES] ✓ Placeholders emitted');
+      console.log('[STREAM-PRES] ✓ Placeholders emitted for', cards.length, 'cards');
     }
 
     // Emit completion
