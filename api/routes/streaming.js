@@ -7,6 +7,7 @@ import express from 'express';
 import crypto from 'crypto';
 import { Card } from '../models/Card.js';
 import ContentGenerator from '../services/ContentGenerator.js';
+import { LLMContentGenerator } from '../services/LLMContentGenerator.js';
 import ThemeService from '../services/ThemeService.js';
 import TemplateEngine from '../services/TemplateEngine.js';
 import { imageGenerationService } from '../services/ImageGenerationService.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // Initialize services
 const contentGenerator = new ContentGenerator();
+const llmContentGenerator = new LLMContentGenerator({ mockMode: true }); // Phase 4: Smart mode generator
 const themeService = new ThemeService();
 const templateEngine = new TemplateEngine();
 
@@ -147,10 +149,18 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       provider = 'gemini',
       layouts,
       theme,
-      streamDelay
+      streamDelay,
+      // Phase 4: Smart mode parameters
+      mode = 'fast', // 'fast' | 'smart'
+      presentationType = 'education', // pitch | education | report | workshop | story
+      audience = 'general',
+      tone = 'professional' // professional | creative | minimal | inspirational
     } = req.body;
 
-    console.log('[ROUTE] Request params:', { topic, cardCount, style, includeImages, streamDelay });
+    console.log('[ROUTE] Request params:', {
+      topic, cardCount, style, includeImages, streamDelay,
+      mode, presentationType, audience, tone
+    });
 
     // Validate required fields
     if (!topic) {
@@ -168,43 +178,118 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
       });
     }
 
-    console.log('[ROUTE] Generating presentation content...');
+    console.log(`[ROUTE] Generating presentation content (mode: ${mode})...`);
 
-    // Generate presentation
-    const presentationData = contentGenerator.generatePresentation({
-      topic,
-      cardCount,
-      style,
-      includeImages: false, // We'll handle images via streaming
-      layouts
-    });
+    let cards;
+    let presentationTheme;
 
-    // Get theme
-    const presentationTheme = theme
-      ? themeService.normalizeTheme(theme)
-      : themeService.getThemeByStyle(style);
+    // Branch based on mode
+    if (mode === 'smart') {
+      // Phase 4: Smart mode with LLM
+      console.log('[ROUTE] 🎯 Using SMART MODE (LLM-powered generation)');
 
-    // Create Card objects
-    const cards = presentationData.cards.map(cardData => {
-      const card = new Card({
-        type: cardData.type,
-        layout: cardData.layout,
-        content: cardData.content,
-        theme: presentationTheme
-      });
-
-      // Generate images if requested
-      if (includeImages) {
-        const imageResult = imageGenerationService.generateImageAsync(card, {
-          provider,
-          aspectRatio: '16:9',
-          style
+      try {
+        // Generate with LLM
+        const presentation = await llmContentGenerator.generatePresentation({
+          topic,
+          cardCount,
+          presentationType,
+          audience,
+          tone
         });
-        card.image = imageResult.image;
+
+        console.log('[ROUTE] ✓ LLM generation complete');
+
+        // Get theme
+        presentationTheme = theme
+          ? themeService.normalizeTheme(theme)
+          : themeService.getThemeByStyle(style);
+
+        // Convert LLM cards to Card objects
+        cards = presentation.cards.map(cardData => {
+          const card = new Card({
+            type: cardData.type,
+            layout: cardData.layout,
+            content: cardData.content,
+            theme: presentationTheme
+          });
+
+          // Generate images if requested
+          if (includeImages) {
+            const imageResult = imageGenerationService.generateImageAsync(card, {
+              provider,
+              aspectRatio: '16:9',
+              style
+            });
+            card.image = imageResult.image;
+          }
+
+          return card;
+        });
+
+      } catch (error) {
+        console.error('[ROUTE] ✗ Smart mode failed, falling back to fast mode:', error.message);
+
+        // Fallback to fast mode
+        const presentationData = contentGenerator.generatePresentation({
+          topic,
+          cardCount,
+          style,
+          includeImages: false,
+          layouts
+        });
+
+        presentationTheme = theme
+          ? themeService.normalizeTheme(theme)
+          : themeService.getThemeByStyle(style);
+
+        cards = presentationData.cards.map(cardData => new Card({
+          type: cardData.type,
+          layout: cardData.layout,
+          content: cardData.content,
+          theme: presentationTheme
+        }));
       }
 
-      return card;
-    });
+    } else {
+      // Phase 3: Fast mode (template-based)
+      console.log('[ROUTE] ⚡ Using FAST MODE (template-based generation)');
+
+      const presentationData = contentGenerator.generatePresentation({
+        topic,
+        cardCount,
+        style,
+        includeImages: false, // We'll handle images via streaming
+        layouts
+      });
+
+      // Get theme
+      presentationTheme = theme
+        ? themeService.normalizeTheme(theme)
+        : themeService.getThemeByStyle(style);
+
+      // Create Card objects
+      cards = presentationData.cards.map(cardData => {
+        const card = new Card({
+          type: cardData.type,
+          layout: cardData.layout,
+          content: cardData.content,
+          theme: presentationTheme
+        });
+
+        // Generate images if requested
+        if (includeImages) {
+          const imageResult = imageGenerationService.generateImageAsync(card, {
+            provider,
+            aspectRatio: '16:9',
+            style
+          });
+          card.image = imageResult.image;
+        }
+
+        return card;
+      });
+    }
 
     console.log('[ROUTE] Generated', cards.length, 'cards');
 
