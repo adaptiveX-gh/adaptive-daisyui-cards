@@ -43,6 +43,15 @@
             <option value="masonry">Masonry Layout</option>
             <option value="dashboard">Dashboard Layout</option>
             <option value="split">Split Layout</option>
+            <option value="image-text">Image and Text Layout</option>
+            <option value="text-image">Text and Image Layout</option>
+            <option value="two-columns">Two Columns Layout</option>
+            <option value="two-columns-headings">Two Columns with Headings</option>
+            <option value="three-columns">Three Columns Layout</option>
+            <option value="three-columns-headings">Three Columns with Headings</option>
+            <option value="four-columns">Four Columns Layout</option>
+            <option value="title-bullets">Title with Bullets</option>
+            <option value="title-bullets-image">Title with Bullets and Image</option>
             <option value="hero">Hero/Presentation Layout</option>
             <option value="hero-overlay">Hero Overlay Layout</option>
           </select>
@@ -351,7 +360,152 @@
             </div>
           </div>
 
-          <!-- LAYOUT 6: HERO/PRESENTATION LAYOUT (Image Right) -->
+          <!-- LAYOUT 6: IMAGE AND TEXT LAYOUT -->
+          <div id="image-text-layout" class="image-text-layout layout-card hidden" data-layout="image-text">
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+                   alt="Collaborative workspace">
+            </div>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">About Our Company</h2>
+              <p class="adaptive-text-base opacity-80 mb-4">
+                We are a team of passionate designers and developers creating innovative solutions
+                for modern challenges. Our approach combines creativity with technical excellence
+                to deliver exceptional results.
+              </p>
+              <ul class="space-y-2 mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">Award-winning design team</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">10+ years of industry experience</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">Global client portfolio</span>
+                </li>
+              </ul>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm adaptive-text-sm">Learn More</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 7: TEXT AND IMAGE LAYOUT -->
+          <div id="text-image-layout" class="text-image-layout layout-card hidden" data-layout="text-image">
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Premium Features</h2>
+              <p class="adaptive-text-lg opacity-80 mb-4">
+                Unlock the full potential of our platform with advanced capabilities designed for power users.
+              </p>
+              <ul class="space-y-3 mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Advanced analytics dashboard with real-time insights</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Custom branding and white-label options</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Priority support with dedicated account manager</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">API access for seamless integrations</span>
+                </li>
+              </ul>
+              <div class="card-actions">
+                <button class="btn btn-primary adaptive-text-sm">Upgrade Now</button>
+                <button class="btn btn-outline adaptive-text-sm">Learn More</button>
+              </div>
+            </div>
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
+                   alt="Analytics dashboard on laptop">
+            </div>
+          </div>
+
+          <!-- LAYOUT 8: TWO COLUMNS LAYOUT -->
+          <div id="two-columns-layout" class="two-columns-layout layout-card hidden" data-layout="two-columns">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Platform Comparison</h2>
+              <p class="adaptive-text-base opacity-70">Choose the approach that best fits your needs</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Traditional Approach</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Built on proven methodologies with extensive legacy support and established workflows.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Comprehensive documentation available</li>
+                  <li class="adaptive-text-sm">Large community and ecosystem</li>
+                  <li class="adaptive-text-sm">Enterprise-grade stability</li>
+                  <li class="adaptive-text-sm">Gradual learning curve</li>
+                  <li class="adaptive-text-sm">Lower risk for critical projects</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Modern Approach</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Leverages cutting-edge technologies for enhanced performance and developer experience.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Faster development cycles</li>
+                  <li class="adaptive-text-sm">Built-in best practices</li>
+                  <li class="adaptive-text-sm">Superior performance metrics</li>
+                  <li class="adaptive-text-sm">Active innovation and updates</li>
+                  <li class="adaptive-text-sm">Smaller, optimized footprint</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 8.5: TWO COLUMNS WITH HEADINGS LAYOUT -->
+          <div id="two-columns-headings-layout" class="two-columns-headings-layout layout-card hidden" data-layout="two-columns-headings">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Decision Analysis</h2>
+              <p class="adaptive-text-base opacity-70">Evaluating the advantages and challenges of our proposed solution</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns-headings">
+              <div class="column">
+                <h3 class="column-heading">Benefits</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">
+                    Key advantages that will drive value and improve outcomes.
+                  </p>
+                  <ul>
+                    <li class="adaptive-text-sm">Increased operational efficiency by 40%</li>
+                    <li class="adaptive-text-sm">Reduced costs through automation</li>
+                    <li class="adaptive-text-sm">Better customer experience and satisfaction</li>
+                    <li class="adaptive-text-sm">Scalable architecture for future growth</li>
+                    <li class="adaptive-text-sm">Enhanced data security and compliance</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="column">
+                <h3 class="column-heading">Challenges</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">
+                    Important considerations that require careful planning and mitigation.
+                  </p>
+                  <ul>
+                    <li class="adaptive-text-sm">Initial implementation time of 6-8 months</li>
+                    <li class="adaptive-text-sm">Team training and change management needed</li>
+                    <li class="adaptive-text-sm">Legacy system integration complexity</li>
+                    <li class="adaptive-text-sm">Upfront investment in infrastructure</li>
+                    <li class="adaptive-text-sm">Potential short-term productivity dip</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 9: HERO/PRESENTATION LAYOUT (Image Right) -->
           <div id="hero-layout" class="hero-layout layout-card hidden" data-layout="hero">
             <div class="hero-content">
               <h1 class="hero-title">Transforming Marketing Segmentation Through Business Agility</h1>
@@ -362,7 +516,7 @@
             </div>
           </div>
 
-          <!-- LAYOUT 7: HERO/PRESENTATION OVERLAY -->
+          <!-- LAYOUT 10: HERO/PRESENTATION OVERLAY -->
           <div id="hero-overlay" class="hero-layout overlay layout-card hidden" data-layout="hero-overlay">
             <div class="hero-image">
               <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=800&fit=crop" alt="Team collaboration in modern office">
@@ -372,6 +526,205 @@
               <p class="hero-subtitle">A card component has a figure, a body part, and inside body there are title and actions parts</p>
               <div class="card-actions justify-end mt-4">
                 <button class="btn btn-primary">Buy Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 11: THREE COLUMNS LAYOUT -->
+          <div id="three-columns-layout" class="three-columns-layout layout-card hidden" data-layout="three-columns">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Our Services</h2>
+              <p class="adaptive-text-base opacity-70">Comprehensive solutions tailored to your business needs</p>
+            </div>
+            <div class="three-columns-container" data-layout-container="three-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Design</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Creating beautiful, user-centered interfaces that engage and delight your audience.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">UI/UX Design</li>
+                  <li class="adaptive-text-sm">Brand Identity</li>
+                  <li class="adaptive-text-sm">Design Systems</li>
+                  <li class="adaptive-text-sm">Prototyping</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Development</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Building robust, scalable applications with modern technologies and best practices.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Web Applications</li>
+                  <li class="adaptive-text-sm">Mobile Apps</li>
+                  <li class="adaptive-text-sm">API Development</li>
+                  <li class="adaptive-text-sm">Cloud Infrastructure</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Consulting</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Strategic guidance to help you navigate complex technology decisions and opportunities.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Technology Strategy</li>
+                  <li class="adaptive-text-sm">Process Optimization</li>
+                  <li class="adaptive-text-sm">Team Training</li>
+                  <li class="adaptive-text-sm">Performance Audits</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 12: THREE COLUMNS WITH HEADINGS LAYOUT -->
+          <div id="three-columns-headings-layout" class="three-columns-headings-layout layout-card hidden" data-layout="three-columns-headings">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Pricing Tiers</h2>
+              <p class="adaptive-text-base opacity-70">Choose the plan that fits your needs</p>
+            </div>
+            <div class="three-columns-container" data-layout-container="three-columns-headings">
+              <div class="column">
+                <h3 class="column-heading">Basic</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">
+                    Perfect for individuals and small projects getting started.
+                  </p>
+                  <ul>
+                    <li class="adaptive-text-sm">Up to 5 projects</li>
+                    <li class="adaptive-text-sm">10GB storage</li>
+                    <li class="adaptive-text-sm">Email support</li>
+                    <li class="adaptive-text-sm">Basic analytics</li>
+                    <li class="adaptive-text-sm">Community access</li>
+                  </ul>
+                  <p class="adaptive-text-2xl font-bold mt-4">$19<span class="adaptive-text-sm font-normal opacity-70">/month</span></p>
+                </div>
+              </div>
+              <div class="column">
+                <h3 class="column-heading">Pro</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">
+                    Best for growing teams and businesses with advanced needs.
+                  </p>
+                  <ul>
+                    <li class="adaptive-text-sm">Unlimited projects</li>
+                    <li class="adaptive-text-sm">100GB storage</li>
+                    <li class="adaptive-text-sm">Priority support</li>
+                    <li class="adaptive-text-sm">Advanced analytics</li>
+                    <li class="adaptive-text-sm">Team collaboration</li>
+                    <li class="adaptive-text-sm">Custom integrations</li>
+                  </ul>
+                  <p class="adaptive-text-2xl font-bold mt-4">$49<span class="adaptive-text-sm font-normal opacity-70">/month</span></p>
+                </div>
+              </div>
+              <div class="column">
+                <h3 class="column-heading">Enterprise</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">
+                    Comprehensive solution for large organizations with custom requirements.
+                  </p>
+                  <ul>
+                    <li class="adaptive-text-sm">Unlimited everything</li>
+                    <li class="adaptive-text-sm">1TB+ storage</li>
+                    <li class="adaptive-text-sm">24/7 dedicated support</li>
+                    <li class="adaptive-text-sm">Custom analytics</li>
+                    <li class="adaptive-text-sm">Advanced security</li>
+                    <li class="adaptive-text-sm">SLA guarantee</li>
+                    <li class="adaptive-text-sm">White-label options</li>
+                  </ul>
+                  <p class="adaptive-text-2xl font-bold mt-4">Custom<span class="adaptive-text-sm font-normal opacity-70"> pricing</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 13: FOUR COLUMNS LAYOUT -->
+          <div id="four-columns-layout" class="four-columns-layout layout-card hidden" data-layout="four-columns">
+            <div class="four-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">2024 Quarterly Performance</h2>
+              <p class="adaptive-text-base opacity-70">Strong growth across all quarters with record-breaking Q4</p>
+            </div>
+            <div class="four-columns-container" data-layout-container="four-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q1 2024</h3>
+                <p class="adaptive-text-3xl font-bold text-primary mb-2">$2.4M</p>
+                <p class="adaptive-text-base opacity-80 mb-3">Strong start with new product launches</p>
+                <ul>
+                  <li class="adaptive-text-sm">15% revenue growth</li>
+                  <li class="adaptive-text-sm">1,200 new customers</li>
+                  <li class="adaptive-text-sm">3 major releases</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q2 2024</h3>
+                <p class="adaptive-text-3xl font-bold text-secondary mb-2">$2.8M</p>
+                <p class="adaptive-text-base opacity-80 mb-3">Summer momentum with enterprise wins</p>
+                <ul>
+                  <li class="adaptive-text-sm">17% revenue growth</li>
+                  <li class="adaptive-text-sm">1,500 new customers</li>
+                  <li class="adaptive-text-sm">5 enterprise deals</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q3 2024</h3>
+                <p class="adaptive-text-3xl font-bold text-accent mb-2">$3.1M</p>
+                <p class="adaptive-text-base opacity-80 mb-3">Peak season performance exceeded targets</p>
+                <ul>
+                  <li class="adaptive-text-sm">20% revenue growth</li>
+                  <li class="adaptive-text-sm">1,800 new customers</li>
+                  <li class="adaptive-text-sm">Market expansion</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q4 2024</h3>
+                <p class="adaptive-text-3xl font-bold text-success mb-2">$3.6M</p>
+                <p class="adaptive-text-base opacity-80 mb-3">Record-breaking quarter, best year ever</p>
+                <ul>
+                  <li class="adaptive-text-sm">25% revenue growth</li>
+                  <li class="adaptive-text-sm">2,200 new customers</li>
+                  <li class="adaptive-text-sm">Industry recognition</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAYOUT 14: TITLE WITH BULLETS LAYOUT -->
+          <div id="title-bullets-layout" class="title-bullets-layout layout-card hidden" data-layout="title-bullets">
+            <div class="title-bullets-header">
+              <h2 class="adaptive-text-3xl font-bold">Key Takeaways</h2>
+              <p class="adaptive-text-lg opacity-70">Essential insights from today's presentation</p>
+            </div>
+            <div class="bullets-container">
+              <ul>
+                <li>Customer retention increased by 35% through improved onboarding and support</li>
+                <li>New product features drove 50% increase in user engagement metrics</li>
+                <li>Strategic partnerships expanded our market reach to 3 new regions</li>
+                <li>Team productivity improved 40% with new collaboration tools</li>
+                <li>Revenue per customer grew 28% with successful upsell initiatives</li>
+                <li>Customer satisfaction scores reached all-time high of 4.8/5.0</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- LAYOUT 15: TITLE WITH BULLETS AND IMAGE LAYOUT -->
+          <div id="title-bullets-image-layout" class="title-bullets-image-layout layout-card hidden" data-layout="title-bullets-image">
+            <div class="title-bullets-header">
+              <h2 class="adaptive-text-2xl font-bold">Product Features</h2>
+              <p class="adaptive-text-base opacity-70">Everything you need to succeed in one powerful platform</p>
+            </div>
+            <div class="content-container">
+              <div class="bullets-section">
+                <ul>
+                  <li class="adaptive-text-base">Real-time collaboration with unlimited team members</li>
+                  <li class="adaptive-text-base">Advanced analytics dashboard with customizable reports</li>
+                  <li class="adaptive-text-base">Automated workflows that save hours of manual work</li>
+                  <li class="adaptive-text-base">Enterprise-grade security with SOC 2 compliance</li>
+                  <li class="adaptive-text-base">Seamless integrations with 100+ popular tools</li>
+                  <li class="adaptive-text-base">24/7 customer support with 2-hour response time</li>
+                </ul>
+              </div>
+              <div class="image-section">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
+                     alt="Product dashboard interface">
               </div>
             </div>
           </div>
@@ -447,7 +800,7 @@
             </li>
             <li class="flex items-start gap-2">
               <span class="text-success mt-1">✓</span>
-              <span>7 distinct layout patterns with multiple breakpoints</span>
+              <span>16 distinct layout patterns with multiple breakpoints</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-success mt-1">✓</span>

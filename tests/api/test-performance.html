@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Management System - Performance Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../dist/output.css">
+</head>
+<body class="bg-base-200 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold mb-2">Performance Test</h1>
+    <p class="text-lg opacity-70 mb-8">Measure rendering performance for 100 cards</p>
+
+    <!-- Test Controls -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Test Configuration</h2>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Number of Cards</span>
+          </label>
+          <input type="number" id="cardCount" value="100" min="10" max="1000" class="input input-bordered" />
+        </div>
+
+        <div class="flex gap-4 mt-4">
+          <button onclick="runPerformanceTest()" class="btn btn-primary">Run Performance Test</button>
+          <button onclick="clearCards()" class="btn btn-outline">Clear Cards</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="stats shadow mb-8 w-full">
+      <div class="stat">
+        <div class="stat-title">Total Time</div>
+        <div class="stat-value text-primary" id="totalTime">-</div>
+        <div class="stat-desc">Target: &lt;10s</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Avg Per Card</div>
+        <div class="stat-value text-secondary" id="avgTime">-</div>
+        <div class="stat-desc">Target: &lt;100ms</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Cards Rendered</div>
+        <div class="stat-value" id="cardsRendered">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Memory Used</div>
+        <div class="stat-value text-info" id="memoryUsed">-</div>
+        <div class="stat-desc">Approx.</div>
+      </div>
+    </div>
+
+    <!-- Test Results -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Test Status</h2>
+        <div id="statusLog" class="font-mono text-sm space-y-1"></div>
+      </div>
+    </div>
+
+    <!-- Pass/Fail Summary -->
+    <div id="testSummary" class="card bg-base-100 shadow-xl mb-8" style="display: none;">
+      <div class="card-body">
+        <h2 class="card-title">Performance Assessment</h2>
+        <div id="assessmentResults"></div>
+      </div>
+    </div>
+
+    <!-- Rendered Cards (collapsed by default) -->
+    <div class="collapse collapse-arrow bg-base-100 shadow-xl">
+      <input type="checkbox" />
+      <div class="collapse-title text-xl font-medium">
+        Rendered Cards (Click to expand)
+      </div>
+      <div class="collapse-content">
+        <div id="cardsContainer" class="space-y-4 max-h-96 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./unified-pipeline.js"></script>
+  <script>
+    let pipeline;
+    const performanceData = {
+      times: [],
+      errors: [],
+      memoryBefore: 0,
+      memoryAfter: 0
+    };
+
+    function log(message, type = 'info') {
+      const statusLog = document.getElementById('statusLog');
+      const entry = document.createElement('div');
+
+      const icon = type === 'error' ? '✗' : type === 'success' ? '✓' : '•';
+      const color = type === 'error' ? 'text-error' : type === 'success' ? 'text-success' : 'text-base-content';
+
+      entry.className = color;
+      entry.textContent = `${icon} ${message}`;
+      statusLog.appendChild(entry);
+
+      // Auto-scroll
+      statusLog.scrollTop = statusLog.scrollHeight;
+    }
+
+    function clearCards() {
+      document.getElementById('cardsContainer').innerHTML = '';
+      document.getElementById('statusLog').innerHTML = '';
+      document.getElementById('testSummary').style.display = 'none';
+      document.getElementById('totalTime').textContent = '-';
+      document.getElementById('avgTime').textContent = '-';
+      document.getElementById('cardsRendered').textContent = '0';
+      document.getElementById('memoryUsed').textContent = '-';
+
+      performanceData.times = [];
+      performanceData.errors = [];
+    }
+
+    async function runPerformanceTest() {
+      clearCards();
+
+      const cardCount = parseInt(document.getElementById('cardCount').value);
+      log(`Starting performance test with ${cardCount} cards...`);
+
+      // Initialize pipeline
+      pipeline = new UnifiedPipeline();
+      log('Pipeline initialized', 'success');
+
+      // Measure memory before (if available)
+      if (performance.memory) {
+        performanceData.memoryBefore = performance.memory.usedJSHeapSize;
+        log(`Memory before: ${(performanceData.memoryBefore / 1024 / 1024).toFixed(2)} MB`);
+      }
+
+      // Start timer
+      const startTime = performance.now();
+
+      // Generate test data
+      const testCards = generateTestCards(cardCount);
+      log(`Generated ${testCards.length} test cards`);
+
+      // Render all cards
+      const container = document.getElementById('cardsContainer');
+      let successCount = 0;
+
+      for (let i = 0; i < testCards.length; i++) {
+        const cardStart = performance.now();
+
+        try {
+          const result = pipeline.createCard(`perf-${i}`, testCards[i].content);
+
+          // Add to DOM (wrapped in container)
+          const wrapper = document.createElement('div');
+          wrapper.className = 'card-container';
+          wrapper.style.width = '600px';
+          wrapper.innerHTML = result.html;
+          container.appendChild(wrapper);
+
+          const cardEnd = performance.now();
+          const cardTime = cardEnd - cardStart;
+          performanceData.times.push(cardTime);
+
+          successCount++;
+
+          // Log every 10 cards
+          if ((i + 1) % 10 === 0) {
+            log(`Rendered ${i + 1}/${testCards.length} cards (avg: ${(cardTime).toFixed(2)}ms)`);
+          }
+
+        } catch (error) {
+          const cardEnd = performance.now();
+          performanceData.times.push(cardEnd - cardStart);
+          performanceData.errors.push({ index: i, error: error.message });
+          log(`Error rendering card ${i}: ${error.message}`, 'error');
+        }
+      }
+
+      // End timer
+      const endTime = performance.now();
+      const totalTime = endTime - startTime;
+
+      // Measure memory after (if available)
+      if (performance.memory) {
+        performanceData.memoryAfter = performance.memory.usedJSHeapSize;
+        const memoryDelta = performanceData.memoryAfter - performanceData.memoryBefore;
+        log(`Memory after: ${(performanceData.memoryAfter / 1024 / 1024).toFixed(2)} MB (+${(memoryDelta / 1024 / 1024).toFixed(2)} MB)`);
+      }
+
+      // Calculate statistics
+      const avgTime = performanceData.times.reduce((a, b) => a + b, 0) / performanceData.times.length;
+
+      // Update UI
+      document.getElementById('totalTime').textContent = `${(totalTime / 1000).toFixed(2)}s`;
+      document.getElementById('avgTime').textContent = `${avgTime.toFixed(2)}ms`;
+      document.getElementById('cardsRendered').textContent = successCount;
+
+      if (performance.memory) {
+        const memoryDelta = performanceData.memoryAfter - performanceData.memoryBefore;
+        document.getElementById('memoryUsed').textContent = `${(memoryDelta / 1024 / 1024).toFixed(2)} MB`;
+      }
+
+      log(`\nTest complete!`, 'success');
+      log(`Total time: ${(totalTime / 1000).toFixed(2)}s`);
+      log(`Average per card: ${avgTime.toFixed(2)}ms`);
+      log(`Success rate: ${successCount}/${cardCount} (${((successCount / cardCount) * 100).toFixed(1)}%)`);
+
+      // Show assessment
+      showAssessment(totalTime, avgTime, successCount, cardCount);
+    }
+
+    function showAssessment(totalTime, avgTime, successCount, cardCount) {
+      const summary = document.getElementById('testSummary');
+      const results = document.getElementById('assessmentResults');
+
+      summary.style.display = 'block';
+
+      const criteria = [
+        {
+          name: 'Total rendering time',
+          target: 10000, // 10 seconds
+          actual: totalTime,
+          unit: 'ms',
+          passed: totalTime < 10000
+        },
+        {
+          name: 'Average time per card',
+          target: 100,
+          actual: avgTime,
+          unit: 'ms',
+          passed: avgTime < 100
+        },
+        {
+          name: 'Success rate',
+          target: 100,
+          actual: (successCount / cardCount) * 100,
+          unit: '%',
+          passed: successCount === cardCount
+        },
+        {
+          name: 'No console errors',
+          target: 0,
+          actual: performanceData.errors.length,
+          unit: 'errors',
+          passed: performanceData.errors.length === 0
+        }
+      ];
+
+      results.innerHTML = criteria.map(c => {
+        const icon = c.passed ? '✓' : '✗';
+        const color = c.passed ? 'success' : 'error';
+        return `
+          <div class="alert alert-${color} mb-2">
+            <span>${icon} <strong>${c.name}</strong>: ${c.actual.toFixed(2)}${c.unit} (target: ${c.passed ? '✓' : `<${c.target}${c.unit}`})</span>
+          </div>
+        `;
+      }).join('');
+
+      const allPassed = criteria.every(c => c.passed);
+      const overallStatus = allPassed ? 'success' : 'warning';
+
+      results.innerHTML += `
+        <div class="alert alert-${overallStatus} mt-4">
+          <span><strong>Overall Result:</strong> ${allPassed ? 'All performance targets met! ✓' : 'Some targets not met'}</span>
+        </div>
+      `;
+    }
+
+    function generateTestCards(count) {
+      const cards = [];
+      const layouts = [
+        { type: 'bullets', content: { title: 'Bullet Layout', bullets: ['Point 1', 'Point 2', 'Point 3'] } },
+        { type: 'metrics', content: { title: 'Metrics', metrics: [{ value: '99%', label: 'Metric 1' }, { value: '50', label: 'Metric 2' }] } },
+        { type: 'features', content: { title: 'Features', cells: [{ title: 'Feature 1' }, { title: 'Feature 2' }, { title: 'Feature 3' }] } },
+        { type: 'hero', content: { title: 'Hero Title', subtitle: 'Hero subtitle' } },
+        { type: 'mixed', content: { title: 'Mixed Content', body: 'Body text here', bullets: ['Item 1', 'Item 2'] } }
+      ];
+
+      for (let i = 0; i < count; i++) {
+        const template = layouts[i % layouts.length];
+        cards.push({
+          ...template,
+          content: {
+            ...template.content,
+            title: `${template.content.title} ${i + 1}`
+          }
+        });
+      }
+
+      return cards;
+    }
+
+    // Show instructions on load
+    window.addEventListener('load', () => {
+      log('Performance test ready. Click "Run Performance Test" to start.');
+      log(`Memory API available: ${!!performance.memory}`);
+    });
+  </script>
+</body>
+</html>

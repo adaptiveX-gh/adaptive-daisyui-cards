@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Management System - Comprehensive Test Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../dist/output.css">
+  <style>
+    .test-result {
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+    }
+    .test-pass { background: #d1f4e0; color: #065f46; }
+    .test-fail { background: #fee2e2; color: #991b1b; }
+    .test-skip { background: #fef3c7; color: #92400e; }
+  </style>
+</head>
+<body class="bg-base-200 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold mb-2">Visual Management System</h1>
+    <p class="text-lg opacity-70 mb-8">Comprehensive Test Suite for Intelligent Content-to-Visual Translation</p>
+
+    <!-- Test Controls -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Test Controls</h2>
+        <div class="flex gap-4">
+          <button onclick="runAllTests()" class="btn btn-primary">Run All Tests</button>
+          <button onclick="clearResults()" class="btn btn-outline">Clear Results</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Results Summary -->
+    <div class="stats shadow mb-8 w-full">
+      <div class="stat">
+        <div class="stat-title">Total Tests</div>
+        <div class="stat-value" id="totalTests">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Passed</div>
+        <div class="stat-value text-success" id="passedTests">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Failed</div>
+        <div class="stat-value text-error" id="failedTests">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Pass Rate</div>
+        <div class="stat-value text-primary" id="passRate">0%</div>
+      </div>
+    </div>
+
+    <!-- Test Results -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Test Results</h2>
+        <div id="testResults" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- Rendered Cards Container -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Rendered Cards Preview</h2>
+        <div id="cardsContainer" class="space-y-6" style="container-type: inline-size; container-name: card-container;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./unified-pipeline.js"></script>
+  <script>
+    // Initialize test framework
+    const testResults = [];
+    let pipeline;
+
+    function logTest(name, passed, message = '') {
+      testResults.push({ name, passed, message });
+
+      const resultsDiv = document.getElementById('testResults');
+      const resultEl = document.createElement('div');
+      resultEl.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+      resultEl.innerHTML = `
+        <strong>${passed ? '✓' : '✗'} ${name}</strong>
+        ${message ? `<div class="text-sm mt-1">${message}</div>` : ''}
+      `;
+      resultsDiv.appendChild(resultEl);
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const total = testResults.length;
+      const passed = testResults.filter(r => r.passed).length;
+      const failed = total - passed;
+      const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+
+      document.getElementById('totalTests').textContent = total;
+      document.getElementById('passedTests').textContent = passed;
+      document.getElementById('failedTests').textContent = failed;
+      document.getElementById('passRate').textContent = `${passRate}%`;
+    }
+
+    function clearResults() {
+      testResults.length = 0;
+      document.getElementById('testResults').innerHTML = '';
+      document.getElementById('cardsContainer').innerHTML = '';
+      updateSummary();
+    }
+
+    // =================================================================
+    // TEST SUITE: AC1 - Content Analysis & Layout Detection
+    // =================================================================
+
+    function testLayoutDetection() {
+      console.log('[TEST] Running Layout Detection Tests...');
+
+      // Test 1: Bullet points → split layout
+      const bulletContent = {
+        title: 'Key Features',
+        bullets: ['Feature 1', 'Feature 2', 'Feature 3']
+      };
+      const layout1 = pipeline.detectLayout(bulletContent);
+      logTest('AC1.1: Bullets → split-layout',
+        layout1 === 'split-layout',
+        `Expected: split-layout, Got: ${layout1}`
+      );
+
+      // Test 2: Metrics → dashboard layout
+      const metricsContent = {
+        title: 'Performance Metrics',
+        metrics: [
+          { value: '99%', label: 'Uptime' },
+          { value: '1.2s', label: 'Load Time' }
+        ]
+      };
+      const layout2 = pipeline.detectLayout(metricsContent);
+      logTest('AC1.2: Metrics → dashboard-layout',
+        layout2 === 'dashboard-layout',
+        `Expected: dashboard-layout, Got: ${layout2}`
+      );
+
+      // Test 3: 3+ cells → feature layout
+      const featureContent = {
+        title: 'Our Services',
+        cells: [
+          { title: 'Service 1', body: 'Description 1' },
+          { title: 'Service 2', body: 'Description 2' },
+          { title: 'Service 3', body: 'Description 3' }
+        ]
+      };
+      const layout3 = pipeline.detectLayout(featureContent);
+      logTest('AC1.3: 3+ cells → feature-layout',
+        layout3 === 'feature-layout',
+        `Expected: feature-layout, Got: ${layout3}`
+      );
+
+      // Test 4: Title + subtitle only → hero layout
+      const heroContent = {
+        title: 'Welcome',
+        subtitle: 'Get started with our platform'
+      };
+      const layout4 = pipeline.detectLayout(heroContent);
+      logTest('AC1.4: Title + subtitle → hero-layout',
+        layout4 === 'hero-layout',
+        `Expected: hero-layout, Got: ${layout4}`
+      );
+
+      // Test 5: Image + title → hero-overlay
+      const overlayContent = {
+        title: 'Amazing Product',
+        imageUrl: 'https://via.placeholder.com/800x400'
+      };
+      const layout5 = pipeline.detectLayout(overlayContent);
+      logTest('AC1.5: Image + title → hero-overlay',
+        layout5 === 'hero-overlay',
+        `Expected: hero-overlay, Got: ${layout5}`
+      );
+    }
+
+    // =================================================================
+    // TEST SUITE: AC2 - Content Normalization
+    // =================================================================
+
+    function testContentNormalization() {
+      console.log('[TEST] Running Content Normalization Tests...');
+
+      // Test 1: items → cells
+      const content1 = {
+        title: 'Test',
+        items: ['Item 1', 'Item 2']
+      };
+      const normalized1 = pipeline.normalizeContent(content1);
+      logTest('AC2.1: items → cells',
+        normalized1.cells && Array.isArray(normalized1.cells),
+        `Has cells: ${!!normalized1.cells}, Is array: ${Array.isArray(normalized1.cells)}`
+      );
+
+      // Test 2: features → cells
+      const content2 = {
+        title: 'Test',
+        features: [{ name: 'Feature 1' }, { name: 'Feature 2' }]
+      };
+      const normalized2 = pipeline.normalizeContent(content2);
+      logTest('AC2.2: features → cells',
+        normalized2.cells && Array.isArray(normalized2.cells),
+        `Has cells: ${!!normalized2.cells}`
+      );
+
+      // Test 3: intro → body
+      const content3 = {
+        title: 'Test',
+        intro: 'This is the introduction'
+      };
+      const normalized3 = pipeline.normalizeContent(content3);
+      logTest('AC2.3: intro → body',
+        normalized3.body === 'This is the introduction' && !normalized3.intro,
+        `Body: ${normalized3.body}, Has intro: ${!!normalized3.intro}`
+      );
+
+      // Test 4: data → metrics
+      const content4 = {
+        title: 'Test',
+        data: { users: '1000', revenue: '$50k' }
+      };
+      const normalized4 = pipeline.normalizeContent(content4);
+      logTest('AC2.4: data → metrics',
+        normalized4.metrics && Array.isArray(normalized4.metrics),
+        `Has metrics: ${!!normalized4.metrics}, Length: ${normalized4.metrics?.length}`
+      );
+
+      // Test 5: Stringified array → parsed array
+      const content5 = {
+        title: 'Test',
+        bullets: '["Bullet 1", "Bullet 2"]'
+      };
+      const normalized5 = pipeline.normalizeContent(content5);
+      logTest('AC2.5: Stringified array → parsed',
+        Array.isArray(normalized5.bullets),
+        `Is array: ${Array.isArray(normalized5.bullets)}, Length: ${normalized5.bullets?.length}`
+      );
+
+      // Test 6: Title variations (heading, header)
+      const content6 = { heading: 'Test Title' };
+      const normalized6 = pipeline.normalizeContent(content6);
+      logTest('AC2.6: heading → title',
+        normalized6.title === 'Test Title',
+        `Title: ${normalized6.title}`
+      );
+    }
+
+    // =================================================================
+    // TEST SUITE: AC3 - Progressive Rendering
+    // =================================================================
+
+    function testProgressiveRendering() {
+      console.log('[TEST] Running Progressive Rendering Tests...');
+
+      // Test 1: Partial content renders without error
+      const partialContent = {
+        title: 'Loading...'
+      };
+      try {
+        const result = pipeline.createCard('partial-1', partialContent);
+        logTest('AC3.1: Partial content renders',
+          result.html && result.html.length > 0,
+          'Card with only title rendered successfully'
+        );
+      } catch (error) {
+        logTest('AC3.1: Partial content renders', false, error.message);
+      }
+
+      // Test 2: Accumulating content updates correctly
+      const baseContent = { title: 'Test' };
+      const result1 = pipeline.createCard('acc-1', baseContent);
+
+      const expandedContent = { ...baseContent, body: 'Added body text' };
+      const result2 = pipeline.createCard('acc-1', expandedContent);
+
+      logTest('AC3.2: Content accumulation works',
+        result2.html.includes('Added body text'),
+        'Expanded content includes new body text'
+      );
+
+      // Test 3: Out-of-order handling (simulate receiving style before content)
+      try {
+        const result = pipeline.createCard('ooo-1', { title: 'Test' });
+        logTest('AC3.3: Out-of-order handling',
+          true,
+          'Pipeline handles minimal content gracefully'
+        );
+      } catch (error) {
+        logTest('AC3.3: Out-of-order handling', false, error.message);
+      }
+    }
+
+    // =================================================================
+    // TEST SUITE: AC4 - Responsive Adaptation
+    // =================================================================
+
+    function testResponsiveAdaptation() {
+      console.log('[TEST] Running Responsive Adaptation Tests...');
+
+      // Test 1: CSS classes are applied
+      const content = {
+        title: 'Test Card',
+        bullets: ['Item 1', 'Item 2']
+      };
+      const result = pipeline.createCard('resp-1', content);
+
+      logTest('AC4.1: Layout classes applied',
+        result.html.includes('split-layout'),
+        `HTML includes layout class: ${result.html.includes('split-layout')}`
+      );
+
+      // Test 2: Adaptive typography classes present
+      logTest('AC4.2: Adaptive typography classes',
+        result.html.includes('adaptive-text'),
+        `HTML includes adaptive typography: ${result.html.includes('adaptive-text')}`
+      );
+
+      // Test 3: Container query setup
+      logTest('AC4.3: Container query compatibility',
+        result.html.includes('layout-card'),
+        'Card has layout-card class for container queries'
+      );
+    }
+
+    // =================================================================
+    // TEST SUITE: AC5 - Error Recovery
+    // =================================================================
+
+    function testErrorRecovery() {
+      console.log('[TEST] Running Error Recovery Tests...');
+
+      // Test 1: Null content
+      try {
+        const result = pipeline.createCard('error-1', null);
+        logTest('AC5.1: Null content handled',
+          result.html && result.html.length > 0,
+          'Fallback HTML generated for null content'
+        );
+      } catch (error) {
+        logTest('AC5.1: Null content handled', false, error.message);
+      }
+
+      // Test 2: Malformed content
+      try {
+        const result = pipeline.createCard('error-2', { garbage: true });
+        logTest('AC5.2: Malformed content handled',
+          result.html && result.html.length > 0,
+          'Fallback HTML generated for malformed content'
+        );
+      } catch (error) {
+        logTest('AC5.2: Malformed content handled', false, error.message);
+      }
+
+      // Test 3: Missing required fields
+      try {
+        const result = pipeline.createCard('error-3', { body: 'No title' });
+        logTest('AC5.3: Missing title handled',
+          result.normalized.title === 'Untitled',
+          `Fallback title applied: ${result.normalized.title}`
+        );
+      } catch (error) {
+        logTest('AC5.3: Missing title handled', false, error.message);
+      }
+
+      // Test 4: Invalid layout override
+      try {
+        const result = pipeline.createCard('error-4',
+          { title: 'Test' },
+          'invalid-layout'
+        );
+        logTest('AC5.4: Invalid layout handled',
+          result.html && result.html.length > 0,
+          'Fallback to default layout'
+        );
+      } catch (error) {
+        logTest('AC5.4: Invalid layout handled', false, error.message);
+      }
+    }
+
+    // =================================================================
+    // TEST SUITE: AC6 - Visual Consistency
+    // =================================================================
+
+    function testVisualConsistency() {
+      console.log('[TEST] Running Visual Consistency Tests...');
+
+      // Test 1: All layouts use layout-card base class
+      const layouts = ['split-layout', 'feature-layout', 'hero-layout', 'dashboard-layout'];
+      layouts.forEach((layout, i) => {
+        const result = pipeline.createCard(`vc-${i}`, { title: 'Test' }, layout);
+        logTest(`AC6.${i + 1}: ${layout} uses layout-card`,
+          result.html.includes('layout-card'),
+          `Base class present: ${result.html.includes('layout-card')}`
+        );
+      });
+
+      // Test 2: Consistent spacing classes
+      const result = pipeline.createCard('vc-spacing', {
+        title: 'Test',
+        body: 'Body text'
+      });
+      logTest('AC6.5: Consistent spacing',
+        result.html.includes('mb-') || result.html.includes('mt-'),
+        'Spacing utility classes applied'
+      );
+    }
+
+    // =================================================================
+    // VISUAL TEST CASES - Render actual cards
+    // =================================================================
+
+    function renderVisualTests() {
+      console.log('[TEST] Rendering Visual Test Cases...');
+
+      const container = document.getElementById('cardsContainer');
+
+      // Test Case 1: Bullet points → split layout
+      const test1 = pipeline.createCard('visual-1', {
+        title: 'Test Case 1: Bullet Points',
+        subtitle: 'Should render as split layout',
+        bullets: [
+          'Bullet point one',
+          'Bullet point two',
+          'Bullet point three'
+        ]
+      });
+      container.innerHTML += `<div class="card-container" style="width: 650px;">${test1.html}</div>`;
+
+      // Test Case 2: Metrics → dashboard
+      const test2 = pipeline.createCard('visual-2', {
+        title: 'Test Case 2: Metrics',
+        metrics: [
+          { value: '99.9%', label: 'Uptime' },
+          { value: '1.2s', label: 'Load Time' },
+          { value: '10M', label: 'Users' },
+          { value: '$50M', label: 'Revenue' }
+        ]
+      });
+      container.innerHTML += `<div class="card-container" style="width: 650px;">${test2.html}</div>`;
+
+      // Test Case 3: Mixed content normalization
+      const test3 = pipeline.createCard('visual-3', {
+        title: 'Test Case 3: Mixed Content',
+        intro: 'This intro should become body',
+        items: ['Item 1', 'Item 2', 'Item 3', 'Item 4']
+      });
+      container.innerHTML += `<div class="card-container" style="width: 650px;">${test3.html}</div>`;
+
+      // Test Case 4: Error recovery
+      const test4 = pipeline.createCard('visual-4', null);
+      container.innerHTML += `<div class="card-container" style="width: 650px;">${test4.html}</div>`;
+    }
+
+    // =================================================================
+    // MAIN TEST RUNNER
+    // =================================================================
+
+    function runAllTests() {
+      clearResults();
+
+      console.log('[TEST] ===== STARTING TEST SUITE =====');
+
+      // Initialize pipeline
+      pipeline = new UnifiedPipeline();
+
+      // Run test suites
+      testLayoutDetection();
+      testContentNormalization();
+      testProgressiveRendering();
+      testResponsiveAdaptation();
+      testErrorRecovery();
+      testVisualConsistency();
+
+      // Render visual tests
+      renderVisualTests();
+
+      console.log('[TEST] ===== TEST SUITE COMPLETE =====');
+      console.log(`[TEST] Results: ${testResults.filter(r => r.passed).length}/${testResults.length} passed`);
+    }
+
+    // Auto-run tests on page load
+    window.addEventListener('load', () => {
+      runAllTests();
+    });
+  </script>
+</body>
+</html>

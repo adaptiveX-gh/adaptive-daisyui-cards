@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title with Bullets and Image Layout Test</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; background: oklch(var(--b2)); }
+    .test-section { margin-bottom: 3rem; background: oklch(var(--b1)); padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid oklch(var(--bc) / 0.1); }
+    .test-title { font-size: 1.5rem; font-weight: 700; color: oklch(var(--bc)); }
+    .test-width { font-family: monospace; font-size: 0.875rem; padding: 0.5rem 1rem; background: oklch(var(--p) / 0.1); color: oklch(var(--p)); border-radius: 0.5rem; font-weight: 600; }
+    .test-container { border: 2px dashed oklch(var(--bc) / 0.2); border-radius: 0.5rem; background: oklch(var(--b2)); padding: 1rem; }
+    .theme-toggle { margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto max-w-7xl">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Title with Bullets and Image Layout Tests</h1>
+      <p class="text-lg opacity-70 mb-4">Bullets left (60%), image right (40%) → stacks at <600px</p>
+      <div class="theme-toggle justify-center">
+        <button class="btn btn-sm theme-btn" data-theme="light">Light</button>
+        <button class="btn btn-sm theme-btn" data-theme="dark">Dark</button>
+        <button class="btn btn-sm theme-btn" data-theme="forest">Forest</button>
+      </div>
+    </header>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test: Desktop Width - Side-by-Side (800px)</h2>
+        <span class="test-width">800px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 800px; margin: 0 auto;">
+          <div class="layout-card title-bullets-image-layout">
+            <div class="title-bullets-header">
+              <h2 class="adaptive-text-2xl font-bold">Product Features</h2>
+              <p class="adaptive-text-base opacity-70">Everything you need in one platform</p>
+            </div>
+            <div class="content-container">
+              <div class="bullets-section">
+                <ul>
+                  <li class="adaptive-text-base">Real-time collaboration with unlimited team members</li>
+                  <li class="adaptive-text-base">Advanced analytics dashboard with custom reports</li>
+                  <li class="adaptive-text-base">Automated workflows that save hours</li>
+                  <li class="adaptive-text-base">Enterprise-grade security with SOC 2 compliance</li>
+                  <li class="adaptive-text-base">Seamless integrations with 100+ tools</li>
+                </ul>
+              </div>
+              <div class="image-section">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" alt="Product dashboard">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test: Mobile Width - Stacked (500px)</h2>
+        <span class="test-width">500px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 500px; margin: 0 auto;">
+          <div class="layout-card title-bullets-image-layout">
+            <div class="title-bullets-header">
+              <h2 class="adaptive-text-2xl font-bold">Why Choose Us</h2>
+            </div>
+            <div class="content-container">
+              <div class="bullets-section">
+                <ul>
+                  <li class="adaptive-text-base">10+ years industry experience</li>
+                  <li class="adaptive-text-base">Award-winning design team</li>
+                  <li class="adaptive-text-base">Global client portfolio</li>
+                </ul>
+              </div>
+              <div class="image-section">
+                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop" alt="Team collaboration">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">UnifiedPipeline Test</h2>
+        <span class="test-width">Dynamic</span>
+      </div>
+      <div class="test-container">
+        <div id="pipeline-test-container"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+  <script>
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', btn.dataset.theme);
+      });
+    });
+
+    const pipeline = new UnifiedPipeline();
+    const testContent = {
+      title: "Platform Benefits",
+      subtitle: "What makes us different",
+      bullets: [
+        "Intuitive interface designed for ease of use",
+        "Powerful features without the complexity",
+        "24/7 support from dedicated team",
+        "Regular updates and new features"
+      ],
+      imageUrl: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+    };
+
+    const result = pipeline.createCard('pipeline-test', testContent);
+    document.getElementById('pipeline-test-container').innerHTML = `
+      <div class="mb-4 alert alert-info"><span>✓ Layout: <strong>${result.layout}</strong></span></div>
+      <div class="card-container" style="width: 800px; margin: 0 auto;">${result.html}</div>
+    `;
+  </script>
+</body>
+</html>

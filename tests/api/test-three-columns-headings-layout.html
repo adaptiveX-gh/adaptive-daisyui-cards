@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three Columns with Headings Layout Test</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; background: oklch(var(--b2)); }
+    .test-section { margin-bottom: 3rem; background: oklch(var(--b1)); padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid oklch(var(--bc) / 0.1); }
+    .test-title { font-size: 1.5rem; font-weight: 700; color: oklch(var(--bc)); }
+    .test-width { font-family: monospace; font-size: 0.875rem; padding: 0.5rem 1rem; background: oklch(var(--p) / 0.1); color: oklch(var(--p)); border-radius: 0.5rem; font-weight: 600; }
+    .test-container { border: 2px dashed oklch(var(--bc) / 0.2); border-radius: 0.5rem; background: oklch(var(--b2)); padding: 1rem; }
+    .theme-toggle { margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto max-w-7xl">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Three Columns with Headings Layout Tests</h1>
+      <p class="text-lg opacity-70 mb-4">Testing 3-column layout with prominent column headings</p>
+      <div class="theme-toggle justify-center">
+        <button class="btn btn-sm theme-btn" data-theme="light">Light</button>
+        <button class="btn btn-sm theme-btn" data-theme="dark">Dark</button>
+        <button class="btn btn-sm theme-btn" data-theme="valentine">Valentine</button>
+      </div>
+    </header>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test: Pricing Tiers (900px)</h2>
+        <span class="test-width">900px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 900px; margin: 0 auto;">
+          <div class="layout-card three-columns-headings-layout">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Pricing Tiers</h2>
+              <p class="adaptive-text-base opacity-70">Choose the plan that fits</p>
+            </div>
+            <div class="three-columns-container">
+              <div class="column">
+                <h3 class="column-heading">Basic</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">For individuals</p>
+                  <ul>
+                    <li class="adaptive-text-sm">5 projects</li>
+                    <li class="adaptive-text-sm">10GB storage</li>
+                    <li class="adaptive-text-sm">Email support</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="column">
+                <h3 class="column-heading">Pro</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">For teams</p>
+                  <ul>
+                    <li class="adaptive-text-sm">Unlimited projects</li>
+                    <li class="adaptive-text-sm">100GB storage</li>
+                    <li class="adaptive-text-sm">Priority support</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="column">
+                <h3 class="column-heading">Enterprise</h3>
+                <div class="column-content">
+                  <p class="adaptive-text-base opacity-80">For organizations</p>
+                  <ul>
+                    <li class="adaptive-text-sm">Unlimited everything</li>
+                    <li class="adaptive-text-sm">1TB+ storage</li>
+                    <li class="adaptive-text-sm">Dedicated support</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">UnifiedPipeline Test</h2>
+        <span class="test-width">Dynamic</span>
+      </div>
+      <div class="test-container">
+        <div id="pipeline-test-container"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+  <script>
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', btn.dataset.theme);
+      });
+    });
+
+    const pipeline = new UnifiedPipeline();
+    const testContent = {
+      title: "Product Variants",
+      subtitle: "Three different approaches",
+      columns: [
+        { heading: "Standard", text: "Classic features", bullets: ["Feature A", "Feature B"] },
+        { heading: "Advanced", text: "Enhanced capabilities", bullets: ["All Standard", "Feature C", "Feature D"] },
+        { heading: "Ultimate", text: "Complete package", bullets: ["All Advanced", "Feature E", "Feature F"] }
+      ]
+    };
+
+    const result = pipeline.createCard('pipeline-test', testContent);
+    document.getElementById('pipeline-test-container').innerHTML = `
+      <div class="mb-4 alert alert-info"><span>✓ Layout: <strong>${result.layout}</strong></span></div>
+      <div class="card-container" style="width: 800px; margin: 0 auto;">${result.html}</div>
+    `;
+  </script>
+</body>
+</html>

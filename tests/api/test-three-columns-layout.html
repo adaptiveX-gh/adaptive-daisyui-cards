@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three Columns Layout Test - Container Query System</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: oklch(var(--b2));
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+      background: oklch(var(--b1));
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid oklch(var(--bc) / 0.1);
+    }
+
+    .test-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: oklch(var(--bc));
+    }
+
+    .test-width {
+      font-family: monospace;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      background: oklch(var(--p) / 0.1);
+      color: oklch(var(--p));
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+
+    .test-container {
+      border: 2px dashed oklch(var(--bc) / 0.2);
+      border-radius: 0.5rem;
+      background: oklch(var(--b2));
+      padding: 1rem;
+    }
+
+    .theme-toggle {
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mx-auto max-w-7xl">
+
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Three Columns Layout Tests</h1>
+      <p class="text-lg opacity-70 mb-4">Testing 3-column responsive behavior: 3-col → 2-col (3rd full-width) → 1-col</p>
+
+      <!-- Theme Toggle -->
+      <div class="theme-toggle justify-center">
+        <button class="btn btn-sm theme-btn" data-theme="light">Light</button>
+        <button class="btn btn-sm theme-btn" data-theme="dark">Dark</button>
+        <button class="btn btn-sm theme-btn" data-theme="cyberpunk">Cyberpunk</button>
+        <button class="btn btn-sm theme-btn" data-theme="forest">Forest</button>
+      </div>
+    </header>
+
+    <!-- Test 1: Desktop Width (900px) - Three Columns -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 1: Desktop Width - Three Columns Side-by-Side</h2>
+        <span class="test-width">900px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 900px; margin: 0 auto;">
+          <div class="layout-card three-columns-layout">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Our Services</h2>
+              <p class="adaptive-text-base opacity-70">Comprehensive solutions for your needs</p>
+            </div>
+            <div class="three-columns-container">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Design</h3>
+                <p class="adaptive-text-base opacity-80">Creating beautiful interfaces</p>
+                <ul>
+                  <li class="adaptive-text-sm">UI/UX Design</li>
+                  <li class="adaptive-text-sm">Brand Identity</li>
+                  <li class="adaptive-text-sm">Prototyping</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Development</h3>
+                <p class="adaptive-text-base opacity-80">Building robust applications</p>
+                <ul>
+                  <li class="adaptive-text-sm">Web Apps</li>
+                  <li class="adaptive-text-sm">Mobile Apps</li>
+                  <li class="adaptive-text-sm">APIs</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Consulting</h3>
+                <p class="adaptive-text-base opacity-80">Strategic guidance</p>
+                <ul>
+                  <li class="adaptive-text-sm">Tech Strategy</li>
+                  <li class="adaptive-text-sm">Process Optimization</li>
+                  <li class="adaptive-text-sm">Training</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 2: Tablet Width (700px) - Two Columns + Third Full Width -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 2: Tablet Width - Two Columns + Third Full Width</h2>
+        <span class="test-width">700px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 700px; margin: 0 auto;">
+          <div class="layout-card three-columns-layout">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Development Process</h2>
+              <p class="adaptive-text-base opacity-70">Our three-phase approach</p>
+            </div>
+            <div class="three-columns-container">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Discovery</h3>
+                <p class="adaptive-text-base opacity-80">Understanding your needs</p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Development</h3>
+                <p class="adaptive-text-base opacity-80">Building the solution</p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Deployment</h3>
+                <p class="adaptive-text-base opacity-80">Launching and supporting</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 3: Mobile Width (400px) - Stacked -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 3: Mobile Width - All Stacked</h2>
+        <span class="test-width">400px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 400px; margin: 0 auto;">
+          <div class="layout-card three-columns-layout">
+            <div class="three-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Key Features</h2>
+            </div>
+            <div class="three-columns-container">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Fast</h3>
+                <p class="adaptive-text-base opacity-80">Lightning-quick performance</p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Secure</h3>
+                <p class="adaptive-text-base opacity-80">Enterprise-grade security</p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Scalable</h3>
+                <p class="adaptive-text-base opacity-80">Grows with your needs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 4: UnifiedPipeline Integration -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 4: UnifiedPipeline Generation</h2>
+        <span class="test-width">Dynamic</span>
+      </div>
+      <div class="test-container">
+        <div id="pipeline-test-container"></div>
+        <div class="mt-4 p-4 bg-base-200 rounded-lg">
+          <h4 class="font-bold mb-2">Test Content Object:</h4>
+          <pre class="text-xs overflow-auto" id="test-content-json"></pre>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+
+  <script>
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', btn.dataset.theme);
+      });
+    });
+
+    const pipeline = new UnifiedPipeline();
+
+    const testContent = {
+      title: "Product Pillars",
+      subtitle: "Three core principles that drive our success",
+      columns: [
+        {
+          title: "Innovation",
+          text: "Continuous improvement and cutting-edge solutions"
+        },
+        {
+          title: "Quality",
+          text: "Excellence in every detail and interaction"
+        },
+        {
+          title: "Support",
+          text: "Dedicated assistance whenever you need it"
+        }
+      ]
+    };
+
+    document.getElementById('test-content-json').textContent = JSON.stringify(testContent, null, 2);
+    const result = pipeline.createCard('pipeline-test', testContent);
+
+    document.getElementById('pipeline-test-container').innerHTML = `
+      <div class="mb-4 alert alert-info">
+        <span>✓ Detected Layout: <strong>${result.layout}</strong></span>
+      </div>
+      <div class="card-container" style="width: 800px; margin: 0 auto;">
+        ${result.html}
+      </div>
+    `;
+  </script>
+
+</body>
+</html>

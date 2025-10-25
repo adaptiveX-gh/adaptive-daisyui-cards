@@ -34,6 +34,15 @@ const elements = {
     masonry: document.getElementById('masonry-layout'),
     dashboard: document.getElementById('dashboard-layout'),
     split: document.getElementById('split-layout'),
+    'image-text': document.getElementById('image-text-layout'),
+    'text-image': document.getElementById('text-image-layout'),
+    'two-columns': document.getElementById('two-columns-layout'),
+    'two-columns-headings': document.getElementById('two-columns-headings-layout'),
+    'three-columns': document.getElementById('three-columns-layout'),
+    'three-columns-headings': document.getElementById('three-columns-headings-layout'),
+    'four-columns': document.getElementById('four-columns-layout'),
+    'title-bullets': document.getElementById('title-bullets-layout'),
+    'title-bullets-image': document.getElementById('title-bullets-image-layout'),
     hero: document.getElementById('hero-layout'),
     'hero-overlay': document.getElementById('hero-overlay')
   }

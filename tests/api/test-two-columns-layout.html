@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Columns Layout Test - Container Query System</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: oklch(var(--b2));
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+      background: oklch(var(--b1));
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid oklch(var(--bc) / 0.1);
+    }
+
+    .test-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: oklch(var(--bc));
+    }
+
+    .test-width {
+      font-family: monospace;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      background: oklch(var(--p) / 0.1);
+      color: oklch(var(--p));
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+
+    .test-container {
+      border: 2px dashed oklch(var(--bc) / 0.2);
+      border-radius: 0.5rem;
+      background: oklch(var(--b2));
+      padding: 1rem;
+    }
+
+    .theme-toggle {
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mx-auto max-w-7xl">
+
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Two Columns Layout Tests</h1>
+      <p class="text-lg opacity-70 mb-4">Comprehensive testing across widths, content types, and themes</p>
+
+      <!-- Theme Toggle -->
+      <div class="theme-toggle justify-center">
+        <button class="btn btn-sm theme-btn" data-theme="light">Light</button>
+        <button class="btn btn-sm theme-btn" data-theme="dark">Dark</button>
+        <button class="btn btn-sm theme-btn" data-theme="cupcake">Cupcake</button>
+        <button class="btn btn-sm theme-btn" data-theme="cyberpunk">Cyberpunk</button>
+        <button class="btn btn-sm theme-btn" data-theme="valentine">Valentine</button>
+        <button class="btn btn-sm theme-btn" data-theme="forest">Forest</button>
+      </div>
+    </header>
+
+    <!-- Test 1: Desktop Width (800px) - Full Side-by-Side -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 1: Desktop Width - Side-by-Side Layout</h2>
+        <span class="test-width">800px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 800px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Platform Comparison</h2>
+              <p class="adaptive-text-base opacity-70">Choose the approach that best fits your needs</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Traditional Approach</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Built on proven methodologies with extensive legacy support.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Comprehensive documentation</li>
+                  <li class="adaptive-text-sm">Large community ecosystem</li>
+                  <li class="adaptive-text-sm">Enterprise-grade stability</li>
+                  <li class="adaptive-text-sm">Gradual learning curve</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Modern Approach</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Leverages cutting-edge technologies for enhanced performance.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Faster development cycles</li>
+                  <li class="adaptive-text-sm">Built-in best practices</li>
+                  <li class="adaptive-text-sm">Superior performance metrics</li>
+                  <li class="adaptive-text-sm">Active innovation</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 2: Tablet Width (500px) - Stacked Columns -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 2: Tablet Width - Stacked Layout</h2>
+        <span class="test-width">500px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 500px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Pros vs Cons</h2>
+              <p class="adaptive-text-base opacity-70">Weighing the options</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Advantages</h3>
+                <ul>
+                  <li class="adaptive-text-sm">Improved user experience</li>
+                  <li class="adaptive-text-sm">Reduced operational costs</li>
+                  <li class="adaptive-text-sm">Scalable architecture</li>
+                  <li class="adaptive-text-sm">Enhanced security</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Challenges</h3>
+                <ul>
+                  <li class="adaptive-text-sm">Initial migration effort</li>
+                  <li class="adaptive-text-sm">Training requirements</li>
+                  <li class="adaptive-text-sm">Temporary workflow disruption</li>
+                  <li class="adaptive-text-sm">Upfront investment needed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 3: Mobile Width (300px) - Compact Stacked -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 3: Mobile Width - Compact Stacked</h2>
+        <span class="test-width">300px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 300px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Before & After</h2>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Before</h3>
+                <p class="adaptive-text-base opacity-80">Manual processes and disconnected systems</p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">After</h3>
+                <p class="adaptive-text-base opacity-80">Automated workflows and integrated platform</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 4: Text in Both Columns -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 4: Text Content Only</h2>
+        <span class="test-width">700px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 700px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Two Perspectives</h2>
+              <p class="adaptive-text-base opacity-70">Different viewpoints on the same topic</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Perspective A</h3>
+                <p class="adaptive-text-base opacity-80">
+                  This approach emphasizes stability and proven track records. Organizations
+                  prioritizing risk mitigation often prefer this path, accepting slower innovation
+                  in exchange for predictable outcomes.
+                </p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Perspective B</h3>
+                <p class="adaptive-text-base opacity-80">
+                  This strategy values agility and competitive advantage. Companies in fast-moving
+                  markets typically favor this direction, embracing calculated risks to stay ahead
+                  of market trends.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 5: Mixed Content (Text + Bullets) -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 5: Mixed Content - Text and Bullets</h2>
+        <span class="test-width">750px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 750px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Feature Comparison</h2>
+              <p class="adaptive-text-base opacity-70">Essential vs Premium tiers</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Essential Plan</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Perfect for individuals and small teams getting started.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Up to 5 users</li>
+                  <li class="adaptive-text-sm">10 GB storage</li>
+                  <li class="adaptive-text-sm">Email support</li>
+                  <li class="adaptive-text-sm">Basic analytics</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Premium Plan</h3>
+                <p class="adaptive-text-base opacity-80">
+                  Advanced features for growing organizations and enterprises.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Unlimited users</li>
+                  <li class="adaptive-text-sm">1 TB storage</li>
+                  <li class="adaptive-text-sm">24/7 priority support</li>
+                  <li class="adaptive-text-sm">Advanced analytics & reporting</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 6: With Images -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 6: Columns with Images</h2>
+        <span class="test-width">900px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 900px; margin: 0 auto;">
+          <div class="layout-card two-columns-layout">
+            <div class="two-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">Platform Options</h2>
+              <p class="adaptive-text-base opacity-70">Visual comparison of our solutions</p>
+            </div>
+            <div class="two-columns-container" data-layout-container="two-columns">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Cloud Solution</h3>
+                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=400&fit=crop" alt="Cloud infrastructure">
+                <p class="adaptive-text-base opacity-80">
+                  Scalable, secure, and accessible from anywhere.
+                </p>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">On-Premise Solution</h3>
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop" alt="Server infrastructure">
+                <p class="adaptive-text-base opacity-80">
+                  Complete control and dedicated resources.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 7: UnifiedPipeline Integration -->
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test 7: UnifiedPipeline Generation</h2>
+        <span class="test-width">Dynamic</span>
+      </div>
+      <div class="test-container">
+        <div id="pipeline-test-container"></div>
+        <div class="mt-4 p-4 bg-base-200 rounded-lg">
+          <h4 class="font-bold mb-2">Test Content Object:</h4>
+          <pre class="text-xs overflow-auto" id="test-content-json"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center opacity-60 py-8">
+      <p>Two Columns Layout Test Suite - Container Query System</p>
+      <p class="mt-2 text-sm">Tests responsive behavior, content types, and theme compatibility</p>
+    </footer>
+
+  </div>
+
+  <!-- Load UnifiedPipeline -->
+  <script src="/tests/api/unified-pipeline.js"></script>
+
+  <script>
+    // Theme switching
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        document.documentElement.setAttribute('data-theme', theme);
+      });
+    });
+
+    // UnifiedPipeline test
+    const pipeline = new UnifiedPipeline();
+
+    // Test content with columns array
+    const testContent = {
+      title: "Development Methodologies",
+      subtitle: "Choosing the right approach for your team",
+      columns: [
+        {
+          title: "Waterfall",
+          text: "Sequential development with distinct phases",
+          bullets: [
+            "Clear milestones and deliverables",
+            "Comprehensive upfront planning",
+            "Best for stable requirements",
+            "Predictable timeline and budget"
+          ]
+        },
+        {
+          title: "Agile",
+          text: "Iterative development with continuous feedback",
+          bullets: [
+            "Flexible and adaptive to change",
+            "Frequent delivery of value",
+            "Best for evolving requirements",
+            "Collaborative team approach"
+          ]
+        }
+      ]
+    };
+
+    // Display test content
+    document.getElementById('test-content-json').textContent = JSON.stringify(testContent, null, 2);
+
+    // Generate card
+    const result = pipeline.createCard('pipeline-test', testContent);
+
+    // Display result
+    const container = document.getElementById('pipeline-test-container');
+    container.innerHTML = `
+      <div class="mb-4 alert alert-info">
+        <span>✓ Detected Layout: <strong>${result.layout}</strong></span>
+      </div>
+      <div class="card-container" style="width: 800px; margin: 0 auto;">
+        ${result.html}
+      </div>
+    `;
+
+    console.log('UnifiedPipeline Test Result:', result);
+  </script>
+
+</body>
+</html>

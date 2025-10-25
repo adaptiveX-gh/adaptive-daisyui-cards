@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Columns with Headings Layout - Test</title>
+  <link rel="stylesheet" href="../../dist/output.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: oklch(var(--b2));
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+    }
+
+    .test-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: oklch(var(--bc));
+    }
+
+    .test-description {
+      color: oklch(var(--bc) / 0.7);
+      margin-bottom: 1rem;
+    }
+
+    /* Container wrappers for testing different widths */
+    .container-desktop {
+      container-type: inline-size;
+      container-name: card;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 3rem;
+      background: oklch(var(--b1));
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .container-tablet {
+      container-type: inline-size;
+      container-name: card;
+      width: 100%;
+      max-width: 550px;
+      margin: 0 auto 3rem;
+      background: oklch(var(--b1));
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .container-mobile {
+      container-type: inline-size;
+      container-name: card;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto 3rem;
+      background: oklch(var(--b1));
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .width-label {
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: oklch(var(--p));
+      margin-bottom: 0.5rem;
+    }
+
+    .theme-switcher {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme Switcher -->
+  <div class="theme-switcher">
+    <select id="theme-select" class="select select-bordered select-sm">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="cupcake">Cupcake</option>
+      <option value="cyberpunk">Cyberpunk</option>
+      <option value="forest">Forest</option>
+      <option value="aqua">Aqua</option>
+    </select>
+  </div>
+
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-4xl font-bold mb-2 text-center">Two Columns with Headings Layout</h1>
+    <p class="text-center opacity-70 mb-8">Testing responsive behavior and content variations</p>
+
+    <!-- TEST 1: Desktop Width - Pros/Cons -->
+    <div class="test-section">
+      <h2 class="test-title">Test 1: Desktop Width (900px) - Pros/Cons</h2>
+      <p class="test-description">Should display side-by-side columns with clear separation</p>
+      <div class="width-label">900px Container</div>
+      <div class="container-desktop">
+        <div class="two-columns-headings-layout layout-card">
+          <div class="two-columns-header">
+            <h2 class="adaptive-text-2xl font-bold">Migrating to Cloud Infrastructure</h2>
+            <p class="adaptive-text-base opacity-70">Evaluating the decision to move our systems to the cloud</p>
+          </div>
+          <div class="two-columns-container" data-layout-container="two-columns-headings">
+            <div class="column">
+              <h3 class="column-heading">Pros</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Key advantages that make cloud migration attractive for our organization.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Scalability on demand without hardware purchases</li>
+                  <li class="adaptive-text-sm">Reduced infrastructure maintenance costs</li>
+                  <li class="adaptive-text-sm">Built-in disaster recovery and backups</li>
+                  <li class="adaptive-text-sm">Global availability and performance</li>
+                  <li class="adaptive-text-sm">Pay-as-you-go pricing model</li>
+                </ul>
+              </div>
+            </div>
+            <div class="column">
+              <h3 class="column-heading">Cons</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Important challenges and considerations we must address during migration.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Ongoing subscription costs can accumulate</li>
+                  <li class="adaptive-text-sm">Dependency on internet connectivity</li>
+                  <li class="adaptive-text-sm">Data security and compliance concerns</li>
+                  <li class="adaptive-text-sm">Vendor lock-in risks</li>
+                  <li class="adaptive-text-sm">Migration complexity for legacy systems</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST 2: Tablet Width - Benefits/Risks -->
+    <div class="test-section">
+      <h2 class="test-title">Test 2: Tablet Width (550px) - Benefits/Risks</h2>
+      <p class="test-description">Should stack vertically, each column retaining its heading</p>
+      <div class="width-label">550px Container</div>
+      <div class="container-tablet">
+        <div class="two-columns-headings-layout layout-card">
+          <div class="two-columns-header">
+            <h2 class="adaptive-text-2xl font-bold">AI Implementation Strategy</h2>
+            <p class="adaptive-text-base opacity-70">Weighing the opportunities and challenges of AI adoption</p>
+          </div>
+          <div class="two-columns-container" data-layout-container="two-columns-headings">
+            <div class="column">
+              <h3 class="column-heading">Benefits</h3>
+              <div class="column-content">
+                <ul>
+                  <li class="adaptive-text-sm">Automate repetitive tasks</li>
+                  <li class="adaptive-text-sm">Improve decision-making accuracy</li>
+                  <li class="adaptive-text-sm">Enhanced customer experience</li>
+                  <li class="adaptive-text-sm">Competitive advantage in market</li>
+                </ul>
+              </div>
+            </div>
+            <div class="column">
+              <h3 class="column-heading">Risks</h3>
+              <div class="column-content">
+                <ul>
+                  <li class="adaptive-text-sm">High initial investment required</li>
+                  <li class="adaptive-text-sm">Staff training and adoption curve</li>
+                  <li class="adaptive-text-sm">Ethical and bias considerations</li>
+                  <li class="adaptive-text-sm">Integration with existing systems</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST 3: Mobile Width - Before/After -->
+    <div class="test-section">
+      <h2 class="test-title">Test 3: Mobile Width (350px) - Before/After</h2>
+      <p class="test-description">Should stack vertically with compact spacing</p>
+      <div class="width-label">350px Container</div>
+      <div class="container-mobile">
+        <div class="two-columns-headings-layout layout-card">
+          <div class="two-columns-header">
+            <h2 class="adaptive-text-2xl font-bold">Process Improvement</h2>
+            <p class="adaptive-text-base opacity-70">How we streamlined our workflow</p>
+          </div>
+          <div class="two-columns-container" data-layout-container="two-columns-headings">
+            <div class="column">
+              <h3 class="column-heading">Before</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Manual data entry, paper-based approvals, 5-day turnaround time.
+                </p>
+              </div>
+            </div>
+            <div class="column">
+              <h3 class="column-heading">After</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Automated workflows, digital signatures, same-day processing.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST 4: Mixed Content - Traditional/Modern -->
+    <div class="test-section">
+      <h2 class="test-title">Test 4: Desktop - Traditional vs Modern (Mixed Content)</h2>
+      <p class="test-description">Testing columns with text, bullets, and images</p>
+      <div class="width-label">900px Container</div>
+      <div class="container-desktop">
+        <div class="two-columns-headings-layout layout-card">
+          <div class="two-columns-header">
+            <h2 class="adaptive-text-2xl font-bold">Development Approach Comparison</h2>
+            <p class="adaptive-text-base opacity-70">Evaluating methodology options for our next project</p>
+          </div>
+          <div class="two-columns-container" data-layout-container="two-columns-headings">
+            <div class="column">
+              <h3 class="column-heading">Traditional Waterfall</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Sequential development phases with comprehensive upfront planning.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Clear project milestones</li>
+                  <li class="adaptive-text-sm">Extensive documentation</li>
+                  <li class="adaptive-text-sm">Predictable timelines</li>
+                  <li class="adaptive-text-sm">Formal change control</li>
+                </ul>
+                <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop" alt="Traditional planning">
+              </div>
+            </div>
+            <div class="column">
+              <h3 class="column-heading">Agile Methodology</h3>
+              <div class="column-content">
+                <p class="adaptive-text-base opacity-80">
+                  Iterative development with continuous feedback and adaptation.
+                </p>
+                <ul>
+                  <li class="adaptive-text-sm">Flexible scope adjustments</li>
+                  <li class="adaptive-text-sm">Regular customer feedback</li>
+                  <li class="adaptive-text-sm">Faster time to market</li>
+                  <li class="adaptive-text-sm">Team empowerment</li>
+                </ul>
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop" alt="Agile teamwork">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST 5: UnifiedPipeline Generation Test -->
+    <div class="test-section">
+      <h2 class="test-title">Test 5: UnifiedPipeline Generation</h2>
+      <p class="test-description">Testing programmatic layout generation with sample content</p>
+      <div class="width-label">900px Container</div>
+      <div id="pipeline-test-container" class="container-desktop">
+        <!-- Will be populated by UnifiedPipeline -->
+      </div>
+      <button id="generate-btn" class="btn btn-primary mt-4">Generate Layout via UnifiedPipeline</button>
+      <pre id="content-structure" class="mt-4 p-4 bg-base-200 rounded text-xs overflow-auto">
+{
+  "title": "Feature Comparison",
+  "subtitle": "Selecting the right solution for our needs",
+  "columns": [
+    {
+      "heading": "Solution A",
+      "text": "Established platform with proven track record.",
+      "bullets": [
+        "Wide range of integrations",
+        "24/7 customer support",
+        "Comprehensive training resources",
+        "Higher cost structure"
+      ]
+    },
+    {
+      "heading": "Solution B",
+      "text": "Modern platform with innovative features.",
+      "bullets": [
+        "Lower total cost of ownership",
+        "AI-powered automation",
+        "Intuitive user interface",
+        "Smaller user community"
+      ]
+    }
+  ]
+}
+      </pre>
+    </div>
+
+  </div>
+
+  <script type="module">
+    // Theme switcher
+    const themeSelect = document.getElementById('theme-select');
+    const htmlElement = document.documentElement;
+
+    themeSelect.addEventListener('change', (e) => {
+      htmlElement.setAttribute('data-theme', e.target.value);
+    });
+
+    // UnifiedPipeline test
+    import { UnifiedPipeline } from './unified-pipeline.js';
+
+    const generateBtn = document.getElementById('generate-btn');
+    const container = document.getElementById('pipeline-test-container');
+
+    generateBtn.addEventListener('click', () => {
+      const pipeline = new UnifiedPipeline();
+
+      const content = {
+        title: "Feature Comparison",
+        subtitle: "Selecting the right solution for our needs",
+        columns: [
+          {
+            heading: "Solution A",
+            text: "Established platform with proven track record.",
+            bullets: [
+              "Wide range of integrations",
+              "24/7 customer support",
+              "Comprehensive training resources",
+              "Higher cost structure"
+            ]
+          },
+          {
+            heading: "Solution B",
+            text: "Modern platform with innovative features.",
+            bullets: [
+              "Lower total cost of ownership",
+              "AI-powered automation",
+              "Intuitive user interface",
+              "Smaller user community"
+            ]
+          }
+        ]
+      };
+
+      // Detect layout
+      const layout = pipeline._detectLayout(content);
+      console.log('Detected layout:', layout);
+
+      // Generate HTML
+      const html = pipeline.generateCard(1, content);
+      console.log('Generated HTML:', html);
+
+      // Insert into container
+      container.innerHTML = html;
+
+      // Show success message
+      generateBtn.textContent = `Generated: ${layout}`;
+      generateBtn.classList.add('btn-success');
+      setTimeout(() => {
+        generateBtn.textContent = 'Generate Layout via UnifiedPipeline';
+        generateBtn.classList.remove('btn-success');
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

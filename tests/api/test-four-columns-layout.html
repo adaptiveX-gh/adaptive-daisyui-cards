@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Four Columns Layout Test</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; background: oklch(var(--b2)); }
+    .test-section { margin-bottom: 3rem; background: oklch(var(--b1)); padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid oklch(var(--bc) / 0.1); }
+    .test-title { font-size: 1.5rem; font-weight: 700; color: oklch(var(--bc)); }
+    .test-width { font-family: monospace; font-size: 0.875rem; padding: 0.5rem 1rem; background: oklch(var(--p) / 0.1); color: oklch(var(--p)); border-radius: 0.5rem; font-weight: 600; }
+    .test-container { border: 2px dashed oklch(var(--bc) / 0.2); border-radius: 0.5rem; background: oklch(var(--b2)); padding: 1rem; }
+    .theme-toggle { margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto max-w-7xl">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Four Columns Layout Tests</h1>
+      <p class="text-lg opacity-70 mb-4">Testing 4-column responsive: 4-col → 2-col → 1-col</p>
+      <div class="theme-toggle justify-center">
+        <button class="btn btn-sm theme-btn" data-theme="light">Light</button>
+        <button class="btn btn-sm theme-btn" data-theme="dark">Dark</button>
+        <button class="btn btn-sm theme-btn" data-theme="business">Business</button>
+      </div>
+    </header>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">Test: Quarterly Results (1000px)</h2>
+        <span class="test-width">1000px</span>
+      </div>
+      <div class="test-container">
+        <div class="card-container" style="width: 1000px; margin: 0 auto;">
+          <div class="layout-card four-columns-layout">
+            <div class="four-columns-header">
+              <h2 class="adaptive-text-2xl font-bold">2024 Performance</h2>
+              <p class="adaptive-text-base opacity-70">Quarterly breakdown</p>
+            </div>
+            <div class="four-columns-container">
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q1</h3>
+                <p class="adaptive-text-base opacity-80">Strong start</p>
+                <ul>
+                  <li class="adaptive-text-sm">$2.4M revenue</li>
+                  <li class="adaptive-text-sm">15% growth</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q2</h3>
+                <p class="adaptive-text-base opacity-80">Momentum builds</p>
+                <ul>
+                  <li class="adaptive-text-sm">$2.8M revenue</li>
+                  <li class="adaptive-text-sm">17% growth</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q3</h3>
+                <p class="adaptive-text-base opacity-80">Peak season</p>
+                <ul>
+                  <li class="adaptive-text-sm">$3.1M revenue</li>
+                  <li class="adaptive-text-sm">20% growth</li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="adaptive-text-xl font-bold">Q4</h3>
+                <p class="adaptive-text-base opacity-80">Record breaking</p>
+                <ul>
+                  <li class="adaptive-text-sm">$3.6M revenue</li>
+                  <li class="adaptive-text-sm">25% growth</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <div class="test-header">
+        <h2 class="test-title">UnifiedPipeline Test</h2>
+        <span class="test-width">Dynamic</span>
+      </div>
+      <div class="test-container">
+        <div id="pipeline-test-container"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+  <script>
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', btn.dataset.theme);
+      });
+    });
+
+    const pipeline = new UnifiedPipeline();
+    const testContent = {
+      title: "Team Structure",
+      subtitle: "Four specialized departments",
+      columns: [
+        { title: "Engineering", text: "Building the product" },
+        { title: "Design", text: "Creating experiences" },
+        { title: "Sales", text: "Growing revenue" },
+        { title: "Support", text: "Helping customers" }
+      ]
+    };
+
+    const result = pipeline.createCard('pipeline-test', testContent);
+    document.getElementById('pipeline-test-container').innerHTML = `
+      <div class="mb-4 alert alert-info"><span>✓ Layout: <strong>${result.layout}</strong></span></div>
+      <div class="card-container" style="width: 1000px; margin: 0 auto;">${result.html}</div>
+    `;
+  </script>
+</body>
+</html>

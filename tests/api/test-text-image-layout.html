@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text-Image Layout Test</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: oklch(var(--b2));
+      padding: 2rem;
+    }
+
+    .test-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+    }
+
+    .test-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: oklch(var(--bc));
+    }
+
+    .test-section p {
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+
+    .width-container {
+      border: 2px dashed oklch(var(--bc) / 0.2);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-container {
+      container-type: inline-size;
+      container-name: card;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-info {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+
+    <!-- Header -->
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-2">Text-Image Layout Test</h1>
+      <p class="text-lg opacity-70">Testing the new text-image-layout with text on LEFT (60%), image on RIGHT (40%)</p>
+      <div class="divider"></div>
+    </header>
+
+    <!-- Theme Selector -->
+    <div class="controls">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Theme</span>
+        </label>
+        <select id="theme-select" class="select select-bordered select-sm">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="cupcake">Cupcake</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="corporate">Corporate</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Test 1: Desktop Width (800px) -->
+    <section class="test-section">
+      <h2>Test 1: Desktop Width (800px)</h2>
+      <p>Text should be on LEFT (60%), image on RIGHT (40%) - side by side</p>
+      <div class="width-container" style="width: 800px;">
+        <div class="card-container">
+          <div class="text-image-layout layout-card" style="position: relative;">
+            <span class="badge badge-primary badge-info">800px</span>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Premium Features</h2>
+              <p class="adaptive-text-lg opacity-80 mb-4">
+                Unlock the full potential of our platform with advanced capabilities.
+              </p>
+              <ul class="space-y-3 mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Advanced analytics dashboard</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Custom branding options</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Priority support</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">API access</span>
+                </li>
+              </ul>
+              <div class="card-actions">
+                <button class="btn btn-primary adaptive-text-sm">Upgrade Now</button>
+              </div>
+            </div>
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
+                   alt="Analytics dashboard">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 2: Tablet Width (500px) -->
+    <section class="test-section">
+      <h2>Test 2: Tablet Width (500px)</h2>
+      <p>Should stack vertically - TEXT on TOP, IMAGE on BOTTOM</p>
+      <div class="width-container" style="width: 500px;">
+        <div class="card-container">
+          <div class="text-image-layout layout-card" style="position: relative;">
+            <span class="badge badge-secondary badge-info">500px</span>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Product Benefits</h2>
+              <p class="adaptive-text-lg opacity-80 mb-4">
+                Discover what makes our solution stand out.
+              </p>
+              <ul class="space-y-2">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Easy to use interface</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Powerful automation</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Scalable architecture</span>
+                </li>
+              </ul>
+            </div>
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=400&fit=crop"
+                   alt="Team collaboration">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 3: Mobile Width (300px) -->
+    <section class="test-section">
+      <h2>Test 3: Mobile Width (300px)</h2>
+      <p>Stacked with proper spacing - TEXT first, IMAGE second</p>
+      <div class="width-container" style="width: 300px;">
+        <div class="card-container">
+          <div class="text-image-layout layout-card" style="position: relative;">
+            <span class="badge badge-accent badge-info">300px</span>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Key Features</h2>
+              <ul class="space-y-2">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">Fast performance</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">Secure by default</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-sm">24/7 support</span>
+                </li>
+              </ul>
+            </div>
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop"
+                   alt="Product showcase">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test 4: UnifiedPipeline Generation -->
+    <section class="test-section">
+      <h2>Test 4: UnifiedPipeline Generation</h2>
+      <p>Testing layout detection and HTML generation from content object</p>
+      <div class="width-container" style="width: 900px;">
+        <div class="card-container">
+          <div id="pipeline-output"></div>
+        </div>
+      </div>
+      <details class="mt-4">
+        <summary class="cursor-pointer font-semibold">View Test Content Object</summary>
+        <pre class="bg-base-300 p-4 rounded-lg mt-2 overflow-auto text-xs"><code id="test-content"></code></pre>
+      </details>
+    </section>
+
+    <!-- Test 5: Dark Theme Compatibility -->
+    <section class="test-section" data-theme="dark">
+      <h2>Test 5: Dark Theme Compatibility</h2>
+      <p>Same layout in dark theme to verify contrast and readability</p>
+      <div class="width-container" style="width: 800px;">
+        <div class="card-container">
+          <div class="text-image-layout layout-card" style="position: relative;">
+            <span class="badge badge-primary badge-info">Dark Theme</span>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Enterprise Solutions</h2>
+              <p class="adaptive-text-lg opacity-80 mb-4">
+                Built for organizations that demand the best.
+              </p>
+              <ul class="space-y-3 mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Single Sign-On (SSO)</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Advanced security controls</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-1">✓</span>
+                  <span class="adaptive-text-base">Dedicated account manager</span>
+                </li>
+              </ul>
+              <button class="btn btn-primary adaptive-text-sm">Contact Sales</button>
+            </div>
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop"
+                   alt="Enterprise team">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+  <script>
+    // Theme switcher
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+      document.documentElement.setAttribute('data-theme', e.target.value);
+    });
+
+    // Test UnifiedPipeline
+    const testContent = {
+      title: "Professional Plan Features",
+      subtitle: "Everything you need for your growing team",
+      bullets: [
+        "Unlimited projects and workspaces",
+        "Advanced collaboration tools",
+        "Premium templates library",
+        "Priority email support"
+      ],
+      imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop"
+    };
+
+    const pipeline = new UnifiedPipeline();
+    const result = pipeline.createCard('test-1', testContent);
+
+    document.getElementById('pipeline-output').innerHTML = result.html;
+    document.getElementById('test-content').textContent = JSON.stringify(testContent, null, 2);
+
+    console.log('Pipeline Test Result:', result);
+    console.log('Detected Layout:', result.layout);
+    console.log('Expected Layout:', 'text-image-layout');
+  </script>
+</body>
+</html>

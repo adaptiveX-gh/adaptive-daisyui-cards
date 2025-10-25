@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image and Text Layout Test</title>
+  <link rel="stylesheet" href="/src/input.css">
+  <style>
+    body {
+      padding: 2rem;
+      background: #f3f4f6;
+    }
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .width-test {
+      margin-bottom: 3rem;
+    }
+    .width-label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1 style="margin-bottom: 2rem; font-size: 2rem; font-weight: bold;">Image and Text Layout Tests</h1>
+
+    <!-- Test at 900px -->
+    <div class="width-test">
+      <div class="width-label">Desktop Width (900px)</div>
+      <div class="card-container" style="width: 900px;">
+        <div class="image-text-layout layout-card">
+          <div class="image-section">
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+                 alt="Collaborative workspace">
+          </div>
+          <div class="text-section">
+            <h2 class="adaptive-text-2xl font-bold mb-3">About Our Company</h2>
+            <p class="adaptive-text-base opacity-80 mb-4">
+              We are a team of passionate designers and developers creating innovative solutions
+              for modern challenges. Our approach combines creativity with technical excellence
+              to deliver exceptional results.
+            </p>
+            <ul class="space-y-2 mb-4">
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">Award-winning design team</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">10+ years of industry experience</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">Global client portfolio</span>
+              </li>
+            </ul>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm adaptive-text-sm">Learn More</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test at 600px -->
+    <div class="width-test">
+      <div class="width-label">Tablet Width (600px)</div>
+      <div class="card-container" style="width: 600px;">
+        <div class="image-text-layout layout-card">
+          <div class="image-section">
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+                 alt="Collaborative workspace">
+          </div>
+          <div class="text-section">
+            <h2 class="adaptive-text-2xl font-bold mb-3">About Our Company</h2>
+            <p class="adaptive-text-base opacity-80 mb-4">
+              We are a team of passionate designers and developers creating innovative solutions
+              for modern challenges.
+            </p>
+            <ul class="space-y-2 mb-4">
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">Award-winning design team</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">10+ years of industry experience</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test at 400px (stacked) -->
+    <div class="width-test">
+      <div class="width-label">Mobile Width (400px) - Should Stack</div>
+      <div class="card-container" style="width: 400px;">
+        <div class="image-text-layout layout-card">
+          <div class="image-section">
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+                 alt="Collaborative workspace">
+          </div>
+          <div class="text-section">
+            <h2 class="adaptive-text-2xl font-bold mb-3">About Our Company</h2>
+            <p class="adaptive-text-base opacity-80 mb-4">
+              We create innovative solutions for modern challenges.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">Award-winning team</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-1">✓</span>
+                <span class="adaptive-text-sm">10+ years experience</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme Test -->
+    <div class="width-test">
+      <div class="width-label">Dark Theme Test (700px)</div>
+      <div data-theme="dark" style="padding: 1rem; border-radius: 0.5rem;">
+        <div class="card-container" style="width: 700px;">
+          <div class="image-text-layout layout-card">
+            <div class="image-section">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop"
+                   alt="Collaborative workspace">
+            </div>
+            <div class="text-section">
+              <h2 class="adaptive-text-2xl font-bold mb-3">Dark Theme Example</h2>
+              <p class="adaptive-text-base opacity-80 mb-4">
+                This layout works seamlessly with all DaisyUI themes, maintaining proper contrast
+                and readability across different color schemes.
+              </p>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm adaptive-text-sm">Get Started</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UnifiedPipeline Test -->
+    <div class="width-test">
+      <div class="width-label">UnifiedPipeline Generated (800px)</div>
+      <div class="card-container" style="width: 800px;">
+        <div id="pipeline-test"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/tests/api/unified-pipeline.js"></script>
+  <script>
+    // Test UnifiedPipeline generation
+    const pipeline = new UnifiedPipeline();
+
+    const testContent = {
+      title: "Our Mission",
+      body: "We strive to create innovative digital experiences that empower businesses to achieve their goals. Our team combines cutting-edge technology with creative design thinking.",
+      imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
+    };
+
+    const result = pipeline.createCard('pipeline-test', testContent);
+    console.log('Generated layout:', result.layout);
+    console.log('Expected layout: image-text-layout');
+
+    document.getElementById('pipeline-test').innerHTML = result.html;
+  </script>
+</body>
+</html>
