@@ -29,6 +29,33 @@
     <!-- Control Panel -->
     <div class="bg-base-100 rounded-lg shadow-lg p-6 mb-8" role="region" aria-label="Controls">
 
+      <!-- Shared Components Controls -->
+      <div class="mb-6 p-4 bg-base-200 rounded-lg">
+        <h3 class="text-lg font-bold mb-3">Shared Components</h3>
+
+        <div class="flex flex-wrap gap-4 mb-3">
+          <!-- Header Toggle -->
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="toggle-headers" class="toggle toggle-primary" />
+            <span class="label-text">Show Headers</span>
+          </label>
+
+          <!-- Footer Toggle -->
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="toggle-footers" class="toggle toggle-primary" />
+            <span class="label-text">Show Footers</span>
+          </label>
+
+          <!-- Edit Buttons -->
+          <button id="edit-header-btn" class="btn btn-sm btn-outline" disabled>
+            Edit Header
+          </button>
+          <button id="edit-footer-btn" class="btn btn-sm btn-outline" disabled>
+            Edit Footer
+          </button>
+        </div>
+      </div>
+
       <!-- Layout and Theme Selectors -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
@@ -137,68 +164,80 @@
         <div class="card-container">
 
           <!-- LAYOUT 1: SIDEBAR LAYOUT -->
-          <div id="sidebar-layout" class="sidebar-layout layout-card" data-layout="sidebar">
-            <img src="https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&h=600&fit=crop"
-                 alt="Modern workspace with laptop and coffee"
-                 class="sidebar-image">
-            <div class="sidebar-content">
-              <h2 class="adaptive-text-2xl font-bold mb-2">Product Showcase</h2>
-              <p class="adaptive-text-base opacity-70 mb-4">
-                Experience adaptive design that responds to container size, not just viewport.
-                This sidebar layout intelligently reorganizes from vertical stacking to horizontal
-                side-by-side arrangement.
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="badge badge-primary adaptive-text-sm">Responsive</span>
-                <span class="badge badge-secondary adaptive-text-sm">Container Queries</span>
-                <span class="badge badge-accent adaptive-text-sm">DaisyUI</span>
+          <div id="sidebar-layout" class="layout-card" data-layout="sidebar">
+            <div class="layout-card-with-components">
+              <div class="shared-header-container" data-card-id="sidebar-layout"></div>
+              <div class="card-content-scrollable sidebar-layout">
+                <img src="https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&h=600&fit=crop"
+                     alt="Modern workspace with laptop and coffee"
+                     class="sidebar-image">
+                <div class="sidebar-content">
+                  <h2 class="adaptive-text-2xl font-bold mb-2">Product Showcase</h2>
+                  <p class="adaptive-text-base opacity-70 mb-4">
+                    Experience adaptive design that responds to container size, not just viewport.
+                    This sidebar layout intelligently reorganizes from vertical stacking to horizontal
+                    side-by-side arrangement.
+                  </p>
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="badge badge-primary adaptive-text-sm">Responsive</span>
+                    <span class="badge badge-secondary adaptive-text-sm">Container Queries</span>
+                    <span class="badge badge-accent adaptive-text-sm">DaisyUI</span>
+                  </div>
+                  <div class="card-actions justify-end mt-auto">
+                    <button class="btn btn-primary btn-sm adaptive-text-sm">Learn More</button>
+                    <button class="btn btn-ghost btn-sm adaptive-text-sm">Details</button>
+                  </div>
+                </div>
               </div>
-              <div class="card-actions justify-end mt-auto">
-                <button class="btn btn-primary btn-sm adaptive-text-sm">Learn More</button>
-                <button class="btn btn-ghost btn-sm adaptive-text-sm">Details</button>
-              </div>
+              <div class="shared-footer-container" data-card-id="sidebar-layout"></div>
             </div>
           </div>
 
           <!-- LAYOUT 2: FEATURE LAYOUT -->
-          <div id="feature-layout" class="feature-layout layout-card hidden" data-layout="feature">
-            <div class="feature-header">
-              <h2 class="adaptive-text-2xl font-bold mb-2">Key Features</h2>
-              <p class="adaptive-text-base opacity-70">
-                Grid layout that adapts from 1 column to 3 columns based on container width
-              </p>
-            </div>
-            <div class="feature-grid">
-              <div class="feature-item">
-                <div class="text-3xl mb-2">🎯</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Precision</h3>
-                <p class="adaptive-text-sm opacity-70">Container-aware layouts for perfect responsive design</p>
+          <div id="feature-layout" class="layout-card hidden" data-layout="feature">
+            <div class="layout-card-with-components">
+              <div class="shared-header-container" data-card-id="feature-layout"></div>
+              <div class="card-content-scrollable feature-layout">
+                <div class="feature-header">
+                  <h2 class="adaptive-text-2xl font-bold mb-2">Key Features</h2>
+                  <p class="adaptive-text-base opacity-70">
+                    Grid layout that adapts from 1 column to 3 columns based on container width
+                  </p>
+                </div>
+                <div class="feature-grid">
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Precision</h3>
+                    <p class="adaptive-text-sm opacity-70">Container-aware layouts for perfect responsive design</p>
+                  </div>
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Performance</h3>
+                    <p class="adaptive-text-sm opacity-70">CSS-native queries with 60fps smooth transitions</p>
+                  </div>
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">🎨</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Theming</h3>
+                    <p class="adaptive-text-sm opacity-70">Works seamlessly with all 29 DaisyUI themes</p>
+                  </div>
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">♿</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Accessible</h3>
+                    <p class="adaptive-text-sm opacity-70">ARIA labels and keyboard navigation included</p>
+                  </div>
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">📱</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Mobile-First</h3>
+                    <p class="adaptive-text-sm opacity-70">Responsive at every container size breakpoint</p>
+                  </div>
+                  <div class="feature-item">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h3 class="adaptive-text-lg font-bold mb-1">Customizable</h3>
+                    <p class="adaptive-text-sm opacity-70">Extend with your own container query breakpoints</p>
+                  </div>
+                </div>
               </div>
-              <div class="feature-item">
-                <div class="text-3xl mb-2">⚡</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Performance</h3>
-                <p class="adaptive-text-sm opacity-70">CSS-native queries with 60fps smooth transitions</p>
-              </div>
-              <div class="feature-item">
-                <div class="text-3xl mb-2">🎨</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Theming</h3>
-                <p class="adaptive-text-sm opacity-70">Works seamlessly with all 29 DaisyUI themes</p>
-              </div>
-              <div class="feature-item">
-                <div class="text-3xl mb-2">♿</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Accessible</h3>
-                <p class="adaptive-text-sm opacity-70">ARIA labels and keyboard navigation included</p>
-              </div>
-              <div class="feature-item">
-                <div class="text-3xl mb-2">📱</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Mobile-First</h3>
-                <p class="adaptive-text-sm opacity-70">Responsive at every container size breakpoint</p>
-              </div>
-              <div class="feature-item">
-                <div class="text-3xl mb-2">🔧</div>
-                <h3 class="adaptive-text-lg font-bold mb-1">Customizable</h3>
-                <p class="adaptive-text-sm opacity-70">Extend with your own container query breakpoints</p>
-              </div>
+              <div class="shared-footer-container" data-card-id="feature-layout"></div>
             </div>
           </div>
 
@@ -506,27 +545,39 @@
           </div>
 
           <!-- LAYOUT 9: HERO/PRESENTATION LAYOUT (Image Right) -->
-          <div id="hero-layout" class="hero-layout layout-card hidden" data-layout="hero">
-            <div class="hero-content">
-              <h1 class="hero-title">Transforming Marketing Segmentation Through Business Agility</h1>
-              <p class="hero-subtitle">A strategic partnership to accelerate growth, improve responsiveness, and unlock your team's full potential in today's dynamic financial landscape.</p>
-            </div>
-            <div class="hero-image">
-              <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop" alt="Modern city skyline at sunset">
+          <div id="hero-layout" class="layout-card hidden" data-layout="hero">
+            <div class="layout-card-with-components">
+              <div class="shared-header-container" data-card-id="hero-layout"></div>
+              <div class="card-content-scrollable hero-layout">
+                <div class="hero-content">
+                  <h1 class="hero-title">Transforming Marketing Segmentation Through Business Agility</h1>
+                  <p class="hero-subtitle">A strategic partnership to accelerate growth, improve responsiveness, and unlock your team's full potential in today's dynamic financial landscape.</p>
+                </div>
+                <div class="hero-image">
+                  <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop" alt="Modern city skyline at sunset">
+                </div>
+              </div>
+              <div class="shared-footer-container" data-card-id="hero-layout"></div>
             </div>
           </div>
 
           <!-- LAYOUT 10: HERO/PRESENTATION OVERLAY -->
-          <div id="hero-overlay" class="hero-layout overlay layout-card hidden" data-layout="hero-overlay">
-            <div class="hero-image">
-              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=800&fit=crop" alt="Team collaboration in modern office">
-            </div>
-            <div class="hero-content">
-              <h1 class="hero-title">Card Title</h1>
-              <p class="hero-subtitle">A card component has a figure, a body part, and inside body there are title and actions parts</p>
-              <div class="card-actions justify-end mt-4">
-                <button class="btn btn-primary">Buy Now</button>
+          <div id="hero-overlay" class="layout-card hidden" data-layout="hero-overlay">
+            <div class="layout-card-with-components">
+              <div class="shared-header-container" data-card-id="hero-overlay"></div>
+              <div class="card-content-scrollable hero-layout overlay">
+                <div class="hero-image">
+                  <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=800&fit=crop" alt="Team collaboration in modern office">
+                </div>
+                <div class="hero-content">
+                  <h1 class="hero-title">Card Title</h1>
+                  <p class="hero-subtitle">A card component has a figure, a body part, and inside body there are title and actions parts</p>
+                  <div class="card-actions justify-end mt-4">
+                    <button class="btn btn-primary">Buy Now</button>
+                  </div>
+                </div>
               </div>
+              <div class="shared-footer-container" data-card-id="hero-overlay"></div>
             </div>
           </div>
 
@@ -827,6 +878,153 @@
     </footer>
 
   </div>
+
+  <!-- Header Edit Dialog -->
+  <dialog id="header-edit-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Edit Header</h3>
+      <form method="dialog">
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Title</span></label>
+          <input type="text" id="header-title-input" class="input input-bordered" placeholder="Presentation Title" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Logo Image URL</span></label>
+          <input type="text" id="header-image-input" class="input input-bordered" placeholder="https://example.com/logo.png" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Background Color</span></label>
+          <div class="grid grid-cols-4 gap-2" id="color-picker-grid">
+            <button type="button" class="color-swatch" data-color="base-100" title="Base 100 (Default)">
+              <div class="swatch-color bg-base-100"></div>
+              <span class="swatch-label">Base 100</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-200" title="Base 200">
+              <div class="swatch-color bg-base-200"></div>
+              <span class="swatch-label">Base 200</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-300" title="Base 300">
+              <div class="swatch-color bg-base-300"></div>
+              <span class="swatch-label">Base 300</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="primary" title="Primary">
+              <div class="swatch-color bg-primary"></div>
+              <span class="swatch-label">Primary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="secondary" title="Secondary">
+              <div class="swatch-color bg-secondary"></div>
+              <span class="swatch-label">Secondary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="accent" title="Accent">
+              <div class="swatch-color bg-accent"></div>
+              <span class="swatch-label">Accent</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="neutral" title="Neutral">
+              <div class="swatch-color bg-neutral"></div>
+              <span class="swatch-label">Neutral</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="info" title="Info">
+              <div class="swatch-color bg-info"></div>
+              <span class="swatch-label">Info</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="success" title="Success">
+              <div class="swatch-color bg-success"></div>
+              <span class="swatch-label">Success</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="warning" title="Warning">
+              <div class="swatch-color bg-warning"></div>
+              <span class="swatch-label">Warning</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="error" title="Error">
+              <div class="swatch-color bg-error"></div>
+              <span class="swatch-label">Error</span>
+            </button>
+          </div>
+          <input type="hidden" id="header-bgcolor-input" value="base-100" />
+        </div>
+        <div class="modal-action">
+          <button type="button" id="save-header-btn" class="btn btn-primary">Save</button>
+          <button type="button" class="btn" onclick="document.getElementById('header-edit-dialog').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Footer Edit Dialog -->
+  <dialog id="footer-edit-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Edit Footer</h3>
+      <form method="dialog">
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Copyright Text</span></label>
+          <input type="text" id="footer-copyright-input" class="input input-bordered" placeholder="© 2025 Your Company" />
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Logo Image URL</span></label>
+          <input type="text" id="footer-image-input" class="input input-bordered" placeholder="https://example.com/logo.png" />
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Background Color</span></label>
+          <div class="grid grid-cols-4 gap-2" id="footer-color-picker-grid">
+            <button type="button" class="footer-color-swatch" data-color="base-100" title="Base 100 (Default)">
+              <div class="swatch-color bg-base-100"></div>
+              <span class="swatch-label">Base 100</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="base-200" title="Base 200">
+              <div class="swatch-color bg-base-200"></div>
+              <span class="swatch-label">Base 200</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="base-300" title="Base 300">
+              <div class="swatch-color bg-base-300"></div>
+              <span class="swatch-label">Base 300</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="primary" title="Primary">
+              <div class="swatch-color bg-primary"></div>
+              <span class="swatch-label">Primary</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="secondary" title="Secondary">
+              <div class="swatch-color bg-secondary"></div>
+              <span class="swatch-label">Secondary</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="accent" title="Accent">
+              <div class="swatch-color bg-accent"></div>
+              <span class="swatch-label">Accent</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="neutral" title="Neutral">
+              <div class="swatch-color bg-neutral"></div>
+              <span class="swatch-label">Neutral</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="info" title="Info">
+              <div class="swatch-color bg-info"></div>
+              <span class="swatch-label">Info</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="success" title="Success">
+              <div class="swatch-color bg-success"></div>
+              <span class="swatch-label">Success</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="warning" title="Warning">
+              <div class="swatch-color bg-warning"></div>
+              <span class="swatch-label">Warning</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="error" title="Error">
+              <div class="swatch-color bg-error"></div>
+              <span class="swatch-label">Error</span>
+            </button>
+          </div>
+          <input type="hidden" id="footer-bgcolor-input" value="base-100" />
+        </div>
+
+        <div class="modal-action">
+          <button type="button" id="save-footer-btn" class="btn btn-primary">Save</button>
+          <button type="button" class="btn" onclick="document.getElementById('footer-edit-dialog').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- JavaScript for Interactivity -->
   <script type="module" src="./src/app.js"></script>

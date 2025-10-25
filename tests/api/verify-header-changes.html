@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header Changes Verification</title>
+  <link rel="stylesheet" href="../../dist/output.css">
+  <style>
+    body {
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card-container {
+      container-type: inline-size;
+      container-name: card;
+      width: 100%;
+      margin: 2rem 0;
+    }
+    .test-section {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+    }
+    .pass {
+      color: green;
+      font-weight: bold;
+    }
+    .fail {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1 class="text-3xl font-bold mb-6">Header Changes Verification Test</h1>
+
+    <div class="test-section">
+      <h2 class="text-xl font-bold mb-3">Test Checklist</h2>
+      <div id="test-results"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls mb-6 p-4 bg-base-200 rounded-lg">
+      <h3 class="text-lg font-bold mb-3">Controls</h3>
+
+      <div class="flex flex-wrap gap-4 mb-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="toggle-headers" class="toggle toggle-primary" />
+          <span class="label-text">Show Headers</span>
+        </label>
+
+        <button id="edit-header-btn" class="btn btn-sm btn-primary" disabled>
+          Edit Header
+        </button>
+
+        <button id="run-tests-btn" class="btn btn-sm btn-info">
+          Run All Tests
+        </button>
+      </div>
+
+      <div class="form-control mt-4">
+        <label class="label"><span class="label-text font-semibold">Theme Switcher</span></label>
+        <select id="theme-select" class="select select-bordered w-full max-w-xs">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="cupcake">Cupcake</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="business">Business</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Test Cards -->
+    <div class="grid grid-cols-1 gap-6">
+      <!-- Card 1: Default Header -->
+      <div class="card-container">
+        <div class="layout-card" data-layout="sidebar">
+          <div class="layout-card-with-components">
+            <div class="shared-header-container" data-card-id="card-1"></div>
+            <div class="card-content-scrollable" style="min-height: 200px; padding: 2rem;">
+              <h3 class="text-lg font-bold mb-2">Card 1: Default Header</h3>
+              <p>This card should show the default header with placeholder logo and base-100 background.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Different Background -->
+      <div class="card-container">
+        <div class="layout-card" data-layout="feature">
+          <div class="layout-card-with-components">
+            <div class="shared-header-container" data-card-id="card-2"></div>
+            <div class="card-content-scrollable" style="min-height: 200px; padding: 2rem;">
+              <h3 class="text-lg font-bold mb-2">Card 2: Test Card</h3>
+              <p>After editing, this should match Card 1's header (they share the same header).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Dialog -->
+  <dialog id="header-edit-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Edit Header</h3>
+      <form method="dialog">
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Title</span></label>
+          <input type="text" id="header-title-input" class="input input-bordered" placeholder="Presentation Title" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Logo Image URL</span></label>
+          <input type="text" id="header-image-input" class="input input-bordered" placeholder="https://example.com/logo.png" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Background Color</span></label>
+          <div class="grid grid-cols-4 gap-2" id="color-picker-grid">
+            <button type="button" class="color-swatch" data-color="base-100" title="Base 100 (Default)">
+              <div class="swatch-color bg-base-100"></div>
+              <span class="swatch-label">Base 100</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-200" title="Base 200">
+              <div class="swatch-color bg-base-200"></div>
+              <span class="swatch-label">Base 200</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-300" title="Base 300">
+              <div class="swatch-color bg-base-300"></div>
+              <span class="swatch-label">Base 300</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="primary" title="Primary">
+              <div class="swatch-color bg-primary"></div>
+              <span class="swatch-label">Primary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="secondary" title="Secondary">
+              <div class="swatch-color bg-secondary"></div>
+              <span class="swatch-label">Secondary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="accent" title="Accent">
+              <div class="swatch-color bg-accent"></div>
+              <span class="swatch-label">Accent</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="neutral" title="Neutral">
+              <div class="swatch-color bg-neutral"></div>
+              <span class="swatch-label">Neutral</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="info" title="Info">
+              <div class="swatch-color bg-info"></div>
+              <span class="swatch-label">Info</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="success" title="Success">
+              <div class="swatch-color bg-success"></div>
+              <span class="swatch-label">Success</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="warning" title="Warning">
+              <div class="swatch-color bg-warning"></div>
+              <span class="swatch-label">Warning</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="error" title="Error">
+              <div class="swatch-color bg-error"></div>
+              <span class="swatch-label">Error</span>
+            </button>
+          </div>
+          <input type="hidden" id="header-bgcolor-input" value="base-100" />
+        </div>
+        <div class="modal-action">
+          <button type="button" id="save-header-btn" class="btn btn-primary">Save</button>
+          <button type="button" class="btn" onclick="document.getElementById('header-edit-dialog').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <script type="module">
+    import SharedComponentManager from '../../src/SharedComponentManager.js';
+
+    const componentManager = new SharedComponentManager();
+    const testResults = [];
+
+    // Test functions
+    function addTest(name, passed, message) {
+      testResults.push({ name, passed, message });
+      updateTestDisplay();
+    }
+
+    function updateTestDisplay() {
+      const resultsDiv = document.getElementById('test-results');
+      resultsDiv.innerHTML = testResults.map(test => `
+        <div class="mb-2 p-2 border-l-4 ${test.passed ? 'border-success bg-success/10' : 'border-error bg-error/10'}">
+          <span class="${test.passed ? 'pass' : 'fail'}">${test.passed ? '✓' : '✗'}</span>
+          <strong>${test.name}</strong>: ${test.message}
+        </div>
+      `).join('');
+    }
+
+    function runTests() {
+      testResults.length = 0;
+
+      // Test 1: Check default config has new fields
+      const hasImageUrl = componentManager.config.header.hasOwnProperty('imageUrl');
+      const hasBackgroundColor = componentManager.config.header.hasOwnProperty('backgroundColor');
+      const hasNoCTA = !componentManager.config.header.hasOwnProperty('ctaText');
+
+      addTest(
+        'Config Structure',
+        hasImageUrl && hasBackgroundColor && hasNoCTA,
+        hasImageUrl && hasBackgroundColor && hasNoCTA
+          ? 'Header config has imageUrl and backgroundColor (no ctaText)'
+          : 'Missing required fields or ctaText still present'
+      );
+
+      // Test 2: Check default values
+      const correctDefaults =
+        componentManager.config.header.imageUrl === 'https://via.placeholder.com/50x50?text=Logo' &&
+        componentManager.config.header.backgroundColor === 'base-100';
+
+      addTest(
+        'Default Values',
+        correctDefaults,
+        correctDefaults
+          ? 'Default imageUrl and backgroundColor are correct'
+          : `Got imageUrl: ${componentManager.config.header.imageUrl}, backgroundColor: ${componentManager.config.header.backgroundColor}`
+      );
+
+      // Test 3: Check HTML rendering
+      componentManager.config.showHeaders = true;
+      componentManager.toggleHeaders(true);
+
+      setTimeout(() => {
+        const headerHTML = componentManager.renderHeaderHTML();
+        const hasImageTag = headerHTML.includes('<img');
+        const hasNoButton = !headerHTML.includes('btn btn-primary');
+        const hasBackgroundClass = headerHTML.includes('bg-base-100');
+
+        addTest(
+          'HTML Rendering',
+          hasImageTag && hasNoButton && hasBackgroundClass,
+          hasImageTag && hasNoButton && hasBackgroundClass
+            ? 'Header HTML contains image, no CTA button, and background class'
+            : 'HTML structure incorrect'
+        );
+
+        // Test 4: Check localStorage persistence
+        const originalConfig = { ...componentManager.config.header };
+        componentManager.updateHeader({
+          title: 'Test Title',
+          imageUrl: 'https://example.com/test.png',
+          backgroundColor: 'primary'
+        });
+
+        const stored = JSON.parse(localStorage.getItem('presentation-shared-components'));
+        const persistenceWorks =
+          stored.header.title === 'Test Title' &&
+          stored.header.imageUrl === 'https://example.com/test.png' &&
+          stored.header.backgroundColor === 'primary';
+
+        addTest(
+          'LocalStorage Persistence',
+          persistenceWorks,
+          persistenceWorks
+            ? 'Settings persist correctly to localStorage'
+            : 'Settings not persisting correctly'
+        );
+
+        // Reset to original
+        componentManager.updateHeader(originalConfig);
+
+        // Test 5: Check dialog fields exist
+        const hasImageInput = !!document.getElementById('header-image-input');
+        const hasBgColorSelect = !!document.getElementById('header-bgcolor-input');
+        const hasNoCTAInput = !document.getElementById('header-cta-input');
+
+        addTest(
+          'Dialog Fields',
+          hasImageInput && hasBgColorSelect && hasNoCTAInput,
+          hasImageInput && hasBgColorSelect && hasNoCTAInput
+            ? 'Edit dialog has new fields (image, bgcolor) and no CTA field'
+            : 'Dialog fields are incorrect'
+        );
+
+        // Test 6: Background color swatches
+        const swatches = document.querySelectorAll('.color-swatch');
+        const hasBaseColors =
+          document.querySelector('.color-swatch[data-color="base-100"]') &&
+          document.querySelector('.color-swatch[data-color="base-200"]') &&
+          document.querySelector('.color-swatch[data-color="base-300"]');
+        const hasSemanticColors =
+          document.querySelector('.color-swatch[data-color="primary"]') &&
+          document.querySelector('.color-swatch[data-color="secondary"]') &&
+          document.querySelector('.color-swatch[data-color="accent"]') &&
+          document.querySelector('.color-swatch[data-color="neutral"]');
+        const hasStateColors =
+          document.querySelector('.color-swatch[data-color="info"]') &&
+          document.querySelector('.color-swatch[data-color="success"]') &&
+          document.querySelector('.color-swatch[data-color="warning"]') &&
+          document.querySelector('.color-swatch[data-color="error"]');
+
+        addTest(
+          'Background Color Swatches',
+          swatches.length === 11 && hasBaseColors && hasSemanticColors && hasStateColors,
+          swatches.length === 11 && hasBaseColors && hasSemanticColors && hasStateColors
+            ? 'All 11 DaisyUI color swatches are present'
+            : `Found ${swatches.length} swatches, expected 11`
+        );
+
+        console.log('All tests completed!', testResults);
+      }, 500);
+    }
+
+    // Initialize
+    componentManager.initialize();
+
+    // Toggle headers
+    const toggleHeaders = document.getElementById('toggle-headers');
+    toggleHeaders.addEventListener('change', (e) => {
+      componentManager.toggleHeaders(e.target.checked);
+      document.getElementById('edit-header-btn').disabled = !e.target.checked;
+    });
+
+    toggleHeaders.checked = componentManager.config.showHeaders;
+    document.getElementById('edit-header-btn').disabled = !componentManager.config.showHeaders;
+
+    // Edit header
+    document.getElementById('edit-header-btn').addEventListener('click', () => {
+      document.getElementById('header-title-input').value = componentManager.config.header.title;
+      document.getElementById('header-image-input').value = componentManager.config.header.imageUrl;
+
+      // Set hidden input value
+      document.getElementById('header-bgcolor-input').value = componentManager.config.header.backgroundColor;
+
+      // Update visual selection
+      document.querySelectorAll('.color-swatch').forEach(swatch => {
+        swatch.classList.remove('selected');
+        if (swatch.dataset.color === componentManager.config.header.backgroundColor) {
+          swatch.classList.add('selected');
+        }
+      });
+
+      document.getElementById('header-edit-dialog').showModal();
+    });
+
+    // Color swatch click handlers
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', (e) => {
+        e.preventDefault();
+        const colorValue = swatch.dataset.color;
+
+        // Update hidden input
+        document.getElementById('header-bgcolor-input').value = colorValue;
+
+        // Update visual selection
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+        swatch.classList.add('selected');
+      });
+    });
+
+    document.getElementById('save-header-btn').addEventListener('click', () => {
+      componentManager.updateHeader({
+        title: document.getElementById('header-title-input').value,
+        imageUrl: document.getElementById('header-image-input').value,
+        backgroundColor: document.getElementById('header-bgcolor-input').value
+      });
+      document.getElementById('header-edit-dialog').close();
+    });
+
+    // Run tests button
+    document.getElementById('run-tests-btn').addEventListener('click', runTests);
+
+    // Theme switcher
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+      document.documentElement.setAttribute('data-theme', e.target.value);
+    });
+
+    // Auto-run tests on load
+    setTimeout(() => {
+      runTests();
+    }, 500);
+
+    console.log('Verification page loaded, componentManager:', componentManager);
+  </script>
+</body>
+</html>

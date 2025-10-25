@@ -7,6 +7,81 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
   <style>
+    /* Shared components styles */
+    .layout-card-with-components {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .card-content-scrollable {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .shared-header-container,
+    .shared-footer-container {
+      flex-shrink: 0;
+    }
+
+    /* Custom footer layout */
+    .custom-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .custom-footer .footer-start,
+    .custom-footer .footer-center,
+    .custom-footer .footer-end {
+      flex: 1;
+    }
+
+    .custom-footer .footer-center {
+      text-align: center;
+    }
+
+    .custom-footer .footer-end {
+      text-align: right;
+    }
+
+    /* Color swatch styling */
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      border: 2px solid transparent;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .color-swatch:hover {
+      border-color: hsl(var(--bc) / 0.2);
+      background: hsl(var(--b2));
+    }
+
+    .color-swatch.selected {
+      border-color: hsl(var(--p));
+      background: hsl(var(--p) / 0.1);
+    }
+
+    .swatch-color {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.375rem;
+      border: 1px solid hsl(var(--bc) / 0.2);
+    }
+
+    .swatch-label {
+      font-size: 0.625rem;
+      text-align: center;
+    }
+  </style>
+  <style>
     /* Layout badge styling */
     .layout-badge {
       position: absolute;
@@ -493,6 +568,33 @@
           </div>
         </div>
 
+        <!-- Shared Components Controls -->
+        <div class="mb-4 p-4 bg-base-200 rounded-lg">
+          <h3 class="text-lg font-bold mb-3">Shared Components</h3>
+
+          <div class="flex flex-wrap gap-4 mb-3">
+            <!-- Header Toggle -->
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="toggle-headers" class="toggle toggle-primary" />
+              <span class="label-text">Show Headers</span>
+            </label>
+
+            <!-- Footer Toggle -->
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="toggle-footers" class="toggle toggle-primary" />
+              <span class="label-text">Show Footers</span>
+            </label>
+
+            <!-- Edit Buttons -->
+            <button id="edit-header-btn" class="btn btn-sm btn-outline" disabled>
+              Edit Header
+            </button>
+            <button id="edit-footer-btn" class="btn btn-sm btn-outline" disabled>
+              Edit Footer
+            </button>
+          </div>
+        </div>
+
         <div class="flex gap-2">
           <button onclick="startStream()" class="btn btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -542,7 +644,13 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Import SharedComponentManager
+    import SharedComponentManager from '../../src/SharedComponentManager.js';
+
+    const componentManager = new SharedComponentManager();
+    window.componentManager = componentManager;
+
     const cardContainer = document.getElementById('cardContainer');
     const eventLog = document.getElementById('eventLog');
     const cards = new Map(); // cardId -> card data
@@ -584,11 +692,119 @@
     }
 
     /**
+     * Initialize shared components system
+     */
+    function initSharedComponents() {
+      componentManager.initialize();
+
+      // Toggle headers
+      const toggleHeaders = document.getElementById('toggle-headers');
+      if (toggleHeaders) {
+        toggleHeaders.addEventListener('change', (e) => {
+          componentManager.toggleHeaders(e.target.checked);
+          document.getElementById('edit-header-btn').disabled = !e.target.checked;
+        });
+        toggleHeaders.checked = componentManager.config.showHeaders;
+        document.getElementById('edit-header-btn').disabled = !componentManager.config.showHeaders;
+      }
+
+      // Toggle footers
+      const toggleFooters = document.getElementById('toggle-footers');
+      if (toggleFooters) {
+        toggleFooters.addEventListener('change', (e) => {
+          componentManager.toggleFooters(e.target.checked);
+          document.getElementById('edit-footer-btn').disabled = !e.target.checked;
+        });
+        toggleFooters.checked = componentManager.config.showFooters;
+        document.getElementById('edit-footer-btn').disabled = !componentManager.config.showFooters;
+      }
+
+      // Edit header button
+      document.getElementById('edit-header-btn')?.addEventListener('click', () => {
+        document.getElementById('header-title-input').value = componentManager.config.header.title;
+        document.getElementById('header-image-input').value = componentManager.config.header.imageUrl;
+        document.getElementById('header-bgcolor-input').value = componentManager.config.header.backgroundColor;
+
+        // Update color swatch selection
+        document.querySelectorAll('#header-color-picker-grid .color-swatch').forEach(swatch => {
+          swatch.classList.remove('selected');
+          if (swatch.dataset.color === componentManager.config.header.backgroundColor) {
+            swatch.classList.add('selected');
+          }
+        });
+
+        document.getElementById('header-edit-dialog').showModal();
+      });
+
+      // Save header
+      document.getElementById('save-header-btn')?.addEventListener('click', () => {
+        componentManager.updateHeader({
+          title: document.getElementById('header-title-input').value,
+          imageUrl: document.getElementById('header-image-input').value,
+          backgroundColor: document.getElementById('header-bgcolor-input').value
+        });
+        document.getElementById('header-edit-dialog').close();
+      });
+
+      // Color swatch handlers for header
+      document.querySelectorAll('#header-color-picker-grid .color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('header-bgcolor-input').value = swatch.dataset.color;
+          document.querySelectorAll('#header-color-picker-grid .color-swatch').forEach(s => s.classList.remove('selected'));
+          swatch.classList.add('selected');
+        });
+      });
+
+      // Edit footer button
+      document.getElementById('edit-footer-btn')?.addEventListener('click', () => {
+        document.getElementById('footer-copyright-input').value = componentManager.config.footer.copyrightText;
+        document.getElementById('footer-image-input').value = componentManager.config.footer.imageUrl;
+        document.getElementById('footer-bgcolor-input').value = componentManager.config.footer.backgroundColor;
+
+        // Update color swatch selection
+        document.querySelectorAll('#footer-color-picker-grid .footer-color-swatch').forEach(swatch => {
+          swatch.classList.remove('selected');
+          if (swatch.dataset.color === componentManager.config.footer.backgroundColor) {
+            swatch.classList.add('selected');
+          }
+        });
+
+        document.getElementById('footer-edit-dialog').showModal();
+      });
+
+      // Save footer
+      document.getElementById('save-footer-btn')?.addEventListener('click', () => {
+        componentManager.updateFooter({
+          copyrightText: document.getElementById('footer-copyright-input').value,
+          imageUrl: document.getElementById('footer-image-input').value,
+          backgroundColor: document.getElementById('footer-bgcolor-input').value
+        });
+        document.getElementById('footer-edit-dialog').close();
+      });
+
+      // Color swatch handlers for footer
+      document.querySelectorAll('#footer-color-picker-grid .footer-color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('footer-bgcolor-input').value = swatch.dataset.color;
+          document.querySelectorAll('#footer-color-picker-grid .footer-color-swatch').forEach(s => s.classList.remove('selected'));
+          swatch.classList.add('selected');
+        });
+      });
+    }
+
+    /**
      * Create card skeleton in DOM
      */
     function renderCardSkeleton(card) {
       logEvent(`📦 Skeleton: ${card.id} (${card.layout})`);
       console.log(`[renderCardSkeleton] Creating skeleton for card:`, card.id);
+
+      // Create wrapper container
+      const cardContainer = document.createElement('div');
+      cardContainer.className = 'card-container';
+      cardContainer.id = `card-container-${card.id}`;
 
       const cardEl = document.createElement('div');
       cardEl.id = `card-${card.id}`;
@@ -599,38 +815,61 @@
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' ');
 
-      // Create skeleton based on layout
+      // Create skeleton based on layout - wrapped with shared components structure
+      let skeletonContent = '';
       if (card.layout === 'hero' || card.layout === 'hero-overlay') {
-        cardEl.innerHTML = `
-          <div class="layout-badge">${layoutDisplayName}</div>
-          <div class="card-body">
-            <div class="skeleton-loading skeleton-title"></div>
-            <div class="skeleton-loading skeleton-subtitle"></div>
-          </div>
+        skeletonContent = `
+          <div class="skeleton-loading skeleton-title"></div>
+          <div class="skeleton-loading skeleton-subtitle"></div>
         `;
       } else if (card.layout === 'split') {
-        cardEl.innerHTML = `
-          <div class="layout-badge">${layoutDisplayName}</div>
-          <div class="card-body">
-            <div>
-              <div class="skeleton-loading skeleton-title"></div>
-              <div class="skeleton-loading skeleton-body"></div>
-              <div class="skeleton-loading skeleton-body" style="width: 80%"></div>
-            </div>
+        skeletonContent = `
+          <div>
+            <div class="skeleton-loading skeleton-title"></div>
+            <div class="skeleton-loading skeleton-body"></div>
+            <div class="skeleton-loading skeleton-body" style="width: 80%"></div>
           </div>
         `;
       } else {
-        cardEl.innerHTML = `
-          <div class="layout-badge">${layoutDisplayName}</div>
-          <div class="card-body">
-            <div class="skeleton-loading skeleton-title"></div>
-            <div class="skeleton-loading skeleton-body"></div>
-            <div class="skeleton-loading skeleton-body" style="width: 90%"></div>
-          </div>
+        skeletonContent = `
+          <div class="skeleton-loading skeleton-title"></div>
+          <div class="skeleton-loading skeleton-body"></div>
+          <div class="skeleton-loading skeleton-body" style="width: 90%"></div>
         `;
       }
 
+      // Wrap with shared components structure
+      cardEl.innerHTML = `
+        <div class="layout-badge">${layoutDisplayName}</div>
+        <div class="layout-card-with-components">
+          <div class="shared-header-container" data-card-id="${card.id}"></div>
+          <div class="card-content-scrollable">
+            <div class="card-body">
+              ${skeletonContent}
+            </div>
+          </div>
+          <div class="shared-footer-container" data-card-id="${card.id}"></div>
+        </div>
+      `;
+
       cardContainer.appendChild(cardEl);
+      document.getElementById('cardContainer').appendChild(cardContainer);
+
+      // Render headers/footers if they're enabled
+      const headerContainer = cardEl.querySelector('.shared-header-container');
+      const footerContainer = cardEl.querySelector('.shared-footer-container');
+
+      if (componentManager.config.showHeaders) {
+        componentManager.renderHeader(headerContainer);
+      } else {
+        headerContainer.style.display = 'none';
+      }
+
+      if (componentManager.config.showFooters) {
+        componentManager.renderFooter(footerContainer);
+      } else {
+        footerContainer.style.display = 'none';
+      }
 
       // Store card reference
       cards.set(card.id, {
@@ -1227,7 +1466,7 @@
     /**
      * Start streaming
      */
-    function startStream() {
+    window.startStream = function() {
       clearCards();
 
       const topic = document.getElementById('topic').value;
@@ -1515,7 +1754,14 @@
         updateStatus('Error', error.message);
         alert(`Failed to start stream: ${error.message}\n\nMake sure the API server is running at http://localhost:3000`);
       });
-    }
+    };
+
+    // Make clearCards available globally
+    window.clearCards = clearCards;
+
+    // Initialize shared components on page load
+    initSharedComponents();
+
     // Event Listeners
     document.getElementById('endpointType').addEventListener('change', (e) => {
       const mockModeContainer = document.getElementById('mockModeContainer');
@@ -1573,5 +1819,149 @@
       logEvent(`🎨 Theme selected: ${e.target.value} (will apply on next stream)`);
     });
   </script>
+
+  <!-- Header Edit Dialog -->
+  <dialog id="header-edit-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Edit Header</h3>
+      <form method="dialog">
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Title</span></label>
+          <input type="text" id="header-title-input" class="input input-bordered" placeholder="Presentation Title" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Logo Image URL</span></label>
+          <input type="text" id="header-image-input" class="input input-bordered" placeholder="https://example.com/logo.png" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Background Color</span></label>
+          <div class="grid grid-cols-4 gap-2" id="header-color-picker-grid">
+            <button type="button" class="color-swatch" data-color="base-100" title="Base 100 (Default)">
+              <div class="swatch-color bg-base-100"></div>
+              <span class="swatch-label">Base 100</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-200" title="Base 200">
+              <div class="swatch-color bg-base-200"></div>
+              <span class="swatch-label">Base 200</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="base-300" title="Base 300">
+              <div class="swatch-color bg-base-300"></div>
+              <span class="swatch-label">Base 300</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="primary" title="Primary">
+              <div class="swatch-color bg-primary"></div>
+              <span class="swatch-label">Primary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="secondary" title="Secondary">
+              <div class="swatch-color bg-secondary"></div>
+              <span class="swatch-label">Secondary</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="accent" title="Accent">
+              <div class="swatch-color bg-accent"></div>
+              <span class="swatch-label">Accent</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="neutral" title="Neutral">
+              <div class="swatch-color bg-neutral"></div>
+              <span class="swatch-label">Neutral</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="info" title="Info">
+              <div class="swatch-color bg-info"></div>
+              <span class="swatch-label">Info</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="success" title="Success">
+              <div class="swatch-color bg-success"></div>
+              <span class="swatch-label">Success</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="warning" title="Warning">
+              <div class="swatch-color bg-warning"></div>
+              <span class="swatch-label">Warning</span>
+            </button>
+            <button type="button" class="color-swatch" data-color="error" title="Error">
+              <div class="swatch-color bg-error"></div>
+              <span class="swatch-label">Error</span>
+            </button>
+          </div>
+          <input type="hidden" id="header-bgcolor-input" value="base-100" />
+        </div>
+        <div class="modal-action">
+          <button type="button" id="save-header-btn" class="btn btn-primary">Save</button>
+          <button type="button" class="btn" onclick="document.getElementById('header-edit-dialog').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Footer Edit Dialog -->
+  <dialog id="footer-edit-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Edit Footer</h3>
+      <form method="dialog">
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Copyright Text</span></label>
+          <input type="text" id="footer-copyright-input" class="input input-bordered" placeholder="© 2025 Your Company" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Logo Image URL</span></label>
+          <input type="text" id="footer-image-input" class="input input-bordered" placeholder="https://example.com/logo.png" />
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Background Color</span></label>
+          <div class="grid grid-cols-4 gap-2" id="footer-color-picker-grid">
+            <button type="button" class="footer-color-swatch" data-color="base-100" title="Base 100 (Default)">
+              <div class="swatch-color bg-base-100"></div>
+              <span class="swatch-label">Base 100</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="base-200" title="Base 200">
+              <div class="swatch-color bg-base-200"></div>
+              <span class="swatch-label">Base 200</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="base-300" title="Base 300">
+              <div class="swatch-color bg-base-300"></div>
+              <span class="swatch-label">Base 300</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="primary" title="Primary">
+              <div class="swatch-color bg-primary"></div>
+              <span class="swatch-label">Primary</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="secondary" title="Secondary">
+              <div class="swatch-color bg-secondary"></div>
+              <span class="swatch-label">Secondary</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="accent" title="Accent">
+              <div class="swatch-color bg-accent"></div>
+              <span class="swatch-label">Accent</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="neutral" title="Neutral">
+              <div class="swatch-color bg-neutral"></div>
+              <span class="swatch-label">Neutral</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="info" title="Info">
+              <div class="swatch-color bg-info"></div>
+              <span class="swatch-label">Info</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="success" title="Success">
+              <div class="swatch-color bg-success"></div>
+              <span class="swatch-label">Success</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="warning" title="Warning">
+              <div class="swatch-color bg-warning"></div>
+              <span class="swatch-label">Warning</span>
+            </button>
+            <button type="button" class="footer-color-swatch" data-color="error" title="Error">
+              <div class="swatch-color bg-error"></div>
+              <span class="swatch-label">Error</span>
+            </button>
+          </div>
+          <input type="hidden" id="footer-bgcolor-input" value="base-100" />
+        </div>
+        <div class="modal-action">
+          <button type="button" id="save-footer-btn" class="btn btn-primary">Save</button>
+          <button type="button" class="btn" onclick="document.getElementById('footer-edit-dialog').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 </body>
 </html>

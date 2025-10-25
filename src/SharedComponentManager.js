@@ -108,22 +108,16 @@ class SharedComponentManager {
    * @returns {string} HTML string for footer
    */
   renderFooterHTML() {
-    const copyrightText = this.escapeHtml(this.config.footer.copyrightText);
-    const imageUrl = this.escapeHtml(this.config.footer.imageUrl || '');
-    const backgroundColor = this.config.footer.backgroundColor || 'base-100';
-
-    // Build image HTML if imageUrl exists
-    const imageHTML = imageUrl ?
-      `<img src="${imageUrl}" alt="Logo" style="max-height: 30px; border-radius: 4px;" onerror="this.style.display='none'" />`
-      : '';
+    const { copyrightText, imageUrl, backgroundColor } = this.config.footer;
+    const bgClass = `bg-${backgroundColor || 'base-100'}`;
 
     return `
-      <footer class="footer p-4 bg-${backgroundColor} text-base-content border-t border-base-300">
+      <footer class="custom-footer p-4 ${bgClass} text-base-content border-t border-base-300">
         <div class="footer-start">
-          ${imageHTML}
+          ${imageUrl ? `<img src="${imageUrl}" alt="Logo" style="max-height: 30px; border-radius: 4px;" onerror="this.style.display='none'" />` : ''}
         </div>
-        <div class="footer-center flex-grow text-center">
-          <p class="text-sm">${copyrightText}</p>
+        <div class="footer-center">
+          <p class="text-sm">${this.escapeHtml(copyrightText)}</p>
         </div>
         <div class="footer-end">
           <!-- Right side empty for now, can add elements later -->

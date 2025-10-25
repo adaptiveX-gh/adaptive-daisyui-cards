@@ -1,8 +1,8 @@
 ## User Story: Presentation Outline Editor with Layout Selection
 
 ### User Story
-**As a** presentation creator  
-**I want to** review and edit an AI-generated outline with the ability to modify content and select layouts before generation  
+**As a** presentation builder using the Adaptive DaisyUI Card System  
+**I want to** review and edit an AI-generated outline with the ability to modify content and select layouts before generation
 **So that** I can ensure my presentation content and visual layouts are correct before committing to the final generation, eliminating layout mismatches and content errors
 
 ### Business Value
@@ -20,7 +20,7 @@
 **When** I enter a topic and click "Generate outline"  
 **Then** I should see:
 - A numbered list of cards (1 to N)
-- Each card showing its content in an editable text field
+- Each card showing relavent content information in an editable text field
 - A dropdown menu for each card showing available layouts
 - The system should generate appropriate initial layout suggestions based on content
 

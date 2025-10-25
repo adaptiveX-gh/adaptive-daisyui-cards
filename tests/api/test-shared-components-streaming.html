@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Shared Components - Streaming Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.0.0/dist/full.min.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4">Shared Components Test</h1>
+
+    <div class="card bg-base-100 shadow-xl mb-4">
+      <div class="card-body">
+        <h2 class="card-title">Test Instructions</h2>
+        <ol class="list-decimal list-inside space-y-2">
+          <li>Open <code>streaming-progressive.html</code> in your browser</li>
+          <li>Check that the "Shared Components" section appears with toggles and edit buttons</li>
+          <li>Toggle "Show Headers" ON - verify headers appear on all cards when streaming starts</li>
+          <li>Click "Edit Header" - verify modal opens with current values</li>
+          <li>Change the header title and background color, click Save</li>
+          <li>Verify header updates on all cards immediately</li>
+          <li>Refresh the page - verify header settings persist from localStorage</li>
+          <li>Repeat steps 3-7 for footers</li>
+          <li>Open <code>index.html</code> in another tab</li>
+          <li>Verify settings sync between both pages (same localStorage key)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card bg-warning text-warning-content mb-4">
+      <div class="card-body">
+        <h2 class="card-title">Expected Behavior</h2>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Headers/footers toggle ON/OFF instantly on all cards</li>
+          <li>Edit buttons are disabled when headers/footers are OFF</li>
+          <li>Color picker shows selected color with highlighted border</li>
+          <li>Changes persist across page refreshes</li>
+          <li>Settings sync between index.html and streaming-progressive.html</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card bg-info text-info-content">
+      <div class="card-body">
+        <h2 class="card-title">localStorage Key</h2>
+        <p>Check browser DevTools → Application → Local Storage</p>
+        <p>Key: <code class="bg-base-300 text-base-content px-2 py-1 rounded">presentation-shared-components</code></p>
+        <button class="btn btn-sm mt-2" onclick="localStorage.clear(); alert('localStorage cleared!');">
+          Clear localStorage
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -11,14 +11,37 @@ Interactive demo showcasing CSS Container Queries with DaisyUI. Cards adapt to t
 ## Structure
 ```
 src/
-├── input.css          # Container queries, adaptive layouts, scalable typography
-└── app.js             # Interactive controls: resize, layout/theme switching
+├── input.css                  # Container queries, adaptive layouts, scalable typography
+├── app.js                     # Interactive controls: resize, layout/theme switching
+└── SharedComponentManager.js  # Manages shared headers/footers (symbol pattern)
 
 index.html             # Demo page with all 16 layouts
 dist/output.css        # Compiled Tailwind CSS (generated, do not edit)
 tests/                 # Playwright E2E and Vitest unit tests
 docs/                  # Detailed documentation and guides
 ```
+
+## Shared Components (Symbol Pattern)
+
+The system supports shared headers and footers that can be:
+- Toggled on/off for ALL cards simultaneously
+- Edited once to update ALL cards immediately
+- Themed automatically with DaisyUI
+- Persisted with presentation data
+
+**Usage:**
+1. Toggle "Show Headers" or "Show Footers" to display on all cards
+2. Click "Edit Header" or "Edit Footer" to modify content
+3. Changes apply to all cards instantly (symbol pattern)
+4. Header: DaisyUI navbar with title and CTA button
+5. Footer: DaisyUI footer with copyright text
+6. Content area scrolls independently when header/footer visible
+
+**Implementation:**
+- `SharedComponentManager` class manages all instances
+- Headers/footers use `.shared-header-container` and `.shared-footer-container`
+- Content wrapped in `.card-content-scrollable` for independent scrolling
+- Settings persist in localStorage with key `presentation-shared-components`
 
 ## 16 Adaptive Layouts
 

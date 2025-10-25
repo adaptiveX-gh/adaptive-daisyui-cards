@@ -4,6 +4,17 @@
  */
 
 // =================================================================
+// SHARED COMPONENTS MANAGEMENT
+// =================================================================
+
+import SharedComponentManager from './SharedComponentManager.js';
+
+const componentManager = new SharedComponentManager();
+
+// Expose to window for access in switchLayout
+window.componentManager = componentManager;
+
+// =================================================================
 // STATE MANAGEMENT
 // =================================================================
 
@@ -67,6 +78,26 @@ function switchLayout(layoutType) {
   // Show selected layout
   if (elements.layouts[layoutType]) {
     elements.layouts[layoutType].classList.remove('hidden');
+
+    // Update headers/footers for newly shown layout
+    if (window.componentManager) {
+      const headerContainer = elements.layouts[layoutType].querySelector('.shared-header-container');
+      const footerContainer = elements.layouts[layoutType].querySelector('.shared-footer-container');
+
+      if (headerContainer) {
+        headerContainer.style.display = window.componentManager.config.showHeaders ? 'block' : 'none';
+        if (window.componentManager.config.showHeaders) {
+          window.componentManager.renderHeader(headerContainer);
+        }
+      }
+
+      if (footerContainer) {
+        footerContainer.style.display = window.componentManager.config.showFooters ? 'block' : 'none';
+        if (window.componentManager.config.showFooters) {
+          window.componentManager.renderFooter(footerContainer);
+        }
+      }
+    }
   }
 
   // Update select value
@@ -374,6 +405,9 @@ function init() {
     });
   }, 100);
 
+  // Initialize shared components (headers/footers)
+  initSharedComponents();
+
   // Log initialization for debugging
   console.log('Adaptive DaisyUI Card System initialized');
   console.log('Current layout:', state.currentLayout);
@@ -456,15 +490,156 @@ document.addEventListener('mousedown', (e) => {
 });
 
 // =================================================================
+// SHARED COMPONENTS INITIALIZATION
+// =================================================================
+
+// Initialize shared components when DOM is ready
+function initSharedComponents() {
+  // Initialize component manager
+  componentManager.initialize();
+
+  // Toggle headers
+  const toggleHeaders = document.getElementById('toggle-headers');
+  if (toggleHeaders) {
+    toggleHeaders.addEventListener('change', (e) => {
+      componentManager.toggleHeaders(e.target.checked);
+      const editBtn = document.getElementById('edit-header-btn');
+      if (editBtn) editBtn.disabled = !e.target.checked;
+    });
+
+    // Set initial state
+    toggleHeaders.checked = componentManager.config.showHeaders;
+    const editHeaderBtn = document.getElementById('edit-header-btn');
+    if (editHeaderBtn) editHeaderBtn.disabled = !componentManager.config.showHeaders;
+  }
+
+  // Toggle footers
+  const toggleFooters = document.getElementById('toggle-footers');
+  if (toggleFooters) {
+    toggleFooters.addEventListener('change', (e) => {
+      componentManager.toggleFooters(e.target.checked);
+      const editBtn = document.getElementById('edit-footer-btn');
+      if (editBtn) editBtn.disabled = !e.target.checked;
+    });
+
+    // Set initial state
+    toggleFooters.checked = componentManager.config.showFooters;
+    const editFooterBtn = document.getElementById('edit-footer-btn');
+    if (editFooterBtn) editFooterBtn.disabled = !componentManager.config.showFooters;
+  }
+
+  // Edit header button
+  const editHeaderBtn = document.getElementById('edit-header-btn');
+  if (editHeaderBtn) {
+    editHeaderBtn.addEventListener('click', () => {
+      document.getElementById('header-title-input').value = componentManager.config.header.title;
+      document.getElementById('header-image-input').value = componentManager.config.header.imageUrl;
+
+      // Set hidden input value
+      document.getElementById('header-bgcolor-input').value = componentManager.config.header.backgroundColor;
+
+      // Update visual selection
+      document.querySelectorAll('.color-swatch').forEach(swatch => {
+        swatch.classList.remove('selected');
+        if (swatch.dataset.color === componentManager.config.header.backgroundColor) {
+          swatch.classList.add('selected');
+        }
+      });
+
+      document.getElementById('header-edit-dialog').showModal();
+    });
+  }
+
+  // Save header
+  const saveHeaderBtn = document.getElementById('save-header-btn');
+  if (saveHeaderBtn) {
+    saveHeaderBtn.addEventListener('click', () => {
+      componentManager.updateHeader({
+        title: document.getElementById('header-title-input').value,
+        imageUrl: document.getElementById('header-image-input').value,
+        backgroundColor: document.getElementById('header-bgcolor-input').value
+      });
+      document.getElementById('header-edit-dialog').close();
+      announceToScreenReader('Header updated');
+    });
+  }
+
+  // Color swatch click handlers
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', (e) => {
+      e.preventDefault();
+      const colorValue = swatch.dataset.color;
+
+      // Update hidden input
+      document.getElementById('header-bgcolor-input').value = colorValue;
+
+      // Update visual selection
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+    });
+  });
+
+  // Edit footer button
+  const editFooterBtn = document.getElementById('edit-footer-btn');
+  if (editFooterBtn) {
+    editFooterBtn.addEventListener('click', () => {
+      document.getElementById('footer-copyright-input').value = componentManager.config.footer.copyrightText;
+      document.getElementById('footer-image-input').value = componentManager.config.footer.imageUrl || '';
+
+      // Set hidden input value
+      document.getElementById('footer-bgcolor-input').value = componentManager.config.footer.backgroundColor || 'base-100';
+
+      // Update visual selection
+      document.querySelectorAll('.footer-color-swatch').forEach(swatch => {
+        swatch.classList.remove('selected');
+        if (swatch.dataset.color === (componentManager.config.footer.backgroundColor || 'base-100')) {
+          swatch.classList.add('selected');
+        }
+      });
+
+      document.getElementById('footer-edit-dialog').showModal();
+    });
+  }
+
+  // Save footer
+  const saveFooterBtn = document.getElementById('save-footer-btn');
+  if (saveFooterBtn) {
+    saveFooterBtn.addEventListener('click', () => {
+      componentManager.updateFooter({
+        copyrightText: document.getElementById('footer-copyright-input').value,
+        imageUrl: document.getElementById('footer-image-input').value,
+        backgroundColor: document.getElementById('footer-bgcolor-input').value
+      });
+      document.getElementById('footer-edit-dialog').close();
+      announceToScreenReader('Footer updated');
+    });
+  }
+
+  // Footer color swatch click handlers
+  document.querySelectorAll('.footer-color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', (e) => {
+      e.preventDefault();
+      const colorValue = swatch.dataset.color;
+
+      // Update hidden input
+      document.getElementById('footer-bgcolor-input').value = colorValue;
+
+      // Update visual selection
+      document.querySelectorAll('.footer-color-swatch').forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+    });
+  });
+}
+
+// =================================================================
 // EXPORT FOR TESTING (if needed)
 // =================================================================
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     switchLayout,
-    switchCustomTheme,
-    switchDaisyUITheme,
     updateContainerWidth,
-    state
+    state,
+    componentManager
   };
 }
