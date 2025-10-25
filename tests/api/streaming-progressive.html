@@ -418,7 +418,7 @@
           </div>
 
           <!-- Presentation Type and Content Tone (same line) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="presentationTypeAndToneContainer" style="display: none;">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" id="presentationTypeAndToneContainer" style="display: none;">
             <div class="form-control" id="presentationTypeContainer">
               <label class="label">
                 <span class="label-text font-semibold">Presentation Type</span>
@@ -443,6 +443,20 @@
                 <option value="inspirational">Inspirational</option>
               </select>
             </div>
+          </div>
+
+          <!-- Amount of Text (LLM mode only) -->
+          <div class="form-control mb-4" id="textAmountContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Amount of Text</span>
+              <span class="label-text-alt">Control the verbosity of generated copy</span>
+            </label>
+            <select id="textAmount" class="select select-bordered">
+              <option value="minimal">Minimal - Brief bullet points and short phrases</option>
+              <option value="concise" selected>Concise - Clear, focused content (recommended)</option>
+              <option value="detailed">Detailed - Comprehensive explanations</option>
+              <option value="extensive">Extensive - In-depth coverage with examples</option>
+            </select>
           </div>
         </div>
 
@@ -768,6 +782,7 @@
         presentationType: 'education',
         audience: 'general',
         tone: 'professional',
+        textAmount: 'concise',
         topic: 'AI in Product Discovery',
         cardCount: 4,
         style: 'professional',
@@ -873,13 +888,13 @@
       if (modeSelect) {
         modeSelect.value = prefs.mode;
         // Show/hide LLM-specific fields
-        const presentationTypeContainer = document.getElementById('presentationTypeContainer');
+        const presentationTypeAndToneContainer = document.getElementById('presentationTypeAndToneContainer');
+        const textAmountContainer = document.getElementById('textAmountContainer');
         const audienceContainer = document.getElementById('audienceContainer');
-        const toneContainer = document.getElementById('toneContainer');
         const showLLMFields = prefs.mode === 'smart';
-        if (presentationTypeContainer) presentationTypeContainer.style.display = showLLMFields ? 'block' : 'none';
+        if (presentationTypeAndToneContainer) presentationTypeAndToneContainer.style.display = showLLMFields ? 'block' : 'none';
+        if (textAmountContainer) textAmountContainer.style.display = showLLMFields ? 'block' : 'none';
         if (audienceContainer) audienceContainer.style.display = showLLMFields ? 'block' : 'none';
-        if (toneContainer) toneContainer.style.display = showLLMFields ? 'block' : 'none';
       }
 
       // Presentation Type
@@ -898,6 +913,12 @@
       const toneSelect = document.getElementById('tone');
       if (toneSelect) {
         toneSelect.value = prefs.tone;
+      }
+
+      // Text Amount
+      const textAmountSelect = document.getElementById('textAmount');
+      if (textAmountSelect) {
+        textAmountSelect.value = prefs.textAmount;
       }
 
       // Topic
@@ -1035,6 +1056,14 @@
       if (toneSelect) {
         toneSelect.addEventListener('change', (e) => {
           preferencesManager.set('tone', e.target.value);
+        });
+      }
+
+      // Text Amount
+      const textAmountSelect = document.getElementById('textAmount');
+      if (textAmountSelect) {
+        textAmountSelect.addEventListener('change', (e) => {
+          preferencesManager.set('textAmount', e.target.value);
         });
       }
 
@@ -1925,6 +1954,7 @@
       const presentationType = document.getElementById('presentationType').value;
       const audience = document.getElementById('audience').value;
       const tone = document.getElementById('tone').value;
+      const textAmount = document.getElementById('textAmount').value;
 
       // Image generation parameters
       const includeImages = document.getElementById('includeImages').checked;
@@ -1967,11 +1997,12 @@
           mode,
           presentationType,
           audience,
-          tone
+          tone,
+          textAmount
         });
         logEvent(`🌐 Using REAL API (${mode} mode)`);
         if (mode === 'smart') {
-          logEvent(`🤖 LLM Config: ${presentationType} for ${audience}, tone: ${tone}`);
+          logEvent(`🤖 LLM Config: ${presentationType} for ${audience}, tone: ${tone}, amount: ${textAmount}`);
         }
       }
 
@@ -2238,6 +2269,7 @@
       const presentationType = document.getElementById('presentationType').value;
       const audience = document.getElementById('audience').value;
       const tone = document.getElementById('tone').value;
+      const textAmount = document.getElementById('textAmount').value;
 
       // Stage 1: Design Structure
       const stage1Toast = showToast('Stage 1: Designing presentation structure...', 'info');
@@ -2264,6 +2296,7 @@
             presentationType,
             audience,
             tone,
+            textAmount,
             files: fileMetadata
           })
         });
@@ -2294,6 +2327,7 @@
             structure: currentStructure,
             topic,
             tone,
+            textAmount,
             files: fileMetadata
           })
         });
@@ -3015,19 +3049,19 @@
 
     // LLM Mode toggle
     document.getElementById('mode').addEventListener('change', (e) => {
-      const presentationTypeContainer = document.getElementById('presentationTypeContainer');
+      const presentationTypeAndToneContainer = document.getElementById('presentationTypeAndToneContainer');
+      const textAmountContainer = document.getElementById('textAmountContainer');
       const audienceContainer = document.getElementById('audienceContainer');
-      const toneContainer = document.getElementById('toneContainer');
 
       if (e.target.value === 'smart') {
-        presentationTypeContainer.style.display = 'block';
+        presentationTypeAndToneContainer.style.display = 'block';
+        textAmountContainer.style.display = 'block';
         audienceContainer.style.display = 'block';
-        toneContainer.style.display = 'block';
         logEvent('🤖 Switched to Smart Mode (LLM-powered)');
       } else {
-        presentationTypeContainer.style.display = 'none';
+        presentationTypeAndToneContainer.style.display = 'none';
+        textAmountContainer.style.display = 'none';
         audienceContainer.style.display = 'none';
-        toneContainer.style.display = 'none';
         logEvent('⚡ Switched to Fast Mode (template-based)');
       }
     });
