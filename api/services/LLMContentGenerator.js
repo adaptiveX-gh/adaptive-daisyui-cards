@@ -8,7 +8,7 @@
  * This is the primary interface for "smart mode" content generation.
  */
 
-import { GeminiLLMAdapter } from './adapters/GeminiLLMAdapter.js';
+import { createContentLLMAdapter } from './adapters/LLMAdapterFactory.js';
 import { PresentationDesigner } from './llm/PresentationDesigner.js';
 import { VisualDesigner } from './llm/VisualDesigner.js';
 import { Copywriter } from './llm/Copywriter.js';
@@ -34,8 +34,7 @@ export class LLMContentGenerator {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else {
-      this.adapter = new GeminiLLMAdapter({
-        apiKey: config.apiKey,
+      this.adapter = createContentLLMAdapter({
         model: config.model,
         mockMode: config.mockMode
       });

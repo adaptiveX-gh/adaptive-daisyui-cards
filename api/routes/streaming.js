@@ -405,6 +405,211 @@ router.post('/presentations/stream', sseMiddleware, async (req, res) => {
 });
 
 /**
+ * POST /api/presentations/stream-from-outline
+ * Stream presentation generation from user-edited outline
+ * Uses explicitly selected layouts (no auto-detection)
+ */
+router.post('/presentations/stream-from-outline', sseMiddleware, async (req, res) => {
+  const clientId = generateClientId();
+  const startTime = Date.now();
+
+  console.log('[OUTLINE-STREAM] ===== NEW CLIENT CONNECTED =====');
+  console.log('[OUTLINE-STREAM] Client ID:', clientId);
+
+  try {
+    const {
+      cards,
+      includeImages = false,
+      imageProvider = 'gemini',
+      streamDelay,
+      tone = 'professional'
+    } = req.body;
+
+    // Validate required fields
+    if (!cards || !Array.isArray(cards) || cards.length === 0) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Field "cards" is required and must be a non-empty array'
+      });
+    }
+
+    // Validate each card has required fields
+    for (const card of cards) {
+      if (!card.id || !card.content || !card.layout) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'Each card must have id, content, and layout'
+        });
+      }
+    }
+
+    console.log('[OUTLINE-STREAM] Generating from outline:', {
+      cardCount: cards.length,
+      includeImages,
+      layouts: cards.map(c => c.layout)
+    });
+
+    // Generate Card objects from outline
+    // Use Copywriter to expand outline content into full card content
+    const expandedCards = await Promise.all(cards.map(async (outlineCard, index) => {
+      try {
+        // Parse outline content (title and bullets)
+        const lines = outlineCard.content.split('\n').filter(line => line.trim());
+        const title = lines[0] || `Card ${index + 1}`;
+        const bullets = lines.slice(1).map(line => line.replace(/^[•\-]\s*/, '').trim()).filter(Boolean);
+
+        // Extract custom prompts
+        const copyPrompt = outlineCard.copyPrompt || '';
+        const visualPrompt = outlineCard.visualPrompt || '';
+
+        // Log custom prompts if provided
+        if (copyPrompt) {
+          console.log(`[OUTLINE-STREAM] Card ${index + 1} copy prompt:`, copyPrompt);
+        }
+        if (visualPrompt) {
+          console.log(`[OUTLINE-STREAM] Card ${index + 1} visual prompt:`, visualPrompt);
+        }
+
+        // Create content based on layout type
+        let content = {
+          title,
+          customCopyPrompt: copyPrompt,
+          customVisualPrompt: visualPrompt
+        };
+
+        // Add content based on layout
+        if (outlineCard.layout.includes('hero')) {
+          content.subtitle = bullets[0] || '';
+          content.kicker = bullets[1] || null;
+        } else if (outlineCard.layout === 'split-layout') {
+          content.left = bullets.slice(0, Math.ceil(bullets.length / 2)).join('\n');
+          content.right = bullets.slice(Math.ceil(bullets.length / 2)).join('\n');
+        } else if (outlineCard.layout.includes('columns')) {
+          // Parse columns from outline
+          const columnCount = outlineCard.layout.includes('four') ? 4 :
+                            outlineCard.layout.includes('three') ? 3 : 2;
+          const itemsPerColumn = Math.ceil(bullets.length / columnCount);
+
+          content.columns = [];
+          for (let i = 0; i < columnCount; i++) {
+            const columnBullets = bullets.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn);
+            content.columns.push({
+              title: columnBullets[0] || `Column ${i + 1}`,
+              bullets: columnBullets.slice(1)
+            });
+          }
+        } else {
+          // Default: title with bullets
+          content.bullets = bullets;
+        }
+
+        // Create Card object with explicit layout from outline
+        const card = new Card({
+          type: 'content',
+          layout: outlineCard.layout,
+          content,
+          theme: themeService.getThemeByStyle('professional')
+        });
+
+        // Generate images if requested
+        if (includeImages) {
+          const imageResult = await imageGenerationService.generateImageAsync(card, {
+            provider: imageProvider,
+            aspectRatio: '16:9',
+            style: 'professional'
+          });
+          card.image = imageResult.image;
+        }
+
+        return card;
+
+      } catch (error) {
+        console.error('[OUTLINE-STREAM] Error expanding card:', error);
+
+        // Fallback: create basic card
+        return new Card({
+          type: 'content',
+          layout: outlineCard.layout || 'title-bullets-layout',
+          content: {
+            title: outlineCard.content.split('\n')[0] || 'Untitled',
+            body: outlineCard.content
+          },
+          theme: themeService.getThemeByStyle('professional')
+        });
+      }
+    }));
+
+    console.log('[OUTLINE-STREAM] Generated', expandedCards.length, 'cards from outline');
+    console.log('[OUTLINE-STREAM] Layout distribution:');
+    expandedCards.forEach((card, i) => {
+      console.log(`  Card ${i + 1}: ${card.layout}`);
+    });
+
+    // Add client to streaming service
+    streamingService.addClient(res, clientId, {
+      cards: expandedCards.map(c => c.id),
+      cardCount: expandedCards.length,
+      startedAt: new Date().toISOString(),
+      fromOutline: true
+    });
+
+    // Apply custom stage delay if provided
+    if (streamDelay !== undefined) {
+      streamingService.config.stageDelay = parseInt(streamDelay) || 0;
+    }
+
+    // Track connection state
+    let connectionClosed = false;
+
+    // Setup cleanup on disconnect
+    req.on('close', () => {
+      connectionClosed = true;
+      const duration = Date.now() - startTime;
+      console.log(`[OUTLINE-STREAM] Connection closed for ${clientId} (${duration}ms)`);
+      streamingService.removeClient(clientId);
+    });
+
+    // Setup image generation listener if needed
+    if (includeImages) {
+      setupImageListener(clientId, expandedCards);
+    }
+
+    // Stream all stages
+    streamPresentation(clientId, expandedCards, includeImages).catch(error => {
+      console.error('[OUTLINE-STREAM] Error during streaming:', error);
+      streamingService.emitError(clientId, 'streaming', error);
+    });
+
+    // Keep connection alive
+    await new Promise((resolve) => {
+      req.on('close', resolve);
+
+      // Safety timeout (10 minutes)
+      setTimeout(() => {
+        if (!connectionClosed) {
+          console.log('[OUTLINE-STREAM] Safety timeout for', clientId);
+          resolve();
+        }
+      }, 600000);
+    });
+
+    console.log('[OUTLINE-STREAM] Exiting route handler for', clientId);
+
+  } catch (error) {
+    console.error('[OUTLINE-STREAM] Error:', error);
+
+    if (streamingService.connectionStore.get(clientId)) {
+      streamingService.emitError(clientId, 'generation', error);
+    } else {
+      res.status(500).json({
+        error: 'Internal Server Error',
+        message: error.message
+      });
+    }
+  }
+});
+
+/**
  * GET /api/stream/demo
  * Demo endpoint with simulated delays for testing
  */

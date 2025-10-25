@@ -33,9 +33,9 @@ export class GeminiLLMAdapter extends LLMProviderAdapter {
   constructor(config = {}) {
     super(config);
 
-    this.apiKey = config.apiKey || process.env.GEMINI_API_KEY;
-    this.model = config.model || process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
-    this.mockMode = config.mockMode || process.env.LLM_MOCK_MODE === 'true';
+    this.apiKey = config.apiKey || process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    this.model = config.model || process.env.CONTENT_LLM_MODEL || process.env.GEMINI_MODEL || 'gemini-1.5-pro';
+    this.mockMode = config.mockMode !== undefined ? config.mockMode : (process.env.LLM_MOCK_MODE === 'true');
 
     if (!this.mockMode && !this.apiKey) {
       console.warn('[GeminiAdapter] No API key provided. Running in mock mode.');

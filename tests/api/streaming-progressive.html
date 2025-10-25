@@ -417,52 +417,59 @@
             </select>
           </div>
 
-          <div class="form-control" id="presentationTypeContainer" style="display: none;">
+          <!-- Presentation Type and Content Tone (same line) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="presentationTypeAndToneContainer" style="display: none;">
+            <div class="form-control" id="presentationTypeContainer">
+              <label class="label">
+                <span class="label-text font-semibold">Presentation Type</span>
+              </label>
+              <select id="presentationType" class="select select-bordered">
+                <option value="education">Education</option>
+                <option value="pitch">Pitch</option>
+                <option value="report">Report</option>
+                <option value="workshop">Workshop</option>
+                <option value="story">Story</option>
+              </select>
+            </div>
+
+            <div class="form-control" id="toneContainer">
+              <label class="label">
+                <span class="label-text font-semibold">Content Tone</span>
+              </label>
+              <select id="tone" class="select select-bordered">
+                <option value="professional">Professional</option>
+                <option value="creative">Creative</option>
+                <option value="minimal">Minimal</option>
+                <option value="inspirational">Inspirational</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Topic and Target Audience (same line, both textareas) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Presentation Type</span>
+              <span class="label-text">Topic</span>
+              <span class="label-text-alt">Describe your presentation topic</span>
             </label>
-            <select id="presentationType" class="select select-bordered">
-              <option value="education">Education</option>
-              <option value="pitch">Pitch</option>
-              <option value="report">Report</option>
-              <option value="workshop">Workshop</option>
-              <option value="story">Story</option>
-            </select>
+            <textarea
+              id="topic"
+              class="textarea textarea-bordered h-20"
+              placeholder="e.g., AI in Product Discovery, Digital Marketing Trends 2025, Remote Team Management, or any custom topic..."
+            >AI in Product Discovery</textarea>
           </div>
 
           <div class="form-control" id="audienceContainer" style="display: none;">
             <label class="label">
               <span class="label-text font-semibold">Target Audience</span>
+              <span class="label-text-alt">Who is this presentation for?</span>
             </label>
-            <input type="text" id="audience" class="input input-bordered" value="general" placeholder="e.g., executives, students, developers">
-          </div>
-
-          <div class="form-control" id="toneContainer" style="display: none;">
-            <label class="label">
-              <span class="label-text font-semibold">Content Tone</span>
-            </label>
-            <select id="tone" class="select select-bordered">
-              <option value="professional">Professional</option>
-              <option value="creative">Creative</option>
-              <option value="minimal">Minimal</option>
-              <option value="inspirational">Inspirational</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div class="form-control">
-            <label class="label"><span class="label-text">Topic</span></label>
-            <select id="topic" class="select select-bordered">
-              <option value="AI in Product Discovery">AI in Product Discovery</option>
-              <option value="Digital Marketing Trends 2025">Digital Marketing Trends 2025</option>
-              <option value="Remote Team Management">Remote Team Management</option>
-            </select>
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Number of Cards</span></label>
-            <input type="number" id="cardCount" class="input input-bordered" value="4" min="2" max="8">
+            <textarea
+              id="audience"
+              class="textarea textarea-bordered h-20"
+              placeholder="e.g., executives, students, developers, medical professionals..."
+            >general</textarea>
           </div>
 
           <div class="form-control">
@@ -510,6 +517,12 @@
             </select>
           </div>
 
+          <!-- Number of Cards and Container Width (same line) -->
+          <div class="form-control">
+            <label class="label"><span class="label-text">Number of Cards</span></label>
+            <input type="number" id="cardCount" class="input input-bordered" value="4" min="2" max="8">
+          </div>
+
           <div class="form-control">
             <label class="label"><span class="label-text">Container Width (for testing breakpoints)</span></label>
             <select id="containerWidth" class="select select-bordered">
@@ -523,6 +536,7 @@
             </select>
           </div>
 
+          <!-- Stream Delay and Typewriter Speed (same line) -->
           <div class="form-control">
             <label class="label"><span class="label-text">Stream Delay (ms)</span></label>
             <input type="number" id="streamDelay" class="input input-bordered" value="300" min="0" max="2000" step="100">
@@ -537,6 +551,40 @@
               <option value="10">Medium</option>
               <option value="20">Slow</option>
             </select>
+          </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="alert alert-info mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">Research & Context Files</h3>
+            <div class="text-sm">Upload files (PDFs, images, documents) that the LLM can use as context when generating outlines, copy, and visuals</div>
+          </div>
+        </div>
+
+        <div class="mb-4 p-4 bg-base-200 rounded-lg">
+          <h3 class="text-lg font-bold mb-3">Upload Files</h3>
+
+          <!-- Drag and Drop Zone -->
+          <div id="file-drop-zone" class="border-2 border-dashed border-base-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-base-300 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="text-lg font-semibold mb-2">Drop files here or click to browse</p>
+            <p class="text-sm opacity-60">Supports: PDF, DOC, DOCX, TXT, PNG, JPG, JPEG, GIF</p>
+            <p class="text-xs opacity-40 mt-2">Max 10 files, 10MB each</p>
+            <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.gif" class="hidden">
+          </div>
+
+          <!-- Uploaded Files List -->
+          <div id="uploaded-files-container" class="mt-4" style="display: none;">
+            <h4 class="font-semibold mb-2">Uploaded Files (<span id="file-count">0</span>)</h4>
+            <div id="uploaded-files-list" class="space-y-2">
+              <!-- Files will be dynamically added here -->
+            </div>
           </div>
         </div>
 
@@ -568,6 +616,45 @@
           </div>
         </div>
 
+        <!-- Image Art Style Selection -->
+        <div class="mb-4 p-4 bg-base-200 rounded-lg" id="imageStyleContainer" style="display: none;">
+          <h3 class="text-lg font-bold mb-3">Image Art Style</h3>
+
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text font-semibold">Preferred Art Style</span>
+              <span class="label-text-alt">Choose the visual style for generated images</span>
+            </label>
+            <select id="imageArtStyle" class="select select-bordered">
+              <option value="photorealistic">Photorealistic</option>
+              <option value="illustration">Illustration</option>
+              <option value="abstract">Abstract</option>
+              <option value="3d">3D Render</option>
+              <option value="line-art">Line Art</option>
+              <option value="custom">Custom Style...</option>
+            </select>
+          </div>
+
+          <!-- Custom Style Input (shown only when Custom is selected) -->
+          <div class="form-control" id="customStyleContainer" style="display: none;">
+            <label class="label">
+              <span class="label-text font-semibold">Custom Style Description</span>
+              <span class="label-text-alt">Describe your desired image style (e.g., "watercolor painting", "minimalist", "vintage poster")</span>
+            </label>
+            <input type="text" id="customImageStyle" class="input input-bordered" placeholder="e.g., watercolor painting, minimalist, vintage poster">
+          </div>
+
+          <!-- Style Descriptions -->
+          <div class="alert alert-info mt-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-xs">
+              <p><strong id="styleDescription">Photorealistic:</strong> <span id="styleDescriptionText">Realistic photos with natural lighting and detail</span></p>
+            </div>
+          </div>
+        </div>
+
         <!-- Shared Components Controls -->
         <div class="mb-4 p-4 bg-base-200 rounded-lg">
           <h3 class="text-lg font-bold mb-3">Shared Components</h3>
@@ -595,14 +682,24 @@
           </div>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="generateOutline()" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+              <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+            </svg>
+            Generate Outline
+          </button>
           <button onclick="startStream()" class="btn btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
             </svg>
-            Start Streaming
+            Start Streaming (Direct)
           </button>
           <button onclick="clearCards()" class="btn btn-outline">Clear Cards</button>
+          <button id="reset-preferences-btn" class="btn btn-sm btn-outline btn-warning">
+            Reset Preferences
+          </button>
         </div>
 
         <!-- Connection Status -->
@@ -660,6 +757,63 @@
     const eventBuffer = []; // Buffer for events that arrive before skeleton
     let skeletonReceived = false;
 
+    // Preferences Manager for localStorage persistence
+    const preferencesManager = {
+      storageKey: 'streaming-progressive-preferences',
+
+      defaults: {
+        endpointType: 'real',
+        mockMode: 'chunked',
+        mode: 'fast',
+        presentationType: 'education',
+        audience: 'general',
+        tone: 'professional',
+        topic: 'AI in Product Discovery',
+        cardCount: 4,
+        style: 'professional',
+        theme: 'light',
+        containerWidth: '650px',
+        streamDelay: 300,
+        typewriterSpeed: 5,
+        includeImages: false,
+        imageProvider: 'gemini',
+        imageArtStyle: 'photorealistic',
+        customImageStyle: ''
+      },
+
+      load() {
+        try {
+          const stored = localStorage.getItem(this.storageKey);
+          if (stored) {
+            return { ...this.defaults, ...JSON.parse(stored) };
+          }
+          return this.defaults;
+        } catch (error) {
+          console.error('Failed to load preferences:', error);
+          return this.defaults;
+        }
+      },
+
+      save(preferences) {
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(preferences));
+        } catch (error) {
+          console.error('Failed to save preferences:', error);
+        }
+      },
+
+      get(key) {
+        const prefs = this.load();
+        return prefs[key];
+      },
+
+      set(key, value) {
+        const prefs = this.load();
+        prefs[key] = value;
+        this.save(prefs);
+      }
+    };
+
     function updateStatus(connection, stage) {
       document.getElementById('connectionStatus').textContent = connection;
       document.getElementById('currentStage').textContent = stage;
@@ -689,6 +843,290 @@
       skeletonReceived = false; // Reset skeleton flag
       updateStats();
       updateStatus('Idle', '-');
+    }
+
+    /**
+     * Initialize form inputs from saved preferences
+     */
+    function initializeFormInputs() {
+      const prefs = preferencesManager.load();
+
+      // Endpoint Type
+      const endpointTypeSelect = document.getElementById('endpointType');
+      if (endpointTypeSelect) {
+        endpointTypeSelect.value = prefs.endpointType;
+        // Show/hide mock mode container
+        const mockModeContainer = document.getElementById('mockModeContainer');
+        if (mockModeContainer) {
+          mockModeContainer.style.display = prefs.endpointType === 'mock' ? 'block' : 'none';
+        }
+      }
+
+      // Mock Mode
+      const mockModeSelect = document.getElementById('mockMode');
+      if (mockModeSelect) {
+        mockModeSelect.value = prefs.mockMode;
+      }
+
+      // Generation Mode
+      const modeSelect = document.getElementById('mode');
+      if (modeSelect) {
+        modeSelect.value = prefs.mode;
+        // Show/hide LLM-specific fields
+        const presentationTypeContainer = document.getElementById('presentationTypeContainer');
+        const audienceContainer = document.getElementById('audienceContainer');
+        const toneContainer = document.getElementById('toneContainer');
+        const showLLMFields = prefs.mode === 'smart';
+        if (presentationTypeContainer) presentationTypeContainer.style.display = showLLMFields ? 'block' : 'none';
+        if (audienceContainer) audienceContainer.style.display = showLLMFields ? 'block' : 'none';
+        if (toneContainer) toneContainer.style.display = showLLMFields ? 'block' : 'none';
+      }
+
+      // Presentation Type
+      const presentationTypeSelect = document.getElementById('presentationType');
+      if (presentationTypeSelect) {
+        presentationTypeSelect.value = prefs.presentationType;
+      }
+
+      // Audience
+      const audienceInput = document.getElementById('audience');
+      if (audienceInput) {
+        audienceInput.value = prefs.audience;
+      }
+
+      // Tone
+      const toneSelect = document.getElementById('tone');
+      if (toneSelect) {
+        toneSelect.value = prefs.tone;
+      }
+
+      // Topic
+      const topicSelect = document.getElementById('topic');
+      if (topicSelect) {
+        topicSelect.value = prefs.topic;
+      }
+
+      // Card Count
+      const cardCountInput = document.getElementById('cardCount');
+      if (cardCountInput) {
+        cardCountInput.value = prefs.cardCount;
+      }
+
+      // Style
+      const styleSelect = document.getElementById('style');
+      if (styleSelect) {
+        styleSelect.value = prefs.style;
+      }
+
+      // Theme
+      const themeSelect = document.getElementById('theme');
+      if (themeSelect) {
+        themeSelect.value = prefs.theme;
+        // Apply the theme to the document
+        document.documentElement.setAttribute('data-theme', prefs.theme);
+      }
+
+      // Container Width
+      const containerWidthSelect = document.getElementById('containerWidth');
+      if (containerWidthSelect) {
+        containerWidthSelect.value = prefs.containerWidth;
+        // Apply width to container
+        cardContainer.style.width = prefs.containerWidth;
+        cardContainer.style.margin = '0 auto';
+      }
+
+      // Stream Delay
+      const streamDelayInput = document.getElementById('streamDelay');
+      if (streamDelayInput) {
+        streamDelayInput.value = prefs.streamDelay;
+      }
+
+      // Typewriter Speed
+      const typewriterSpeedSelect = document.getElementById('typewriterSpeed');
+      if (typewriterSpeedSelect) {
+        typewriterSpeedSelect.value = prefs.typewriterSpeed;
+      }
+
+      // Include Images
+      const includeImagesCheckbox = document.getElementById('includeImages');
+      if (includeImagesCheckbox) {
+        includeImagesCheckbox.checked = prefs.includeImages;
+        // Show/hide image provider and style containers
+        const imageProviderContainer = document.getElementById('imageProviderContainer');
+        if (imageProviderContainer) {
+          imageProviderContainer.style.display = prefs.includeImages ? 'block' : 'none';
+        }
+        const imageStyleContainer = document.getElementById('imageStyleContainer');
+        if (imageStyleContainer) {
+          imageStyleContainer.style.display = prefs.includeImages ? 'block' : 'none';
+        }
+      }
+
+      // Image Provider
+      const imageProviderSelect = document.getElementById('imageProvider');
+      if (imageProviderSelect) {
+        imageProviderSelect.value = prefs.imageProvider;
+      }
+
+      // Image Art Style
+      const imageArtStyleSelect = document.getElementById('imageArtStyle');
+      if (imageArtStyleSelect) {
+        imageArtStyleSelect.value = prefs.imageArtStyle;
+        // Trigger change event to update UI
+        const event = new Event('change');
+        imageArtStyleSelect.dispatchEvent(event);
+      }
+
+      // Custom Image Style
+      const customImageStyleInput = document.getElementById('customImageStyle');
+      if (customImageStyleInput) {
+        customImageStyleInput.value = prefs.customImageStyle;
+      }
+
+      console.log('Form inputs initialized from localStorage:', prefs);
+    }
+
+    /**
+     * Setup event listeners to save preferences when inputs change
+     */
+    function setupPreferencesSaving() {
+      // Endpoint Type
+      const endpointTypeSelect = document.getElementById('endpointType');
+      if (endpointTypeSelect) {
+        endpointTypeSelect.addEventListener('change', (e) => {
+          preferencesManager.set('endpointType', e.target.value);
+        });
+      }
+
+      // Mock Mode
+      const mockModeSelect = document.getElementById('mockMode');
+      if (mockModeSelect) {
+        mockModeSelect.addEventListener('change', (e) => {
+          preferencesManager.set('mockMode', e.target.value);
+        });
+      }
+
+      // Generation Mode
+      const modeSelect = document.getElementById('mode');
+      if (modeSelect) {
+        modeSelect.addEventListener('change', (e) => {
+          preferencesManager.set('mode', e.target.value);
+        });
+      }
+
+      // Presentation Type
+      const presentationTypeSelect = document.getElementById('presentationType');
+      if (presentationTypeSelect) {
+        presentationTypeSelect.addEventListener('change', (e) => {
+          preferencesManager.set('presentationType', e.target.value);
+        });
+      }
+
+      // Audience
+      const audienceInput = document.getElementById('audience');
+      if (audienceInput) {
+        audienceInput.addEventListener('input', (e) => {
+          preferencesManager.set('audience', e.target.value);
+        });
+      }
+
+      // Tone
+      const toneSelect = document.getElementById('tone');
+      if (toneSelect) {
+        toneSelect.addEventListener('change', (e) => {
+          preferencesManager.set('tone', e.target.value);
+        });
+      }
+
+      // Topic
+      const topicSelect = document.getElementById('topic');
+      if (topicSelect) {
+        topicSelect.addEventListener('change', (e) => {
+          preferencesManager.set('topic', e.target.value);
+        });
+      }
+
+      // Card Count
+      const cardCountInput = document.getElementById('cardCount');
+      if (cardCountInput) {
+        cardCountInput.addEventListener('change', (e) => {
+          preferencesManager.set('cardCount', parseInt(e.target.value));
+        });
+      }
+
+      // Style
+      const styleSelect = document.getElementById('style');
+      if (styleSelect) {
+        styleSelect.addEventListener('change', (e) => {
+          preferencesManager.set('style', e.target.value);
+        });
+      }
+
+      // Theme
+      const themeSelect = document.getElementById('theme');
+      if (themeSelect) {
+        themeSelect.addEventListener('change', (e) => {
+          preferencesManager.set('theme', e.target.value);
+        });
+      }
+
+      // Container Width
+      const containerWidthSelect = document.getElementById('containerWidth');
+      if (containerWidthSelect) {
+        containerWidthSelect.addEventListener('change', (e) => {
+          preferencesManager.set('containerWidth', e.target.value);
+        });
+      }
+
+      // Stream Delay
+      const streamDelayInput = document.getElementById('streamDelay');
+      if (streamDelayInput) {
+        streamDelayInput.addEventListener('change', (e) => {
+          preferencesManager.set('streamDelay', parseInt(e.target.value));
+        });
+      }
+
+      // Typewriter Speed
+      const typewriterSpeedSelect = document.getElementById('typewriterSpeed');
+      if (typewriterSpeedSelect) {
+        typewriterSpeedSelect.addEventListener('change', (e) => {
+          preferencesManager.set('typewriterSpeed', parseInt(e.target.value));
+        });
+      }
+
+      // Include Images
+      const includeImagesCheckbox = document.getElementById('includeImages');
+      if (includeImagesCheckbox) {
+        includeImagesCheckbox.addEventListener('change', (e) => {
+          preferencesManager.set('includeImages', e.target.checked);
+        });
+      }
+
+      // Image Provider
+      const imageProviderSelect = document.getElementById('imageProvider');
+      if (imageProviderSelect) {
+        imageProviderSelect.addEventListener('change', (e) => {
+          preferencesManager.set('imageProvider', e.target.value);
+        });
+      }
+
+      // Image Art Style
+      const imageArtStyleSelect = document.getElementById('imageArtStyle');
+      if (imageArtStyleSelect) {
+        imageArtStyleSelect.addEventListener('change', (e) => {
+          preferencesManager.set('imageArtStyle', e.target.value);
+        });
+      }
+
+      // Custom Image Style
+      const customImageStyleInput = document.getElementById('customImageStyle');
+      if (customImageStyleInput) {
+        customImageStyleInput.addEventListener('input', (e) => {
+          preferencesManager.set('customImageStyle', e.target.value);
+        });
+      }
+
+      console.log('Preferences saving event listeners attached');
     }
 
     /**
@@ -1759,7 +2197,808 @@
     // Make clearCards available globally
     window.clearCards = clearCards;
 
-    // Initialize shared components on page load
+    /**
+     * OUTLINE EDITOR FUNCTIONALITY
+     */
+
+    // Available layouts with display names
+    const AVAILABLE_LAYOUTS = [
+      { value: 'hero-layout', label: 'Hero/Presentation' },
+      { value: 'hero-overlay-layout', label: 'Hero Overlay' },
+      { value: 'image-text-layout', label: 'Image and Text' },
+      { value: 'text-image-layout', label: 'Text and Image' },
+      { value: 'two-columns-layout', label: 'Two Columns' },
+      { value: 'two-columns-headings-layout', label: 'Two Columns with Headings' },
+      { value: 'three-columns-layout', label: 'Three Columns' },
+      { value: 'three-columns-headings-layout', label: 'Three Columns with Headings' },
+      { value: 'four-columns-layout', label: 'Four Columns' },
+      { value: 'title-bullets-layout', label: 'Title with Bullets' },
+      { value: 'title-bullets-image-layout', label: 'Title with Bullets and Image' },
+      { value: 'sidebar-layout', label: 'Sidebar' },
+      { value: 'feature-layout', label: 'Features Grid' },
+      { value: 'masonry-layout', label: 'Masonry Gallery' },
+      { value: 'dashboard-layout', label: 'Dashboard' },
+      { value: 'split-layout', label: 'Split View' }
+    ];
+
+    // Store current outline and structure
+    let currentOutline = null;
+    let currentStructure = null;
+
+    // Store uploaded files
+    let uploadedFiles = [];
+
+    /**
+     * Generate outline from form inputs using two-stage approach
+     */
+    window.generateOutline = async function() {
+      const topic = document.getElementById('topic').value;
+      const cardCount = parseInt(document.getElementById('cardCount').value);
+      const mode = document.getElementById('mode').value;
+      const presentationType = document.getElementById('presentationType').value;
+      const audience = document.getElementById('audience').value;
+      const tone = document.getElementById('tone').value;
+
+      // Stage 1: Design Structure
+      const stage1Toast = showToast('Stage 1: Designing presentation structure...', 'info');
+
+      // Prepare file metadata
+      const fileMetadata = uploadedFiles.map(file => ({
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }));
+
+      if (uploadedFiles.length > 0) {
+        logEvent(`📎 ${uploadedFiles.length} file(s) available as context`);
+      }
+
+      try {
+        // Stage 1: Call design-structure endpoint
+        const structureResponse = await fetch('/api/presentation/design-structure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic,
+            cardCount,
+            presentationType,
+            audience,
+            tone,
+            files: fileMetadata
+          })
+        });
+
+        if (!structureResponse.ok) {
+          const error = await structureResponse.json();
+          throw new Error(error.message || 'Failed to design structure');
+        }
+
+        const structureData = await structureResponse.json();
+        currentStructure = structureData.structure;
+
+        console.log('[OUTLINE] Stage 1 complete - Structure:', currentStructure);
+
+        if (structureData.fallback) {
+          console.warn('[OUTLINE] Using fallback structure');
+        }
+
+        hideToast(stage1Toast);
+
+        // Stage 2: Generate Content Outline
+        const stage2Toast = showToast('Stage 2: Generating content outline...', 'info');
+
+        const outlineResponse = await fetch('/api/presentation/generate-outline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            structure: currentStructure,
+            topic,
+            tone,
+            files: fileMetadata
+          })
+        });
+
+        if (!outlineResponse.ok) {
+          const error = await outlineResponse.json();
+          throw new Error(error.message || 'Failed to generate outline');
+        }
+
+        const outlineData = await outlineResponse.json();
+        currentOutline = outlineData.outline;
+
+        console.log('[OUTLINE] Stage 2 complete - Outline:', currentOutline);
+
+        hideToast(stage2Toast);
+
+        // Populate outline editor with structure information
+        populateOutlineEditor(currentOutline);
+
+        // Show modal
+        document.getElementById('outline-edit-dialog').showModal();
+
+        showToast('Outline generated successfully!', 'success');
+
+      } catch (error) {
+        console.error('[OUTLINE] Error generating outline:', error);
+        hideToast(stage1Toast);
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    };
+
+    /**
+     * Populate outline editor with cards
+     */
+    function populateOutlineEditor(outline) {
+      const container = document.getElementById('outline-cards-container');
+      container.innerHTML = '';
+
+      // Remove existing structure header if present
+      const existingHeader = document.getElementById('structure-info-header');
+      if (existingHeader) {
+        existingHeader.remove();
+      }
+
+      // Add structure header if available
+      if (outline.structure) {
+        const headerEl = createStructureHeader(outline.structure);
+        container.insertAdjacentHTML('beforebegin', headerEl);
+      }
+
+      outline.cards.forEach((card, index) => {
+        // Add insert button before first card
+        if (index === 0) {
+          const insertBtn = createInsertCardButton(index);
+          container.appendChild(insertBtn);
+        }
+
+        // Add the card
+        const cardEl = createOutlineCardElement(card, index, outline.structure, outline.cards.length);
+        container.appendChild(cardEl);
+
+        // Add insert button after each card
+        const insertBtn = createInsertCardButton(index + 1);
+        container.appendChild(insertBtn);
+      });
+
+      // Update card count display
+      document.getElementById('outline-card-count-display').textContent = outline.cards.length;
+
+      // Wire up move up buttons
+      container.querySelectorAll('.move-card-up-btn').forEach(btn => {
+        btn.addEventListener('click', handleMoveCardUp);
+      });
+
+      // Wire up move down buttons
+      container.querySelectorAll('.move-card-down-btn').forEach(btn => {
+        btn.addEventListener('click', handleMoveCardDown);
+      });
+
+      // Wire up duplicate buttons
+      container.querySelectorAll('.duplicate-card-btn').forEach(btn => {
+        btn.addEventListener('click', handleDuplicateCard);
+      });
+
+      // Wire up delete buttons
+      container.querySelectorAll('.delete-card-btn').forEach(btn => {
+        btn.addEventListener('click', handleDeleteCard);
+      });
+
+      // Wire up insert buttons
+      container.querySelectorAll('.insert-card-btn').forEach(btn => {
+        btn.addEventListener('click', handleInsertCard);
+      });
+    }
+
+    /**
+     * Create structure header with pedagogical information
+     */
+    function createStructureHeader(structure) {
+      if (!structure || !structure.goal) return '';
+
+      const narrativeArc = structure.narrativeArc || {};
+      const approach = structure.pedagogicalApproach || 'education';
+
+      return `
+        <div class="card bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/20 mb-4" id="structure-info-header">
+          <div class="card-body p-4">
+            <div class="flex items-start gap-3">
+              <div class="text-3xl">🎯</div>
+              <div class="flex-1">
+                <h3 class="text-lg font-bold mb-2">Presentation Structure</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <span class="badge badge-primary badge-sm">Approach</span>
+                    <span class="ml-2 text-sm capitalize">${approach}</span>
+                  </div>
+                  <div>
+                    <span class="badge badge-secondary badge-sm">Goal</span>
+                    <span class="ml-2 text-sm">${structure.goal}</span>
+                  </div>
+                </div>
+                ${narrativeArc.opening ? `
+                  <div class="text-xs opacity-70 mt-2">
+                    <strong>Narrative Arc:</strong>
+                    ${narrativeArc.opening} → ${narrativeArc.development || 'Build'} → ${narrativeArc.climax || 'Reveal'} → ${narrativeArc.closing || 'Conclude'}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Create a single outline card element
+     */
+    function createOutlineCardElement(card, index, structure, totalCards) {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'card bg-base-200 p-4';
+      cardEl.dataset.cardIndex = index;
+
+      const isFirstCard = index === 0;
+      const isLastCard = index === totalCards - 1;
+
+      // Determine role badge style
+      const roleBadgeClass = getRoleBadgeClass(card.role);
+
+      // Generate layout options HTML
+      const layoutOptions = AVAILABLE_LAYOUTS.map(layout =>
+        `<option value="${layout.value}" ${layout.value === card.suggestedLayout ? 'selected' : ''}>
+          ${layout.label}
+        </option>`
+      ).join('');
+
+      // Extract structure info if available
+      const structureInfo = card.structureInfo || {};
+      const hasStructureInfo = structureInfo.purpose || structureInfo.pedagogicalNote;
+
+      cardEl.innerHTML = `
+        <div class="flex items-start gap-4">
+          <div class="flex flex-col items-center gap-2">
+            <div class="badge badge-lg badge-primary">${index + 1}</div>
+            ${card.role ? `<div class="badge ${roleBadgeClass} badge-sm">${card.role}</div>` : ''}
+          </div>
+          <div class="flex-1 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-sm">Card Content</h4>
+              <div class="flex gap-1">
+                <button class="btn btn-sm btn-ghost btn-circle move-card-up-btn" data-card-index="${index}" title="Move card up" ${isFirstCard ? 'disabled' : ''}>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+                <button class="btn btn-sm btn-ghost btn-circle move-card-down-btn" data-card-index="${index}" title="Move card down" ${isLastCard ? 'disabled' : ''}>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <button class="btn btn-sm btn-ghost btn-circle duplicate-card-btn" data-card-index="${index}" title="Duplicate card">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <button class="btn btn-sm btn-ghost btn-circle delete-card-btn" data-card-index="${index}" title="Delete card">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="label">
+                  <span class="label-text font-semibold text-xs">Purpose</span>
+                  <span class="label-text-alt opacity-60">Card's role in presentation</span>
+                </label>
+                <input
+                  type="text"
+                  class="input input-bordered input-sm w-full text-xs outline-card-purpose"
+                  placeholder="e.g., Introduce topic and capture attention"
+                  data-card-id="${card.id}"
+                  value="${structureInfo.purpose || ''}"
+                />
+              </div>
+              <div>
+                <label class="label">
+                  <span class="label-text font-semibold text-xs">Type</span>
+                  <span class="label-text-alt opacity-60">Content type</span>
+                </label>
+                <select class="select select-bordered select-sm w-full text-xs outline-card-type" data-card-id="${card.id}">
+                  <option value="">Select type...</option>
+                  <option value="title" ${structureInfo.contentType === 'title' ? 'selected' : ''}>Title</option>
+                  <option value="concept" ${structureInfo.contentType === 'concept' ? 'selected' : ''}>Concept</option>
+                  <option value="data" ${structureInfo.contentType === 'data' ? 'selected' : ''}>Data</option>
+                  <option value="quote" ${structureInfo.contentType === 'quote' ? 'selected' : ''}>Quote</option>
+                  <option value="image" ${structureInfo.contentType === 'image' ? 'selected' : ''}>Image</option>
+                  <option value="comparison" ${structureInfo.contentType === 'comparison' ? 'selected' : ''}>Comparison</option>
+                  <option value="process" ${structureInfo.contentType === 'process' ? 'selected' : ''}>Process</option>
+                  <option value="takeaway" ${structureInfo.contentType === 'takeaway' ? 'selected' : ''}>Takeaway</option>
+                </select>
+              </div>
+            </div>
+            ${structureInfo.pedagogicalNote ? `
+              <div class="text-xs opacity-70 italic mt-1">📝 ${structureInfo.pedagogicalNote}</div>
+            ` : ''}
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold text-xs">Main Content</span>
+              </label>
+              <textarea
+                class="textarea textarea-bordered w-full font-mono text-sm outline-card-content"
+                rows="4"
+                placeholder="Card Title\n• Bullet point 1\n• Bullet point 2"
+                data-card-id="${card.id}"
+              >${card.content}</textarea>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="label">
+                <span class="label-text font-semibold text-xs">Layout:</span>
+              </label>
+              <select class="select select-bordered select-sm flex-1 outline-card-layout" data-card-id="${card.id}">
+                ${layoutOptions}
+              </select>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold text-xs">Copy Prompt (Optional)</span>
+                <span class="label-text-alt opacity-60">Additional instructions for copywriter</span>
+              </label>
+              <textarea
+                class="textarea textarea-bordered w-full text-sm outline-card-copy-prompt"
+                rows="2"
+                placeholder="e.g., Use casual tone, include a question, emphasize benefits"
+                data-card-id="${card.id}"
+              >${card.copyPrompt || ''}</textarea>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold text-xs">Visual Prompt (Optional)</span>
+                <span class="label-text-alt opacity-60">Guidance for visual designer</span>
+              </label>
+              <textarea
+                class="textarea textarea-bordered w-full text-sm outline-card-visual-prompt"
+                rows="2"
+                placeholder="e.g., Use vibrant colors, show a modern office, include data visualization"
+                data-card-id="${card.id}"
+              >${card.visualPrompt || ''}</textarea>
+            </div>
+            ${card.rationale ? `<div class="text-xs opacity-60 italic">💡 ${card.rationale}</div>` : ''}
+          </div>
+        </div>
+      `;
+
+      return cardEl;
+    }
+
+    /**
+     * Get badge class for card role
+     */
+    function getRoleBadgeClass(role) {
+      const roleClasses = {
+        'opening': 'badge-success',
+        'hook': 'badge-success',
+        'body': 'badge-info',
+        'transition': 'badge-warning',
+        'climax': 'badge-accent',
+        'closing': 'badge-secondary'
+      };
+      return roleClasses[role] || 'badge-ghost';
+    }
+
+    /**
+     * Create insert card button
+     */
+    function createInsertCardButton(position) {
+      const btnEl = document.createElement('div');
+      btnEl.className = 'flex justify-center my-2';
+      btnEl.innerHTML = `
+        <button class="btn btn-sm btn-circle btn-outline btn-primary insert-card-btn" data-position="${position}" title="Insert card here">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      `;
+      return btnEl;
+    }
+
+    /**
+     * Handle insert card
+     */
+    function handleInsertCard(event) {
+      const position = parseInt(event.currentTarget.dataset.position);
+      if (!currentOutline) return;
+      if (currentOutline.cards.length >= 20) {
+        showToast('Maximum 20 cards allowed', 'warning');
+        return;
+      }
+
+      const newCard = {
+        id: `card-${Date.now()}`,
+        content: `New Card\n• Key point 1\n• Key point 2`,
+        suggestedLayout: 'title-bullets-layout',
+        role: 'body',
+        rationale: '',
+        copyPrompt: '',
+        visualPrompt: '',
+        structureInfo: {
+          purpose: '',
+          contentType: '',
+          pedagogicalNote: ''
+        }
+      };
+
+      currentOutline.cards.splice(position, 0, newCard);
+      populateOutlineEditor(currentOutline);
+      showToast(`Card inserted at position ${position + 1}`, 'success');
+    }
+
+    /**
+     * Handle move card up
+     */
+    function handleMoveCardUp(event) {
+      const index = parseInt(event.currentTarget.dataset.cardIndex);
+      if (!currentOutline) return;
+      if (index === 0) return; // Already at top
+
+      // Swap with previous card
+      const temp = currentOutline.cards[index];
+      currentOutline.cards[index] = currentOutline.cards[index - 1];
+      currentOutline.cards[index - 1] = temp;
+
+      populateOutlineEditor(currentOutline);
+      showToast(`Card moved up`, 'success');
+    }
+
+    /**
+     * Handle move card down
+     */
+    function handleMoveCardDown(event) {
+      const index = parseInt(event.currentTarget.dataset.cardIndex);
+      if (!currentOutline) return;
+      if (index === currentOutline.cards.length - 1) return; // Already at bottom
+
+      // Swap with next card
+      const temp = currentOutline.cards[index];
+      currentOutline.cards[index] = currentOutline.cards[index + 1];
+      currentOutline.cards[index + 1] = temp;
+
+      populateOutlineEditor(currentOutline);
+      showToast(`Card moved down`, 'success');
+    }
+
+    /**
+     * Handle duplicate card
+     */
+    function handleDuplicateCard(event) {
+      const index = parseInt(event.currentTarget.dataset.cardIndex);
+      if (!currentOutline) return;
+      if (currentOutline.cards.length >= 20) {
+        showToast('Maximum 20 cards allowed', 'warning');
+        return;
+      }
+
+      // Get the card to duplicate
+      const originalCard = currentOutline.cards[index];
+
+      // Create a deep copy of the card
+      const duplicatedCard = {
+        id: `card-${Date.now()}`,
+        content: originalCard.content,
+        suggestedLayout: originalCard.suggestedLayout,
+        role: originalCard.role,
+        rationale: originalCard.rationale || '',
+        copyPrompt: originalCard.copyPrompt || '',
+        visualPrompt: originalCard.visualPrompt || '',
+        structureInfo: originalCard.structureInfo ? { ...originalCard.structureInfo } : undefined
+      };
+
+      // Insert the duplicated card right after the original
+      currentOutline.cards.splice(index + 1, 0, duplicatedCard);
+      populateOutlineEditor(currentOutline);
+      showToast(`Card ${index + 1} duplicated`, 'success');
+    }
+
+    /**
+     * Handle delete card
+     */
+    let pendingDeleteIndex = null;
+
+    function handleDeleteCard(event) {
+      const index = parseInt(event.currentTarget.dataset.cardIndex);
+      if (!currentOutline) return;
+      if (currentOutline.cards.length <= 1) {
+        showToast('Cannot delete the last card', 'warning');
+        return;
+      }
+
+      // Store the index to delete
+      pendingDeleteIndex = index;
+
+      // Update modal with card number
+      document.getElementById('delete-card-number').textContent = index + 1;
+
+      // Show the delete confirmation modal
+      document.getElementById('delete-card-dialog').showModal();
+    }
+
+    // Handle confirm delete button
+    document.getElementById('confirm-delete-card-btn')?.addEventListener('click', () => {
+      if (pendingDeleteIndex !== null && currentOutline) {
+        currentOutline.cards.splice(pendingDeleteIndex, 1);
+        populateOutlineEditor(currentOutline);
+        showToast(`Card ${pendingDeleteIndex + 1} deleted`, 'success');
+
+        // Reset and close modal
+        pendingDeleteIndex = null;
+        document.getElementById('delete-card-dialog').close();
+      }
+    });
+
+    /**
+     * Adjust card count
+     */
+    document.getElementById('outline-decrease-cards')?.addEventListener('click', () => {
+      if (!currentOutline) return;
+      if (currentOutline.cards.length <= 1) return;
+
+      currentOutline.cards.pop();
+      populateOutlineEditor(currentOutline);
+    });
+
+    document.getElementById('outline-increase-cards')?.addEventListener('click', () => {
+      if (!currentOutline) return;
+      if (currentOutline.cards.length >= 20) return;
+
+      const newCard = {
+        id: `card-${currentOutline.cards.length + 1}`,
+        content: `New Card ${currentOutline.cards.length + 1}\n• Key point`,
+        suggestedLayout: 'title-bullets-layout',
+        role: 'body',
+        rationale: '',
+        copyPrompt: '',
+        visualPrompt: '',
+        structureInfo: {
+          purpose: '',
+          contentType: '',
+          pedagogicalNote: ''
+        }
+      };
+
+      currentOutline.cards.push(newCard);
+      populateOutlineEditor(currentOutline);
+    });
+
+    /**
+     * Regenerate outline
+     */
+    document.getElementById('regenerate-outline-btn')?.addEventListener('click', () => {
+      document.getElementById('outline-edit-dialog').close();
+      window.generateOutline();
+    });
+
+    /**
+     * Generate presentation from outline
+     */
+    document.getElementById('generate-from-outline-btn')?.addEventListener('click', async () => {
+      if (!currentOutline) {
+        showToast('No outline available', 'error');
+        return;
+      }
+
+      // Collect edited data from form
+      const cards = [];
+      const cardElements = document.querySelectorAll('#outline-cards-container [data-card-index]');
+
+      cardElements.forEach((el, index) => {
+        const contentTextarea = el.querySelector('.outline-card-content');
+        const layoutSelect = el.querySelector('.outline-card-layout');
+        const copyPromptTextarea = el.querySelector('.outline-card-copy-prompt');
+        const visualPromptTextarea = el.querySelector('.outline-card-visual-prompt');
+        const purposeInput = el.querySelector('.outline-card-purpose');
+        const typeSelect = el.querySelector('.outline-card-type');
+
+        cards.push({
+          id: currentOutline.cards[index].id,
+          content: contentTextarea.value,
+          layout: layoutSelect.value,
+          copyPrompt: copyPromptTextarea?.value || '',
+          visualPrompt: visualPromptTextarea?.value || '',
+          purpose: purposeInput?.value || '',
+          type: typeSelect?.value || ''
+        });
+      });
+
+      console.log('[OUTLINE] Generating presentation from outline:', cards);
+
+      // Close modal
+      document.getElementById('outline-edit-dialog').close();
+
+      // Clear existing cards
+      clearCards();
+
+      // Get streaming parameters
+      const includeImages = document.getElementById('includeImages').checked;
+      const imageProvider = document.getElementById('imageProvider').value;
+      const streamDelay = parseInt(document.getElementById('streamDelay').value);
+      const containerWidth = document.getElementById('containerWidth').value;
+      const imageArtStyle = document.getElementById('imageArtStyle').value;
+      const customImageStyle = document.getElementById('customImageStyle').value;
+
+      // Determine final image style
+      const finalImageStyle = imageArtStyle === 'custom' ? customImageStyle : imageArtStyle;
+
+      // Apply container width
+      cardContainer.style.width = containerWidth;
+      cardContainer.style.margin = '0 auto';
+
+      updateStatus('Connecting', '-');
+      logEvent(`🚀 Generating from outline: ${cards.length} cards`);
+
+      if (includeImages) {
+        logEvent(`🖼️ Image generation enabled (provider: ${imageProvider}, style: ${finalImageStyle})`);
+      }
+
+      // Start SSE streaming from outline
+      streamFromOutline(cards, { includeImages, imageProvider, streamDelay, imageArtStyle: finalImageStyle });
+    });
+
+    /**
+     * Stream presentation from edited outline
+     */
+    async function streamFromOutline(cards, options) {
+      const { includeImages, imageProvider, streamDelay, imageArtStyle } = options;
+
+      // Prepare file metadata
+      const fileMetadata = uploadedFiles.map(file => ({
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }));
+
+      const endpoint = '/api/presentations/stream-from-outline';
+      const requestBody = JSON.stringify({
+        cards,
+        includeImages,
+        imageProvider,
+        imageArtStyle,
+        streamDelay,
+        files: fileMetadata
+      });
+
+      console.log('[OUTLINE-STREAM] Starting stream from outline...');
+      console.log('[OUTLINE-STREAM] Endpoint:', endpoint);
+      console.log('[OUTLINE-STREAM] Cards:', cards.length);
+
+      const abortController = new AbortController();
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream'
+          },
+          body: requestBody,
+          signal: abortController.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        logEvent(`✓ Connected to outline stream`);
+        updateStatus('Connected', 'initializing');
+
+        if (!response.body) {
+          throw new Error('Response body is null - streaming not supported');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        console.log('[OUTLINE-STREAM] Starting to read stream...');
+
+        function readStream() {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              console.log('[OUTLINE-STREAM] Stream complete');
+              logEvent(`🏁 Stream ended`);
+              updateStatus('Complete', 'closed');
+              return;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            buffer += chunk;
+
+            // Process complete SSE messages
+            const messages = buffer.split(/\r?\n\r?\n/);
+            buffer = messages.pop() || '';
+
+            for (const rawMessage of messages) {
+              try {
+                const message = rawMessage.trim();
+                if (!message) continue;
+
+                // Parse SSE message
+                const lines = message.split(/\r?\n/);
+                let sseEvent = 'message';
+                const dataLines = [];
+
+                for (let rawLine of lines) {
+                  if (!rawLine) continue;
+                  if (rawLine.startsWith(':')) {
+                    console.log('[OUTLINE-STREAM] Heartbeat');
+                    continue;
+                  }
+
+                  const idx = rawLine.indexOf(':');
+                  const field = idx === -1 ? rawLine : rawLine.slice(0, idx);
+                  const value = idx === -1 ? '' : rawLine.slice(idx + 1).replace(/^\s*/, '');
+
+                  if (field === 'event') {
+                    sseEvent = value.trim();
+                  } else if (field === 'data') {
+                    dataLines.push(value.replace(/\r$/, ''));
+                  }
+                }
+
+                const rawData = dataLines.join('\n');
+                if (!rawData) continue;
+
+                const data = JSON.parse(rawData);
+                handleMessage(data);
+
+              } catch (error) {
+                console.error('[OUTLINE-STREAM] Error processing message:', error);
+              }
+            }
+
+            readStream();
+          }).catch(error => {
+            console.error('[OUTLINE-STREAM] Read error:', error);
+            logEvent(`❌ Read error: ${error.message}`);
+            updateStatus('Error', 'read failed');
+          });
+        }
+
+        readStream();
+
+      } catch (error) {
+        console.error('[OUTLINE-STREAM] Error:', error);
+        logEvent(`❌ Stream error: ${error.message}`);
+        updateStatus('Error', error.message);
+        showToast(`Stream failed: ${error.message}`, 'error');
+      }
+    }
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${type} fixed bottom-4 right-4 w-auto max-w-md shadow-lg z-50`;
+      toast.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>${message}</span>
+      `;
+      document.body.appendChild(toast);
+      return toast;
+    }
+
+    /**
+     * Hide toast notification
+     */
+    function hideToast(toast) {
+      if (toast && toast.parentElement) {
+        toast.remove();
+      }
+    }
+
+    // Initialize on page load
+    initializeFormInputs();
+    setupPreferencesSaving();
     initSharedComponents();
 
     // Event Listeners
@@ -1796,14 +3035,73 @@
     // Image generation toggle
     document.getElementById('includeImages').addEventListener('change', (e) => {
       const imageProviderContainer = document.getElementById('imageProviderContainer');
+      const imageStyleContainer = document.getElementById('imageStyleContainer');
 
       if (e.target.checked) {
         imageProviderContainer.style.display = 'block';
+        imageStyleContainer.style.display = 'block';
         logEvent('🖼️ Image generation enabled');
       } else {
         imageProviderContainer.style.display = 'none';
+        imageStyleContainer.style.display = 'none';
         logEvent('🚫 Image generation disabled');
       }
+    });
+
+    // Image art style selection
+    const imageArtStyleSelect = document.getElementById('imageArtStyle');
+    const customStyleContainer = document.getElementById('customStyleContainer');
+    const customImageStyleInput = document.getElementById('customImageStyle');
+    const styleDescription = document.getElementById('styleDescription');
+    const styleDescriptionText = document.getElementById('styleDescriptionText');
+
+    // Style descriptions mapping
+    const styleDescriptions = {
+      'photorealistic': {
+        title: 'Photorealistic',
+        description: 'Realistic photos with natural lighting and detail'
+      },
+      'illustration': {
+        title: 'Illustration',
+        description: 'Hand-drawn or digital artwork style with artistic interpretation'
+      },
+      'abstract': {
+        title: 'Abstract',
+        description: 'Non-representational art using shapes, colors, and forms'
+      },
+      '3d': {
+        title: '3D Render',
+        description: 'Computer-generated 3D graphics with depth and dimension'
+      },
+      'line-art': {
+        title: 'Line Art',
+        description: 'Simple black and white drawings using lines and outlines'
+      },
+      'custom': {
+        title: 'Custom Style',
+        description: 'Describe your own unique visual style below'
+      }
+    };
+
+    // Handle image art style changes
+    imageArtStyleSelect?.addEventListener('change', (e) => {
+      const selectedStyle = e.target.value;
+
+      // Show/hide custom input
+      if (selectedStyle === 'custom') {
+        customStyleContainer.style.display = 'block';
+      } else {
+        customStyleContainer.style.display = 'none';
+      }
+
+      // Update description
+      const styleInfo = styleDescriptions[selectedStyle];
+      if (styleInfo) {
+        styleDescription.textContent = styleInfo.title + ':';
+        styleDescriptionText.textContent = styleInfo.description;
+      }
+
+      logEvent(`🎨 Image style selected: ${selectedStyle}`);
     });
 
     // Container width toggle (dynamic resize without re-streaming)
@@ -1817,6 +3115,151 @@
     // Theme selector (for visual reference, actual theme is sent to API)
     document.getElementById('theme').addEventListener('change', (e) => {
       logEvent(`🎨 Theme selected: ${e.target.value} (will apply on next stream)`);
+    });
+
+    // Reset preferences button
+    const resetPrefsBtn = document.getElementById('reset-preferences-btn');
+    if (resetPrefsBtn) {
+      resetPrefsBtn.addEventListener('click', () => {
+        if (confirm('Reset all preferences to default values? This will reload the page.')) {
+          localStorage.removeItem('streaming-progressive-preferences');
+          logEvent('🔄 Preferences reset to defaults');
+          location.reload();
+        }
+      });
+    }
+
+    /**
+     * File Upload Functions
+     */
+
+    // Get file type icon
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const iconMap = {
+        'pdf': '📄',
+        'doc': '📝',
+        'docx': '📝',
+        'txt': '📝',
+        'png': '🖼️',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'gif': '🖼️'
+      };
+      return iconMap[ext] || '📎';
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Render uploaded files list
+    function renderUploadedFiles() {
+      const container = document.getElementById('uploaded-files-container');
+      const list = document.getElementById('uploaded-files-list');
+      const count = document.getElementById('file-count');
+
+      if (uploadedFiles.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      count.textContent = uploadedFiles.length;
+
+      list.innerHTML = uploadedFiles.map((file, index) => `
+        <div class="flex items-center justify-between p-3 bg-base-100 rounded-lg border border-base-300">
+          <div class="flex items-center gap-3 flex-1">
+            <span class="text-2xl">${getFileIcon(file.name)}</span>
+            <div class="flex-1">
+              <p class="font-semibold text-sm">${file.name}</p>
+              <p class="text-xs opacity-60">${formatFileSize(file.size)}</p>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost btn-circle remove-file-btn" data-file-index="${index}" title="Remove file">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      `).join('');
+
+      // Attach remove button event listeners
+      document.querySelectorAll('.remove-file-btn').forEach(btn => {
+        btn.addEventListener('click', handleRemoveFile);
+      });
+    }
+
+    // Handle file selection
+    function handleFileSelection(files) {
+      const maxFiles = 10;
+      const maxSize = 10 * 1024 * 1024; // 10MB
+
+      const validFiles = Array.from(files).filter(file => {
+        if (file.size > maxSize) {
+          showToast(`${file.name} exceeds 10MB limit`, 'error');
+          return false;
+        }
+        return true;
+      });
+
+      const remainingSlots = maxFiles - uploadedFiles.length;
+      if (validFiles.length > remainingSlots) {
+        showToast(`Maximum ${maxFiles} files allowed. Only adding ${remainingSlots} files.`, 'warning');
+        validFiles.splice(remainingSlots);
+      }
+
+      uploadedFiles.push(...validFiles);
+      renderUploadedFiles();
+      showToast(`${validFiles.length} file(s) uploaded`, 'success');
+    }
+
+    // Handle remove file
+    function handleRemoveFile(event) {
+      const index = parseInt(event.currentTarget.dataset.fileIndex);
+      const fileName = uploadedFiles[index].name;
+      uploadedFiles.splice(index, 1);
+      renderUploadedFiles();
+      showToast(`${fileName} removed`, 'info');
+    }
+
+    // File drop zone click
+    const dropZone = document.getElementById('file-drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone?.addEventListener('click', () => {
+      fileInput?.click();
+    });
+
+    // File input change
+    fileInput?.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelection(e.target.files);
+        e.target.value = ''; // Reset input
+      }
+    });
+
+    // Drag and drop events
+    dropZone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-primary', 'bg-base-300');
+    });
+
+    dropZone?.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-primary', 'bg-base-300');
+    });
+
+    dropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-primary', 'bg-base-300');
+
+      if (e.dataTransfer.files.length > 0) {
+        handleFileSelection(e.dataTransfer.files);
+      }
     });
   </script>
 
@@ -1888,6 +3331,72 @@
           <button type="button" class="btn" onclick="document.getElementById('header-edit-dialog').close()">Cancel</button>
         </div>
       </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Outline Editor Dialog -->
+  <dialog id="outline-edit-dialog" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box max-w-4xl max-h-[90vh]">
+      <h3 class="font-bold text-2xl mb-2">Edit Presentation Outline</h3>
+      <p class="text-sm opacity-70 mb-4">Review and edit the AI-generated outline before creating your presentation</p>
+
+      <!-- Card Count Controls -->
+      <div class="flex items-center gap-4 mb-4 p-3 bg-base-200 rounded-lg">
+        <span class="font-semibold">Number of Cards:</span>
+        <button id="outline-decrease-cards" class="btn btn-sm btn-circle btn-outline">-</button>
+        <span id="outline-card-count-display" class="badge badge-lg badge-primary">6</span>
+        <button id="outline-increase-cards" class="btn btn-sm btn-circle btn-outline">+</button>
+        <span class="text-xs opacity-60 ml-2">(Range: 1-20)</span>
+      </div>
+
+      <!-- Outline Cards Container -->
+      <div id="outline-cards-container" class="space-y-4 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+        <!-- Cards will be dynamically inserted here -->
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-action">
+        <button id="regenerate-outline-btn" class="btn btn-outline">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+          </svg>
+          Regenerate Outline
+        </button>
+        <button id="generate-from-outline-btn" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          Generate Presentation
+        </button>
+        <button class="btn" onclick="document.getElementById('outline-edit-dialog').close()">Cancel</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Delete Card Confirmation Dialog -->
+  <dialog id="delete-card-dialog" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Delete Card?</h3>
+      <div class="alert alert-warning mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <p class="font-semibold">Are you sure you want to delete this card?</p>
+          <p class="text-sm" id="delete-card-message">Card #<span id="delete-card-number"></span> will be permanently removed from the outline.</p>
+        </div>
+      </div>
+      <div class="modal-action">
+        <button id="confirm-delete-card-btn" class="btn btn-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Delete Card
+        </button>
+        <button class="btn" onclick="document.getElementById('delete-card-dialog').close()">Cancel</button>
+      </div>
     </div>
     <form method="dialog" class="modal-backdrop"><button>close</button></form>
   </dialog>

@@ -16,20 +16,19 @@
 ## Acceptance Criteria
 
 ### AC1: Outline Generation Interface
-**Given** I am on the presentation creation page  
-**When** I enter a topic and click "Generate outline"  
-**Then** I should see:
+**Given** I am on the Progressive Card Streaming 
+**When** I enter a topic and click "Start Streaming"  
+**Then** I should see a new modal pop-up:
 - A numbered list of cards (1 to N)
-- Each card showing relavent content information in an editable text field
+- Each card showing relavent content information in an editable textarea field
 - A dropdown menu for each card showing available layouts
-- The system should generate appropriate initial layout suggestions based on content
+- The system should generate appropriate initial layout suggestion based on the purpose and content of the item
 
 ### AC2: Content Editing
 **Given** an outline has been generated  
 **When** I click into any card's text area  
 **Then** I should be able to:
-- Edit the title (first line of text)
-- Add, edit, or remove bullet points (subsequent lines)
+- Edit the title (first line of text), or adjust any (subsequent lines and bullets)
 - Use line breaks to separate content sections
 - See changes reflected immediately without saving
 
@@ -39,19 +38,24 @@ Title of Card
 • First bullet point
 • Second bullet point
 • Third bullet point
+• Etc...
 ```
 
 ### AC3: Layout Selection
 **Given** I am viewing a card in the outline  
 **When** I click the layout dropdown  
 **Then** I should see these options at minimum:
-- Title Slide
-- Bullet Points
-- Two Columns
-- Three Columns
-- Image + Text
-- Quote
-- Comparison
+Hero/Presentation
+Hero Overlay
+Image and Text
+Text and Image
+Two Columns
+Two Columns with Headings
+Three Columns
+Three Columns with Headings
+Four Columns
+Title with Bullets
+Title with Bullets and Image
 
 **And** the selected layout should persist when generating the final presentation
 
@@ -69,9 +73,9 @@ Title of Card
 **When** I click "Generate Presentation"  
 **Then** the system should:
 - Create cards using the exact layouts selected in the dropdowns
-- Use the exact text content as edited
+- Leverage the copywriter prompt and visual-designer prompt to build the content (using the text as a guide and the layout defined)
 - Display layout type as a badge on each generated card
-- Never show a different layout than what was selected
+- Never use a different layout than what was selected
 
 ### AC6: Data Persistence
 **Given** I have edited an outline  
@@ -83,7 +87,7 @@ Title of Card
     {
       "id": "card-1",
       "content": "Title of Card\n• Point 1\n• Point 2",
-      "layout": "bullets"
+      "layout": "Text and Image"
     }
   ]
 }
@@ -139,9 +143,9 @@ Each layout type maps to exactly one rendering template:
 
 ### Test 1: Layout Persistence
 1. Generate outline for "AI Benefits"
-2. Change card 2 from "bullets" to "two-column"
+2. Change card 2 from "Title with Bullets" to "Two Columns"
 3. Generate presentation
-4. **Verify:** Card 2 renders as two-column layout
+4. **Verify:** Card 2 renders as Two Columns layout
 
 ### Test 2: Content Editing
 1. Generate outline
@@ -151,6 +155,6 @@ Each layout type maps to exactly one rendering template:
 
 ### Test 3: No Auto-Detection
 1. Create card with bullet points
-2. Select "title" layout
+2. Select "Title with Bullets" layout
 3. Generate presentation
-4. **Verify:** Card renders as title slide (not bullets), even though content has bullet points
+4. **Verify:** Card renders as Title with Bullets, even though content has bullet points

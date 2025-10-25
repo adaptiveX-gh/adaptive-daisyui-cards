@@ -12,6 +12,7 @@ import cardsRouter from './routes/cards.js';
 import presentationsRouter from './routes/presentations.js';
 import imagesRouter from './routes/images.js';
 import streamingRouter from './routes/streaming.js';
+import outlineRouter from './routes/outline.js';
 import ThemeService from './services/ThemeService.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -80,7 +81,12 @@ app.get('/api', (req, res) => {
       streaming: {
         'POST /api/cards/stream': 'Stream single card generation (SSE)',
         'POST /api/presentations/stream': 'Stream presentation generation (SSE)',
+        'POST /api/presentations/stream-from-outline': 'Stream from user-edited outline (SSE)',
         'GET /api/stream/demo': 'Demo SSE streaming with delays'
+      },
+      outline: {
+        'POST /api/presentation/generate-outline': 'Generate editable outline',
+        'POST /api/presentation/generate-from-outline': 'Validate outline (redirects to SSE)'
       },
       themes: {
         'GET /api/themes': 'List available themes',
@@ -102,6 +108,7 @@ app.get('/api', (req, res) => {
 app.use('/api/cards', cardsRouter);
 app.use('/api/presentations', presentationsRouter);
 app.use('/api/images', imagesRouter);
+app.use('/api/presentation', outlineRouter);
 
 // Mount streaming routes (Phase 3)
 app.use('/api', streamingRouter);

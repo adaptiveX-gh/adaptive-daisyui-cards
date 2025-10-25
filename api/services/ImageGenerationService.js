@@ -16,18 +16,31 @@ export class ImageGenerationService extends EventEmitter {
 
     this.config = config;
 
+    // Determine image generation provider and model from environment
+    const imageProvider = process.env.IMAGE_GENERATION_PROVIDER || 'gemini';
+    const imageModel = process.env.IMAGE_GENERATION_MODEL;
+
+    console.log(`[ImageGenerationService] Initializing with provider: ${imageProvider}, model: ${imageModel || 'default'}`);
+
     // Initialize providers
     this.providers = {
       gemini: new GeminiImageAdapter({
-        apiKey: config.geminiApiKey || process.env.GEMINI_API_KEY,
+        apiKey: config.geminiApiKey || process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY,
+        model: imageModel || 'imagen-3.0-generate-001',
         timeout: config.timeout || parseInt(process.env.IMAGE_GENERATION_TIMEOUT || '30000'),
         retries: 2
       }),
       placeholder: new PlaceholderAdapter()
     };
 
-    // Fallback chain: Gemini -> Placeholder
-    this.fallbackChain = config.fallbackChain || ['gemini', 'placeholder'];
+    // Default provider from environment or config
+    this.defaultProvider = imageProvider;
+
+    // Fallback chain based on default provider
+    const defaultFallbackChain = imageProvider === 'placeholder'
+      ? ['placeholder']
+      : [imageProvider, 'placeholder'];
+    this.fallbackChain = config.fallbackChain || defaultFallbackChain;
 
     // Status store
     this.statusStore = config.statusStore || imageStatusStore;
@@ -46,7 +59,7 @@ export class ImageGenerationService extends EventEmitter {
    */
   async generateImage(prompt, options = {}) {
     const {
-      provider = 'gemini',
+      provider = this.defaultProvider,
       aspectRatio = '16:9',
       style = 'professional-presentation',
       theme = null

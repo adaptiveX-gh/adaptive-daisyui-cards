@@ -66,6 +66,78 @@ Each layout responds to **container width** via `@container` queries:
 
 All layouts use `.layout-card` base class for DaisyUI styling.
 
+## Shared Components (Headers & Footers)
+
+All layouts support optional shared headers and footers that can be toggled on/off and customized globally:
+
+### Header Features
+- Title text (customizable)
+- Logo image (right-aligned, 40px max height)
+- Background color (11 DaisyUI theme colors)
+- Positioned at top of each card
+
+### Footer Features
+- Logo image (left-aligned, 30px max height)
+- Copyright text (center-aligned)
+- Background color (11 DaisyUI theme colors)
+- Positioned at bottom of each card
+
+### Persistence
+All header/footer settings save to localStorage and persist across:
+- Page refreshes
+- Browser restarts
+- Different pages (index.html ↔ streaming-progressive.html)
+
+localStorage key: `presentation-shared-components`
+
+### Layout Structure Pattern
+
+**IMPORTANT**: When creating a new layout, you MUST wrap it with the shared components structure:
+
+```html
+<div id="new-layout" class="layout-card hidden" data-layout="new-layout-name">
+  <div class="layout-card-with-components">
+    <div class="shared-header-container" data-card-id="new-layout"></div>
+    <div class="card-content-scrollable">
+      <!-- Your layout content goes here -->
+      <div class="your-layout-class">
+        <!-- Layout-specific HTML -->
+      </div>
+    </div>
+    <div class="shared-footer-container" data-card-id="new-layout"></div>
+  </div>
+</div>
+```
+
+### CSS Classes Required
+- `.layout-card-with-components` - Flexbox container (flex-direction: column)
+- `.shared-header-container` - Header wrapper (flex-shrink: 0, sticky top)
+- `.card-content-scrollable` - Scrollable content area (flex: 1, overflow-y: auto)
+- `.shared-footer-container` - Footer wrapper (flex-shrink: 0, sticky bottom)
+
+These classes are defined in `src/input.css` (lines 1106-1160).
+
+### Header/Footer Controls
+Located at the top of index.html (lines 32-57):
+- Toggle switches to show/hide headers and footers
+- Edit buttons to customize content, images, and colors
+- Visual color picker with 11 DaisyUI color options
+
+### Edit Dialogs
+Located at the bottom of index.html (lines 858-1027):
+- Modal dialogs for editing header and footer properties
+- Real-time preview of color swatches
+- Form validation and save functionality
+
+### JavaScript Integration
+The `SharedComponentManager` class (src/SharedComponentManager.js) handles:
+- Rendering headers/footers across all cards
+- Saving/loading settings from localStorage
+- Updating all instances when content changes (symbol pattern)
+
+### Theme Compatibility
+Headers and footers automatically adapt to all 29 DaisyUI themes because they use theme-aware utility classes (bg-primary, bg-base-100, etc.).
+
 ## Key Patterns
 
 **Container Query Setup:**
@@ -99,9 +171,10 @@ npm run test:e2e       # Run E2E tests only
 
 **Adding a new layout:**
 1. Add CSS in `src/input.css` following existing pattern
-2. Add HTML structure in `index.html`
+2. Add HTML structure in `index.html` **wrapped with shared components** (see pattern above)
 3. Update JavaScript in `src/app.js` (add to elements.layouts)
 4. Rebuild CSS: `npm run build`
+5. Test that headers and footers appear on the new layout
 
 **Modifying breakpoints:**
 - Edit `@container card (min-width: XXXpx)` queries in `src/input.css`
