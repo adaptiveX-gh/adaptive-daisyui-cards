@@ -829,6 +829,166 @@
       }
     };
 
+    /**
+     * Layout Configuration System
+     * Defines which layouts need images and their structural requirements
+     */
+    const layoutConfig = {
+      imageLayouts: [
+        'hero-layout',
+        'hero-overlay',
+        'sidebar-layout',
+        'image-text-layout',
+        'text-image-layout',
+        'title-bullets-image-layout',
+        'masonry-layout'
+      ],
+
+      shouldHaveImage(layout) {
+        return this.imageLayouts.includes(layout);
+      },
+
+      getStructure(layout) {
+        if (!layout) {
+          return { type: 'default', layoutClass: '' };
+        }
+
+        // Column layouts
+        if (layout.includes('columns')) {
+          const baseLayoutName = layout.includes('two-columns') ? 'two-columns' :
+                                 layout.includes('three-columns') ? 'three-columns' :
+                                 layout.includes('four-columns') ? 'four-columns' : 'two-columns';
+          return {
+            type: 'columns',
+            layoutClass: layout,
+            headerClass: `${baseLayoutName}-header`,
+            containerClass: `${baseLayoutName}-container`
+          };
+        }
+
+        // Hero layouts
+        if (layout === 'hero-layout' || layout === 'hero-overlay' || layout === 'hero') {
+          return {
+            type: 'hero',
+            layoutClass: layout === 'hero' ? 'hero-layout' : layout,
+            contentClass: 'hero-content',
+            imageClass: 'hero-image'
+          };
+        }
+
+        // Sidebar layout
+        if (layout === 'sidebar-layout') {
+          return {
+            type: 'sidebar',
+            layoutClass: 'sidebar-layout',
+            imageClass: 'sidebar-image',
+            contentClass: 'sidebar-content'
+          };
+        }
+
+        // Image-text layout
+        if (layout === 'image-text-layout') {
+          return {
+            type: 'image-text',
+            layoutClass: 'image-text-layout',
+            imageClass: 'image-section',
+            textClass: 'text-section'
+          };
+        }
+
+        // Text-image layout
+        if (layout === 'text-image-layout') {
+          return {
+            type: 'text-image',
+            layoutClass: 'text-image-layout',
+            textClass: 'text-section',
+            imageClass: 'image-section'
+          };
+        }
+
+        // Title-bullets-image layout
+        if (layout === 'title-bullets-image-layout') {
+          return {
+            type: 'title-bullets-image',
+            layoutClass: 'title-bullets-image-layout',
+            headerClass: 'title-bullets-header',
+            containerClass: 'content-container',
+            bulletsClass: 'bullets-section',
+            imageClass: 'image-section'
+          };
+        }
+
+        // Title-bullets layout
+        if (layout === 'title-bullets-layout') {
+          return {
+            type: 'title-bullets',
+            layoutClass: 'title-bullets-layout',
+            headerClass: 'title-bullets-header',
+            containerClass: 'bullets-container'
+          };
+        }
+
+        // Feature layout
+        if (layout === 'feature-layout') {
+          return {
+            type: 'feature',
+            layoutClass: 'feature-layout',
+            headerClass: 'feature-header',
+            gridClass: 'feature-grid',
+            itemClass: 'feature-item'
+          };
+        }
+
+        // Dashboard layout
+        if (layout === 'dashboard-layout') {
+          return {
+            type: 'dashboard',
+            layoutClass: 'dashboard-layout',
+            headerClass: 'dashboard-header',
+            sidebarClass: 'dashboard-sidebar',
+            mainClass: 'dashboard-main',
+            footerClass: 'dashboard-footer'
+          };
+        }
+
+        // Split layout
+        if (layout === 'split-layout') {
+          return {
+            type: 'split',
+            layoutClass: 'split-layout',
+            leftClass: 'split-left',
+            rightClass: 'split-right'
+          };
+        }
+
+        // Masonry layout
+        if (layout === 'masonry-layout') {
+          return {
+            type: 'masonry',
+            layoutClass: 'masonry-layout',
+            gridClass: 'masonry-grid',
+            itemClass: 'masonry-item'
+          };
+        }
+
+        // Objectives layout
+        if (layout === 'objectives-layout') {
+          return {
+            type: 'objectives',
+            layoutClass: 'objectives-layout',
+            gridClass: 'objectives-grid',
+            listClass: 'objectives-list'
+          };
+        }
+
+        // Default fallback
+        return {
+          type: 'default',
+          layoutClass: layout
+        };
+      }
+    };
+
     function updateStatus(connection, stage) {
       document.getElementById('connectionStatus').textContent = connection;
       document.getElementById('currentStage').textContent = stage;
@@ -1455,39 +1615,180 @@
 
       // CRITICAL FIX: Clear skeleton on first content BUT preserve image container
       if (Object.keys(card.content).length === 1) {
-        // Save image container if it exists (check both .card-image and .hero-image)
-        let imageContainer = cardBody.querySelector('.card-image');
-        if (!imageContainer && (card.layout === 'hero-overlay' || card.layout === 'hero')) {
-          imageContainer = cardBody.querySelector('.hero-image');
-        }
+        // Save image container if it exists (check various image container types)
+        let imageContainer = cardBody.querySelector('.card-image, .hero-image, .sidebar-image');
 
         // Clear card body
         cardBody.innerHTML = '';
 
-        // Create layout-specific structure
-        if (card.layout === 'hero-overlay' || card.layout === 'hero') {
-          // Hero layouts need specific structure
-          const heroContent = document.createElement('div');
-          heroContent.className = 'hero-content';
-          heroContent.dataset.heroContent = 'true';
-          cardBody.appendChild(heroContent);
+        // Create layout-specific structure using layoutConfig
+        const structure = layoutConfig.getStructure(card.layout);
+        const scrollableContainer = cardBody.closest('.card-content-scrollable');
+
+        switch (structure.type) {
+          case 'hero':
+            // Hero layouts need hero-content wrapper
+            const heroContent = document.createElement('div');
+            heroContent.className = structure.wrapper;
+            heroContent.dataset.heroContent = 'true';
+            cardBody.appendChild(heroContent);
+            break;
+
+          case 'sidebar':
+            // Sidebar layout: create sidebar-content wrapper (image will be inserted before it)
+            if (scrollableContainer) {
+              scrollableContainer.classList.add('sidebar-layout');
+            }
+            const sidebarContent = document.createElement('div');
+            sidebarContent.className = structure.contentClass;
+            sidebarContent.dataset.sidebarContent = 'true';
+            cardBody.appendChild(sidebarContent);
+            break;
+
+          case 'image-text':
+            // Image-text layout: image section + text section
+            if (scrollableContainer) {
+              scrollableContainer.classList.add('image-text-layout');
+            }
+            const imageSection = document.createElement('div');
+            imageSection.className = structure.imageSection;
+            imageSection.dataset.imageSection = 'true';
+            cardBody.appendChild(imageSection);
+
+            const textSection = document.createElement('div');
+            textSection.className = structure.textSection;
+            textSection.dataset.textSection = 'true';
+            cardBody.appendChild(textSection);
+            break;
+
+          case 'text-image':
+            // Text-image layout: text section + image section
+            if (scrollableContainer) {
+              scrollableContainer.classList.add('text-image-layout');
+            }
+            const textSectionTI = document.createElement('div');
+            textSectionTI.className = structure.textSection;
+            textSectionTI.dataset.textSection = 'true';
+            cardBody.appendChild(textSectionTI);
+
+            const imageSectionTI = document.createElement('div');
+            imageSectionTI.className = structure.imageSection;
+            imageSectionTI.dataset.imageSection = 'true';
+            cardBody.appendChild(imageSectionTI);
+            break;
+
+          case 'title-bullets-image':
+            // Title-bullets-image layout: header + content container (which will have bullets + image)
+            if (scrollableContainer) {
+              scrollableContainer.classList.add('title-bullets-image-layout');
+            }
+            const tbiHeader = document.createElement('div');
+            tbiHeader.className = structure.headerClass;
+            tbiHeader.dataset.layoutHeader = 'true';
+            cardBody.appendChild(tbiHeader);
+
+            const contentContainer = document.createElement('div');
+            contentContainer.className = structure.containerClass;
+            contentContainer.dataset.contentContainer = 'true';
+            cardBody.appendChild(contentContainer);
+
+            // Create bullets-section inside content-container
+            const bulletsSection = document.createElement('div');
+            bulletsSection.className = 'bullets-section';
+            bulletsSection.dataset.bulletsSection = 'true';
+            contentContainer.appendChild(bulletsSection);
+            break;
+
+          default:
+            // Default: no special structure needed
+            break;
         }
 
         // Restore image container if it existed
         if (imageContainer) {
           console.log(`[renderCardContent] Preserving image container for card ${card.id} (class: ${imageContainer.className})`);
-          cardBody.prepend(imageContainer);
+          // Re-insert based on layout type
+          if (card.layout === 'sidebar-layout') {
+            const sidebarContent = cardBody.querySelector('[data-sidebar-content]');
+            if (sidebarContent) {
+              cardBody.insertBefore(imageContainer, sidebarContent);
+            } else {
+              cardBody.prepend(imageContainer);
+            }
+          } else if (card.layout === 'image-text-layout') {
+            const imageSection = cardBody.querySelector('[data-image-section]');
+            if (imageSection) {
+              imageSection.appendChild(imageContainer);
+            } else {
+              cardBody.prepend(imageContainer);
+            }
+          } else if (card.layout === 'text-image-layout') {
+            const imageSectionTI = cardBody.querySelector('[data-image-section]');
+            if (imageSectionTI) {
+              imageSectionTI.appendChild(imageContainer);
+            } else {
+              cardBody.prepend(imageContainer);
+            }
+          } else if (card.layout === 'title-bullets-image-layout') {
+            const contentContainer = cardBody.querySelector('[data-content-container]');
+            if (contentContainer) {
+              let imageSection = contentContainer.querySelector('.image-section');
+              if (!imageSection) {
+                imageSection = document.createElement('div');
+                imageSection.className = 'image-section';
+                imageSection.dataset.imageSection = 'true';
+                contentContainer.appendChild(imageSection);
+              }
+              imageSection.appendChild(imageContainer);
+            } else {
+              cardBody.prepend(imageContainer);
+            }
+          } else {
+            cardBody.prepend(imageContainer);
+          }
         }
       }
 
       // Find the right container for this content based on layout
       let targetContainer = cardBody;
-      if (card.layout === 'hero-overlay' || card.layout === 'hero') {
-        // For hero layouts, text content goes inside .hero-content
-        const heroContent = cardBody.querySelector('[data-hero-content]');
-        if (heroContent) {
-          targetContainer = heroContent;
-        }
+      const structure = layoutConfig.getStructure(card.layout);
+
+      switch (structure.type) {
+        case 'hero':
+          // Hero content goes inside hero-content wrapper
+          const heroContent = cardBody.querySelector('[data-hero-content]');
+          if (heroContent) targetContainer = heroContent;
+          break;
+
+        case 'sidebar':
+          // Text content goes in sidebar-content wrapper
+          const sidebarContent = cardBody.querySelector('[data-sidebar-content]');
+          if (sidebarContent) targetContainer = sidebarContent;
+          break;
+
+        case 'image-text':
+        case 'text-image':
+          // Text content goes in text-section
+          if (section !== 'image' && section !== 'imagePrompt') {
+            const textSec = cardBody.querySelector('[data-text-section]');
+            if (textSec) targetContainer = textSec;
+          }
+          break;
+
+        case 'title-bullets-image':
+          // Title/subtitle in header, bullets in bullets-section
+          if (section === 'title' || section === 'subtitle') {
+            const header = cardBody.querySelector('[data-layout-header]');
+            if (header) targetContainer = header;
+          } else if (section === 'bullets' || section === 'items') {
+            const bullets = cardBody.querySelector('[data-bullets-section]');
+            if (bullets) targetContainer = bullets;
+          }
+          break;
+
+        default:
+          // Default: content goes directly in card-body
+          break;
       }
 
       // Create element for content
@@ -1593,7 +1894,7 @@
       }
 
       logEvent(`🖼️ Placeholder: ${cardId.substring(0, 8)}`);
-      console.log(`[renderPlaceholder] Creating NEW placeholder for ${cardId}`);
+      console.log(`[renderPlaceholder] Creating NEW placeholder for ${cardId} with layout: ${card.layout}`);
 
       // Create image container
       const cardBody = card.element.querySelector('.card-body');
@@ -1601,27 +1902,101 @@
         console.error(`[renderPlaceholder] No .card-body found in card element for ${cardId}`);
         return;
       }
-      console.log(`[renderPlaceholder] ✓ CardBody found, creating image container`);
+      console.log(`[renderPlaceholder] ✓ CardBody found, creating layout-aware image container`);
 
-      // Create NEW image container - layout-aware
+      // Create NEW image container - LAYOUT-AWARE
       const imageContainer = document.createElement('div');
+      imageContainer.dataset.cardId = cardId;
 
-      // For hero-overlay, create the .hero-image wrapper
-      if (card.layout === 'hero-overlay') {
+      // Layout-specific image placement
+      if (card.layout === 'hero-overlay' || card.layout === 'hero') {
+        // Hero layouts: full-bleed background image
         imageContainer.className = 'hero-image';
-        imageContainer.dataset.cardId = cardId;
-
-        // Prepend to card body (image as background)
         cardBody.prepend(imageContainer);
-        console.log(`[renderPlaceholder] ✓ Hero-image container created for hero-overlay layout`);
+        console.log(`[renderPlaceholder] ✓ Hero-image container created for ${card.layout}`);
+      } else if (card.layout === 'sidebar-layout') {
+        // Sidebar: image goes in .sidebar-image (left side, 300px wide)
+        imageContainer.className = 'sidebar-image';
+        // Insert as first child of card-body (before sidebar-content)
+        const sidebarContent = cardBody.querySelector('[data-sidebar-content]');
+        if (sidebarContent) {
+          cardBody.insertBefore(imageContainer, sidebarContent);
+          console.log(`[renderPlaceholder] ✓ Sidebar-image container created before sidebar-content`);
+        } else {
+          cardBody.prepend(imageContainer);
+          console.log(`[renderPlaceholder] ⚠️ No sidebar-content found, prepending sidebar-image`);
+        }
+      } else if (card.layout === 'image-text-layout') {
+        // Image-text: image goes in .image-section (left, 40% width)
+        const imageSection = cardBody.querySelector('[data-image-section]');
+        if (imageSection) {
+          imageContainer.className = 'w-full h-full';
+          imageSection.appendChild(imageContainer);
+          console.log(`[renderPlaceholder] ✓ Image container placed in image-section for image-text-layout`);
+        } else {
+          // Fallback: create image-section if structure not yet created
+          imageContainer.className = 'card-image mb-4';
+          cardBody.prepend(imageContainer);
+          console.log(`[renderPlaceholder] ⚠️ No image-section found, using fallback placement`);
+        }
+      } else if (card.layout === 'text-image-layout') {
+        // Text-image: image goes in .image-section (RIGHT side, 40% width)
+        const imageSection = cardBody.querySelector('[data-image-section]');
+        if (imageSection) {
+          imageContainer.className = 'w-full h-full';
+          imageSection.appendChild(imageContainer);
+          console.log(`[renderPlaceholder] ✓ Image container placed in image-section for text-image-layout`);
+        } else {
+          // Fallback: create image-section if structure not yet created
+          imageContainer.className = 'card-image mb-4';
+          cardBody.prepend(imageContainer);
+          console.log(`[renderPlaceholder] ⚠️ No image-section found, using fallback placement`);
+        }
+      } else if (card.layout === 'title-bullets-image-layout') {
+        // Title-bullets-image: image goes in .image-section inside .content-container (right side)
+        const contentContainer = cardBody.querySelector('[data-content-container]');
+        if (contentContainer) {
+          // Check if image-section already exists
+          let imageSection = contentContainer.querySelector('.image-section');
+          if (!imageSection) {
+            // Create image-section as sibling to bullets-section
+            imageSection = document.createElement('div');
+            imageSection.className = 'image-section';
+            imageSection.dataset.imageSection = 'true';
+            contentContainer.appendChild(imageSection);
+            console.log(`[renderPlaceholder] ✓ Created image-section in content-container`);
+          }
+          imageContainer.className = 'w-full h-full';
+          imageSection.appendChild(imageContainer);
+          console.log(`[renderPlaceholder] ✓ Image container placed in image-section for title-bullets-image`);
+        } else {
+          // Fallback if structure not yet created
+          imageContainer.className = 'card-image mb-4';
+          cardBody.prepend(imageContainer);
+          console.log(`[renderPlaceholder] ⚠️ No content-container found, using fallback placement`);
+        }
+      } else if (card.layout === 'masonry-layout') {
+        // Masonry: images should go in multiple .masonry-item containers
+        // For now, create a single masonry-item (multi-image support would need backend changes)
+        const masonryGrid = cardBody.querySelector('.masonry-grid');
+        if (masonryGrid) {
+          const masonryItem = document.createElement('div');
+          masonryItem.className = 'masonry-item';
+          imageContainer.className = 'w-full h-full';
+          masonryItem.appendChild(imageContainer);
+          masonryGrid.appendChild(masonryItem);
+          console.log(`[renderPlaceholder] ✓ Image placed in masonry-item`);
+        } else {
+          // Fallback
+          imageContainer.className = 'card-image mb-4';
+          cardBody.prepend(imageContainer);
+          console.log(`[renderPlaceholder] ⚠️ No masonry-grid found, using fallback placement`);
+        }
       } else {
-        // Default image placement for other layouts
+        // Default: generic placement at top (for layouts without specific image handling)
         imageContainer.className = 'card-image mb-4';
-        imageContainer.dataset.cardId = cardId;
-
-        // Prepend to card body (image at top)
         cardBody.prepend(imageContainer);
-        console.log(`[renderPlaceholder] ✓ ImageContainer prepended to card body`);
+        console.log(`[renderPlaceholder] ✓ Generic card-image container created for ${card.layout}`);
       }
 
       // Show placeholder with progressive loading UI
@@ -2826,7 +3201,20 @@
       container.appendChild(tempCardContainer);
 
       // Temporarily swap the main card container
-      const originalContainer = document.getElementById('cardContainer');
+      // First, try to recover from a stuck state
+      let originalContainer = document.getElementById('cardContainer');
+      if (!originalContainer) {
+        // Check if it's stuck with the temp ID from a previous failed preview
+        const stuckContainer = document.getElementById('cardContainer-temp');
+        if (stuckContainer) {
+          console.log('[PREVIEW] Recovering from stuck state - restoring cardContainer ID');
+          stuckContainer.id = 'cardContainer';
+          originalContainer = stuckContainer;
+        } else {
+          throw new Error('Main card container not found. The page needs to be refreshed.');
+        }
+      }
+
       const originalContainerId = originalContainer.id;
       originalContainer.id = 'cardContainer-temp';
       tempCardContainer.id = 'cardContainer';
