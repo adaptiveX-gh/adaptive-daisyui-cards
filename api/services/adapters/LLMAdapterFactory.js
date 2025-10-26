@@ -17,6 +17,7 @@
  */
 
 import { GeminiLLMAdapter } from './GeminiLLMAdapter.js';
+import { AnthropicLLMAdapter } from './AnthropicLLMAdapter.js';
 
 /**
  * Create content LLM adapter based on environment configuration
@@ -50,8 +51,11 @@ export function createContentLLMAdapter(options = {}) {
 
     case 'anthropic':
     case 'claude':
-      // TODO: Implement Anthropic adapter
-      throw new Error('Anthropic adapter not yet implemented. Coming soon!');
+      return new AnthropicLLMAdapter({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+        model: model || process.env.CONTENT_LLM_MODEL || 'claude-3-5-sonnet-20240620',
+        mockMode
+      });
 
     case 'mock':
       return new GeminiLLMAdapter({

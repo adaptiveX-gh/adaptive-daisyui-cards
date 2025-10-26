@@ -1,0 +1,17 @@
+<div class="layout-card feature-layout" data-layout="feature-layout" data-card-id="{{id}}">
+  <div class="feature-header">
+    <h2 class="adaptive-text-2xl font-bold mb-2">{{title}}</h2>
+    <p class="adaptive-text-base opacity-70">
+      {{subtitle}}
+    </p>
+  </div>
+  <div class="feature-grid">
+    {{#each features}}
+    <div class="feature-item">
+      <div class="text-3xl mb-2">{{icon}}</div>
+      <h3 class="adaptive-text-lg font-bold mb-1">{{title}}</h3>
+      <p class="adaptive-text-sm opacity-70">{{description}}</p>
+    </div>
+    {{/each}}
+  </div>
+</div>

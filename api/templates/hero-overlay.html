@@ -1,22 +1,17 @@
-<div class="layout-card hero-layout overlay" data-layout="hero-overlay" data-card-id="{{id}}">
+<div class="layout-card hero-overlay" data-layout="hero-overlay" data-card-id="{{id}}">
   <div class="hero-image">
-    {{#if imageUrl}}
-    <img src="{{imageUrl}}" alt="{{title}}" />
-    {{else}}
-    <div class="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent"></div>
-    {{/if}}
+    <img src="{{imageUrl}}" alt="{{imageAlt}}">
   </div>
   <div class="hero-content">
-    {{#if kicker}}
-    <p class="adaptive-text-base uppercase tracking-wider opacity-90 mb-2">{{kicker}}</p>
-    {{/if}}
-    <h1 class="hero-title text-white">{{title}}</h1>
+    <h1 class="hero-title">{{title}}</h1>
     {{#if subtitle}}
-    <p class="hero-subtitle text-white">{{subtitle}}</p>
+    <p class="hero-subtitle">{{subtitle}}</p>
     {{/if}}
-    {{#if cta}}
-    <div class="mt-6">
-      <a href="{{cta.href}}" class="btn btn-primary btn-lg">{{cta.label}}</a>
+    {{#if buttons}}
+    <div class="card-actions justify-end mt-4">
+      {{#each buttons}}
+      <button class="btn btn-{{style}}">{{text}}</button>
+      {{/each}}
     </div>
     {{/if}}
   </div>

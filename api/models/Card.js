@@ -84,7 +84,27 @@ export class Card {
   }
 
   isValidLayout(layout) {
-    const validLayouts = ['split', 'numbered-list', 'grid', 'hero', 'hero-overlay', 'content-bullets'];
+    const validLayouts = [
+      // Original layouts
+      // New layouts from index.html
+      'objectives-layout',      
+      'sidebar-layout',
+      'feature-layout',
+      'masonry-layout',
+      'dashboard-layout',
+      'split-layout',
+      'image-text-layout',
+      'text-image-layout',
+      'two-columns-layout',
+      'two-columns-headings-layout',
+      'hero-layout',
+      'hero-overlay-layout',
+      'three-columns-layout',
+      'three-columns-headings-layout',
+      'four-columns-layout',
+      'title-bullets-layout',
+      'title-bullets-image-layout'
+    ];
     return validLayouts.includes(layout);
   }
 

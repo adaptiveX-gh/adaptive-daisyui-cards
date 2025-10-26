@@ -1,0 +1,25 @@
+<div class="layout-card sidebar-layout" data-layout="sidebar-layout" data-card-id="{{id}}">
+  <img src="{{imageUrl}}"
+       alt="{{imageAlt}}"
+       class="sidebar-image">
+  <div class="sidebar-content">
+    <h2 class="adaptive-text-2xl font-bold mb-2">{{title}}</h2>
+    <p class="adaptive-text-base opacity-70 mb-4">
+      {{body}}
+    </p>
+    {{#if badges}}
+    <div class="flex flex-wrap gap-2 mb-4">
+      {{#each badges}}
+      <span class="badge badge-{{style}} adaptive-text-sm">{{text}}</span>
+      {{/each}}
+    </div>
+    {{/if}}
+    {{#if buttons}}
+    <div class="card-actions justify-end mt-auto">
+      {{#each buttons}}
+      <button class="btn btn-{{style}} btn-sm adaptive-text-sm">{{text}}</button>
+      {{/each}}
+    </div>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="layout-card split-layout" data-layout="split-layout" data-card-id="{{id}}">
+  <div class="split-left">
+    <h2 class="adaptive-text-2xl font-bold mb-4">{{leftTitle}}</h2>
+    {{#if avatarUrl}}
+    <div class="flex items-center gap-4 mb-4">
+      <div class="avatar">
+        <div class="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+          <img src="{{avatarUrl}}" alt="{{avatarAlt}}" />
+        </div>
+      </div>
+      <div>
+        <h3 class="adaptive-text-lg font-bold">{{name}}</h3>
+        <p class="adaptive-text-sm opacity-70">{{role}}</p>
+      </div>
+    </div>
+    {{/if}}
+    <div class="space-y-2">
+      {{#each leftItems}}
+      <div>
+        <span class="adaptive-text-sm font-semibold">{{label}}:</span>
+        <p class="adaptive-text-sm opacity-70">{{value}}</p>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class="split-right">
+    <h3 class="adaptive-text-lg font-bold mb-3">{{rightTitle}}</h3>
+    <div class="space-y-3">
+      {{#each rightItems}}
+      <div class="flex items-start gap-2">
+        <div class="badge badge-{{badgeStyle}} badge-sm mt-1">{{badge}}</div>
+        <div>
+          <p class="adaptive-text-sm font-semibold">{{title}}</p>
+          <p class="adaptive-text-xs opacity-70">{{timestamp}}</p>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

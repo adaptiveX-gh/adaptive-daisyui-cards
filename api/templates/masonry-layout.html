@@ -1,0 +1,15 @@
+<div class="layout-card masonry-layout" data-layout="masonry-layout" data-card-id="{{id}}">
+  <h2 class="adaptive-text-2xl font-bold mb-4">{{title}}</h2>
+  <div class="masonry-grid">
+    {{#each items}}
+    <div class="masonry-item">
+      <img src="{{imageUrl}}"
+           alt="{{imageAlt}}">
+      <div class="masonry-item-content">
+        <h3 class="adaptive-text-base font-bold">{{title}}</h3>
+        <p class="adaptive-text-sm opacity-70">{{description}}</p>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>

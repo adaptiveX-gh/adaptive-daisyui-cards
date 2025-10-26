@@ -1,0 +1,21 @@
+<div class="layout-card title-bullets-image-layout" data-layout="title-bullets-image-layout" data-card-id="{{id}}">
+  <div class="title-bullets-header">
+    <h2 class="adaptive-text-2xl font-bold">{{title}}</h2>
+    {{#if subtitle}}
+    <p class="adaptive-text-base opacity-70">{{subtitle}}</p>
+    {{/if}}
+  </div>
+  <div class="content-container">
+    <div class="bullets-section">
+      <ul>
+        {{#each bullets}}
+        <li class="adaptive-text-base">{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+    <div class="image-section">
+      <img src="{{imageUrl}}"
+           alt="{{imageAlt}}">
+    </div>
+  </div>
+</div>

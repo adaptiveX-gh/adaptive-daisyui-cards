@@ -1,0 +1,178 @@
+<div class="layout-card objectives-layout" data-layout="objectives-layout" data-card-id="{{id}}">
+  <!-- Two-column split: 40/60 favoring right -->
+  <div class="objectives-grid">
+
+    <!-- Left Column: Context -->
+    <div class="objectives-context">
+      <h2 class="adaptive-text-3xl font-bold mb-4">{{title}}</h2>
+
+      {{#if subtitle}}
+      <p class="adaptive-text-lg opacity-80 mb-6">{{subtitle}}</p>
+      {{/if}}
+
+      {{#if body}}
+      <div class="adaptive-text-base opacity-90 mb-6">
+        {{#if (isArray body)}}
+          {{#each body}}
+          <p class="mb-3">{{this}}</p>
+          {{/each}}
+        {{else}}
+          <p>{{body}}</p>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      {{#if imageUrl}}
+      <figure class="objectives-image">
+        <img src="{{imageUrl}}" alt="{{imageAlt}}" class="rounded-lg" />
+        {{#if imageCaption}}
+        <figcaption class="adaptive-text-sm opacity-60 mt-2 italic">{{imageCaption}}</figcaption>
+        {{/if}}
+      </figure>
+      {{/if}}
+    </div>
+
+    <!-- Right Column: Numbered Objectives -->
+    <div class="objectives-list-container">
+      {{#if objectivesHeading}}
+      <h3 class="adaptive-text-xl font-semibold mb-6 opacity-90">{{objectivesHeading}}</h3>
+      {{/if}}
+
+      <ol class="objectives-list space-y-4">
+        {{#each objectives}}
+        <li class="objective-item">
+          <!-- Circled Number Badge -->
+          <div class="badge badge-primary badge-lg objective-badge">{{inc @index}}</div>
+
+          <div class="objective-content">
+            <!-- Bold action text -->
+            <span class="objective-action adaptive-text-base font-bold">{{action}}</span>
+
+            <!-- Supporting description -->
+            {{#if description}}
+            <p class="objective-description adaptive-text-sm opacity-80 mt-1">{{description}}</p>
+            {{/if}}
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+
+      {{#if footnote}}
+      <p class="adaptive-text-sm opacity-60 mt-6 italic">{{footnote}}</p>
+      {{/if}}
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* Objectives Layout - Container Query Responsive */
+.objectives-layout {
+  container-type: inline-size;
+  container-name: objectives;
+}
+
+/* Mobile-first: Stacked */
+.objectives-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.objectives-context {
+  width: 100%;
+}
+
+.objectives-list-container {
+  width: 100%;
+}
+
+/* Tablet: Side-by-side 45/55 split */
+@container objectives (min-width: 600px) {
+  .objectives-grid {
+    display: grid;
+    grid-template-columns: 45fr 55fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+
+/* Desktop: Wider 40/60 split */
+@container objectives (min-width: 900px) {
+  .objectives-grid {
+    grid-template-columns: 40fr 60fr;
+    gap: 4rem;
+  }
+}
+
+/* Objective Item Layout */
+.objective-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.objective-badge {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+/* Badge sizing at different breakpoints */
+@container objectives (min-width: 600px) {
+  .objective-badge {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+@container objectives (min-width: 900px) {
+  .objective-badge {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+.objective-content {
+  flex: 1;
+  padding-top: 0.125rem; /* Align with badge center */
+}
+
+.objective-action {
+  display: block;
+  line-height: 1.4;
+}
+
+.objective-description {
+  line-height: 1.5;
+}
+
+/* Image styling */
+.objectives-image {
+  max-width: 100%;
+}
+
+.objectives-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Responsive image sizing */
+@container objectives (min-width: 600px) {
+  .objectives-image img {
+    max-height: 300px;
+  }
+}
+
+@container objectives (min-width: 900px) {
+  .objectives-image img {
+    max-height: 400px;
+  }
+}
+</style>

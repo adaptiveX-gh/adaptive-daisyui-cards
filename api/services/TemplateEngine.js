@@ -48,7 +48,26 @@ export class TemplateEngine {
    */
   loadTemplates() {
     const templateDir = join(__dirname, '..', 'templates');
-    const layouts = ['split', 'numbered-list', 'grid', 'hero', 'hero-overlay', 'content-bullets'];
+    const layouts = [
+      // All current layouts
+      'hero-overlay',
+      'objectives-layout',
+      'sidebar-layout',
+      'feature-layout',
+      'masonry-layout',
+      'dashboard-layout',
+      'split-layout',
+      'image-text-layout',
+      'text-image-layout',
+      'two-columns-layout',
+      'two-columns-headings-layout',
+      'hero-layout',
+      'three-columns-layout',
+      'three-columns-headings-layout',
+      'four-columns-layout',
+      'title-bullets-layout',
+      'title-bullets-image-layout'
+    ];
 
     for (const layout of layouts) {
       try {

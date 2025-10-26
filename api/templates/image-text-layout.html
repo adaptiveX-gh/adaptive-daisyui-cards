@@ -1,0 +1,27 @@
+<div class="layout-card image-text-layout" data-layout="image-text-layout" data-card-id="{{id}}">
+  <div class="image-section">
+    <img src="{{imageUrl}}"
+         alt="{{imageAlt}}">
+  </div>
+  <div class="text-section">
+    <h2 class="adaptive-text-2xl font-bold mb-3">{{title}}</h2>
+    <p class="adaptive-text-base opacity-80 mb-4">
+      {{body}}
+    </p>
+    {{#if bullets}}
+    <ul class="space-y-2 mb-4">
+      {{#each bullets}}
+      <li class="flex items-start gap-2">
+        <span class="text-primary mt-1">✓</span>
+        <span class="adaptive-text-sm">{{this}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    {{/if}}
+    {{#if buttonText}}
+    <div class="card-actions">
+      <button class="btn btn-primary btn-sm adaptive-text-sm">{{buttonText}}</button>
+    </div>
+    {{/if}}
+  </div>
+</div>

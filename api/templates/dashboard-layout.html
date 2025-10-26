@@ -1,0 +1,31 @@
+<div class="layout-card dashboard-layout" data-layout="dashboard-layout" data-card-id="{{id}}">
+  <div class="dashboard-header">
+    <h2 class="adaptive-text-xl font-bold">{{title}}</h2>
+    <p class="adaptive-text-sm opacity-70">{{subtitle}}</p>
+  </div>
+
+  <div class="dashboard-sidebar">
+    <h3 class="adaptive-text-base font-bold mb-2">{{sidebarTitle}}</h3>
+    <ul class="menu menu-compact adaptive-text-sm">
+      {{#each menuItems}}
+      <li><a>{{this}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
+
+  <div class="dashboard-main">
+    {{#each widgets}}
+    <div class="dashboard-widget">
+      <h3 class="adaptive-text-lg font-bold mb-2">{{title}}</h3>
+      <p class="adaptive-text-3xl font-bold text-{{color}}">{{value}}</p>
+      <p class="adaptive-text-sm opacity-70 mt-1">{{description}}</p>
+    </div>
+    {{/each}}
+  </div>
+
+  {{#if footerText}}
+  <div class="dashboard-footer">
+    <p class="adaptive-text-sm opacity-70 text-center">{{footerText}}</p>
+  </div>
+  {{/if}}
+</div>

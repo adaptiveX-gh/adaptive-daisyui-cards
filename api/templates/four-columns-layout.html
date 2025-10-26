@@ -1,0 +1,24 @@
+<div class="layout-card four-columns-layout" data-layout="four-columns-layout" data-card-id="{{id}}">
+  <div class="four-columns-header">
+    <h2 class="adaptive-text-2xl font-bold">{{title}}</h2>
+    <p class="adaptive-text-base opacity-70">{{subtitle}}</p>
+  </div>
+  <div class="four-columns-container" data-layout-container="four-columns">
+    {{#each columns}}
+    <div class="column">
+      <h3 class="adaptive-text-xl font-bold">{{title}}</h3>
+      {{#if value}}
+      <p class="adaptive-text-3xl font-bold text-{{color}} mb-2">{{value}}</p>
+      {{/if}}
+      <p class="adaptive-text-base opacity-80 mb-3">{{description}}</p>
+      {{#if items}}
+      <ul>
+        {{#each items}}
+        <li class="adaptive-text-sm">{{this}}</li>
+        {{/each}}
+      </ul>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+</div>

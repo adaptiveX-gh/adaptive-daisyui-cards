@@ -1,0 +1,28 @@
+<div class="layout-card three-columns-headings-layout" data-layout="three-columns-headings-layout" data-card-id="{{id}}">
+  <div class="three-columns-header">
+    <h2 class="adaptive-text-2xl font-bold">{{title}}</h2>
+    <p class="adaptive-text-base opacity-70">{{subtitle}}</p>
+  </div>
+  <div class="three-columns-container" data-layout-container="three-columns-headings">
+    {{#each columns}}
+    <div class="column">
+      <h3 class="column-heading">{{heading}}</h3>
+      <div class="column-content">
+        <p class="adaptive-text-base opacity-80">
+          {{description}}
+        </p>
+        {{#if items}}
+        <ul>
+          {{#each items}}
+          <li class="adaptive-text-sm">{{this}}</li>
+          {{/each}}
+        </ul>
+        {{/if}}
+        {{#if price}}
+        <p class="adaptive-text-2xl font-bold mt-4">{{price}}<span class="adaptive-text-sm font-normal opacity-70">{{priceUnit}}</span></p>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>

@@ -95,7 +95,43 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Features/benefits need prominence, image is supportive
 - **Avoid when**: Image should be hero/dominant element
 
-### 7. **two-columns-layout**
+### 7. **objectives-layout**
+- **Best for**: Learning objectives, workshop goals, session outcomes, course objectives
+- **Characteristics**:
+  - 40/60 or 45/55 split favoring right column
+  - Left column: contextual information (title, body text, supporting image)
+  - Right column: numbered list with circled badge numbers (DaisyUI badge component)
+  - Each objective has bold action text + supporting description
+  - Responsive: stacks on mobile, side-by-side on tablet+
+- **Content Structure**:
+  ```json
+  {
+    "title": "Main heading (required)",
+    "subtitle": "Optional context",
+    "body": "Descriptive text or array of paragraphs",
+    "imageUrl": "Optional supporting image",
+    "imageCaption": "Optional image attribution",
+    "objectivesHeading": "By the end of this session, you'll be able to:",
+    "objectives": [
+      {
+        "action": "Identify key patterns",
+        "description": "Recognize common design patterns in presentations"
+      },
+      {
+        "action": "Generate compelling content",
+        "description": "Create engaging copy that resonates with audiences"
+      }
+    ],
+    "footnote": "Optional additional context"
+  }
+  ```
+- **Use when**: Presenting learning outcomes, session goals, workshop objectives (5-6 objectives max)
+- **Avoid when**: More than 6 objectives (too overwhelming) or objectives are unordered/equal priority (use bullets instead)
+- **DaisyUI Components Used**:
+  - `badge badge-primary badge-lg` for circled numbers
+  - Automatically responsive with container queries
+
+### 8. **two-columns-layout**
 - **Best for**: Comparisons, pros/cons, before/after, parallel concepts, side-by-side information
 - **Characteristics**:
   - Title and subtitle at top (full width)
@@ -127,7 +163,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Comparing two items, showing parallel concepts, pros/cons lists, option comparisons
 - **Avoid when**: Need more than 2 columns (use feature-layout) or unequal emphasis (use split-layout)
 
-### 7.5. **two-columns-headings-layout**
+### 9. **two-columns-headings-layout**
 - **Best for**: Labeled comparisons, categorized content, pros/cons, advantages/disadvantages, before/after with labels
 - **Characteristics**:
   - Main title and subtitle at top (full width)
@@ -160,7 +196,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Need to label/categorize each column (pros/cons, benefits/risks, old/new)
 - **Avoid when**: Column labels are unnecessary (use two-columns-layout instead)
 
-### 8. **feature-layout**
+### 10. **feature-layout**
 - **Best for**: Multiple equal-priority items, feature lists, team introductions
 - **Characteristics**:
   - 3-col → 2-col → 1-col grid (responsive)
@@ -169,7 +205,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Several items of similar type/importance
 - **Avoid when**: Items have hierarchical relationship
 
-### 9. **three-columns-layout**
+### 11. **three-columns-layout**
 - **Best for**: Three equal concepts, services, features, process steps
 - **Characteristics**:
   - Title and subtitle at top (full width)
@@ -205,7 +241,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Exactly 3 items with equal weight (services, pillars, steps, phases)
 - **Avoid when**: Need more/fewer than 3 columns or items have unequal importance
 
-### 10. **three-columns-headings-layout**
+### 12. **three-columns-headings-layout**
 - **Best for**: Pricing tiers, product variants, categorized three-way comparisons
 - **Characteristics**:
   - Main title and subtitle at top
@@ -240,7 +276,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Three-way comparisons need category labels (pricing tiers, product lines)
 - **Avoid when**: Column labels are redundant (use three-columns-layout instead)
 
-### 11. **four-columns-layout**
+### 13. **four-columns-layout**
 - **Best for**: Quarterly data, 4-part processes, team of 4, four seasons/phases
 - **Characteristics**:
   - Title and subtitle at top
@@ -279,7 +315,7 @@ You are an expert in presentation visual design specializing in layout selection
 - **Use when**: Exactly 4 equal items (quarters, phases, team members, stages)
 - **Avoid when**: Content is too dense for narrow columns or need different column count
 
-### 12. **title-bullets-layout**
+### 14. **title-bullets-layout**
 - **Best for**: Key points, takeaways, simple lists, agenda items, executive summary
 - **Characteristics**:
   - Large, centered title and subtitle

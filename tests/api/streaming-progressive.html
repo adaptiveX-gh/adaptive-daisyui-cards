@@ -2412,6 +2412,11 @@
         btn.addEventListener('click', handleDuplicateCard);
       });
 
+      // Wire up preview buttons
+      container.querySelectorAll('.preview-card-btn').forEach(btn => {
+        btn.addEventListener('click', handlePreviewCard);
+      });
+
       // Wire up delete buttons
       container.querySelectorAll('.delete-card-btn').forEach(btn => {
         btn.addEventListener('click', handleDeleteCard);
@@ -2512,6 +2517,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </button>
+                <button class="btn btn-sm btn-primary btn-circle preview-card-btn" data-card-index="${index}" title="Preview card">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
                 <button class="btn btn-sm btn-ghost btn-circle delete-card-btn" data-card-index="${index}" title="Delete card">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -2540,14 +2551,10 @@
                 </label>
                 <select class="select select-bordered select-sm w-full text-xs outline-card-type" data-card-id="${card.id}">
                   <option value="">Select type...</option>
-                  <option value="title" ${structureInfo.contentType === 'title' ? 'selected' : ''}>Title</option>
-                  <option value="concept" ${structureInfo.contentType === 'concept' ? 'selected' : ''}>Concept</option>
+                  <option value="linear" ${structureInfo.contentType === 'linear' ? 'selected' : ''}>Linear</option>
                   <option value="data" ${structureInfo.contentType === 'data' ? 'selected' : ''}>Data</option>
-                  <option value="quote" ${structureInfo.contentType === 'quote' ? 'selected' : ''}>Quote</option>
-                  <option value="image" ${structureInfo.contentType === 'image' ? 'selected' : ''}>Image</option>
-                  <option value="comparison" ${structureInfo.contentType === 'comparison' ? 'selected' : ''}>Comparison</option>
-                  <option value="process" ${structureInfo.contentType === 'process' ? 'selected' : ''}>Process</option>
-                  <option value="takeaway" ${structureInfo.contentType === 'takeaway' ? 'selected' : ''}>Takeaway</option>
+                  <option value="freeform" ${structureInfo.contentType === 'freeform' ? 'selected' : ''}>Freeform</option>
+                  <option value="personal" ${structureInfo.contentType === 'personal' ? 'selected' : ''}>Personal</option>
                 </select>
               </div>
             </div>
@@ -2731,6 +2738,131 @@
       currentOutline.cards.splice(index + 1, 0, duplicatedCard);
       populateOutlineEditor(currentOutline);
       showToast(`Card ${index + 1} duplicated`, 'success');
+    }
+
+    /**
+     * Handle preview card
+     */
+    async function handlePreviewCard(event) {
+      const index = parseInt(event.currentTarget.dataset.cardIndex);
+      if (!currentOutline) return;
+
+      const card = currentOutline.cards[index];
+
+      // Show the preview modal
+      const modal = document.getElementById('card-preview-dialog');
+      modal.showModal();
+
+      // Update modal title
+      document.getElementById('preview-card-number').textContent = index + 1;
+
+      // Clear previous content
+      const previewContainer = document.getElementById('preview-card-container');
+      previewContainer.innerHTML = '<div class="loading loading-spinner loading-lg mx-auto"></div>';
+
+      // Gather all parameters from the form
+      const params = {
+        topic: document.getElementById('topic')?.value || '',
+        targetAudience: document.getElementById('targetAudience')?.value || '',
+        presentationType: document.getElementById('presentationType')?.value || 'education',
+        tone: document.getElementById('tone')?.value || 'professional',
+        textAmount: document.getElementById('textAmount')?.value || 'concise',
+        imageArtStyle: document.getElementById('imageArtStyle')?.value || 'photorealistic',
+        theme: document.getElementById('theme')?.value || 'corporate',
+        layout: card.suggestedLayout,
+        mainContent: card.content,
+        copyPrompt: card.copyPrompt || '',
+        visualPrompt: card.visualPrompt || '',
+        purpose: card.structureInfo?.purpose || '',
+        contentType: card.structureInfo?.contentType || ''
+      };
+
+      try {
+        // Generate the card
+        await generateSingleCardPreview(params, previewContainer);
+      } catch (error) {
+        console.error('[PREVIEW] Error generating card:', error);
+        previewContainer.innerHTML = `
+          <div class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Failed to generate preview: ${error.message}</span>
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Generate a single card preview
+     */
+    async function generateSingleCardPreview(params, container) {
+      // Build the request body using the outline-based streaming format
+      const requestBody = {
+        cards: [{
+          layout: params.layout,
+          content: params.mainContent,
+          copyPrompt: params.copyPrompt,
+          visualPrompt: params.visualPrompt
+        }],
+        includeImages: true,
+        imageProvider: 'gemini',
+        imageArtStyle: params.imageArtStyle,
+        streamDelay: 50
+      };
+
+      console.log('[PREVIEW] Generating card with params:', requestBody);
+
+      // Make the streaming request using the outline endpoint
+      const response = await fetch('/api/presentations/stream-from-outline', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Read the SSE stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      container.innerHTML = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const event = JSON.parse(data);
+
+              if (event.type === 'card') {
+                // Render the card HTML
+                const cardHtml = event.data.html;
+                container.innerHTML = cardHtml;
+              } else if (event.type === 'error') {
+                throw new Error(event.data.message);
+              }
+            } catch (e) {
+              console.error('[PREVIEW] Error parsing SSE event:', e);
+            }
+          }
+        }
+      }
     }
 
     /**
@@ -3430,6 +3562,40 @@
           Delete Card
         </button>
         <button class="btn" onclick="document.getElementById('delete-card-dialog').close()">Cancel</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Card Preview Dialog -->
+  <dialog id="card-preview-dialog" class="modal">
+    <div class="modal-box max-w-4xl">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <h3 class="font-bold text-lg mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Preview Card #<span id="preview-card-number"></span>
+      </h3>
+
+      <div class="bg-base-200 rounded-lg p-4 mb-4">
+        <p class="text-sm opacity-70 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Generating card with AI using all your parameters (theme, tone, verbosity, image style, etc.)
+        </p>
+      </div>
+
+      <div id="preview-card-container" class="min-h-[400px] bg-base-100 rounded-lg p-4 overflow-auto" style="max-height: 70vh;">
+        <div class="loading loading-spinner loading-lg mx-auto"></div>
+      </div>
+
+      <div class="modal-action">
+        <button class="btn" onclick="document.getElementById('card-preview-dialog').close()">Close</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop"><button>close</button></form>
