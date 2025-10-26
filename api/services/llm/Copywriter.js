@@ -117,6 +117,21 @@ export class Copywriter {
       // Parse response
       const copy = this._parseCopy(response);
 
+      // Build content object based on layout type
+      const content = {
+        title: copy.title,
+        subtitle: copy.subtitle || null,
+        imagePrompt: copy.image_prompt || null // LLM-generated image prompt (layout-aware!)
+      };
+
+      // Add columns or body based on what was generated
+      if (copy.columns) {
+        content.columns = copy.columns;
+      } else {
+        content.body = copy.body;
+        content.kicker = copy.kicker || null;
+      }
+
       // Build complete card object
       const card = {
         id: `card-${index + 1}`,
@@ -125,13 +140,7 @@ export class Copywriter {
         role: cardData.role || 'body',
 
         // Generated copy
-        content: {
-          title: copy.title,
-          subtitle: copy.subtitle || null,
-          body: copy.body,
-          kicker: copy.kicker || null,
-          imagePrompt: copy.image_prompt || null // LLM-generated image prompt (layout-aware!)
-        },
+        content,
 
         // Metadata
         speakerNotes: copy.speaker_notes || cardData.speaker_notes || '',
@@ -243,16 +252,25 @@ ${userRequest}`;
       throw new Error('Copy must contain title');
     }
 
-    // Ensure required fields
-    return {
+    // Build base object
+    const parsed = {
       title: json.title,
       subtitle: json.subtitle || null,
-      body: json.body || '',
-      kicker: json.kicker || null,
       speaker_notes: json.speaker_notes || '',
       word_count: json.word_count || { total: 0 },
-      image_prompt: json.image_prompt || null // Optional: LLM can suggest image prompts
+      image_prompt: json.image_prompt || null
     };
+
+    // Handle column-based layouts
+    if (json.columns && Array.isArray(json.columns)) {
+      parsed.columns = json.columns;
+    } else {
+      // Simple layouts use body/kicker
+      parsed.body = json.body || '';
+      parsed.kicker = json.kicker || null;
+    }
+
+    return parsed;
   }
 
   /**

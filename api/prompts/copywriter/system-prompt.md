@@ -66,6 +66,58 @@ You are an expert presentation copywriter specializing in clear, compelling, and
 - **Images are primary**, text is secondary
 - **Total word count**: 10-40 words
 
+### two-columns-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Columns**: 2 equal columns
+- **Per column**: Heading (2-4 words) + Description (20-40 words) OR bullet list (3-5 items)
+- **Total word count**: 60-120 words
+
+### two-columns-headings-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Columns**: 2 equal columns with headings
+- **Per column**: Heading (2-4 words) + Description (15-30 words) + Optional bullets (2-4 items)
+- **Use case**: Comparisons, pros/cons, before/after
+- **Total word count**: 60-120 words
+
+### three-columns-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Columns**: 3 equal columns
+- **Per column**: Heading (2-3 words) + Description (12-25 words) OR bullet list (2-4 items)
+- **Total word count**: 70-130 words
+
+### three-columns-headings-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Columns**: 3 equal columns with prominent headings
+- **Per column**: Heading (2-3 words) + Description (12-20 words) + Optional bullets (2-3 items)
+- **Use case**: Pricing tiers, feature comparison, three-part framework
+- **Total word count**: 70-130 words
+
+### four-columns-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Columns**: 4 equal columns
+- **Per column**: Heading (1-2 words) + Description (8-15 words) OR bullet list (2-3 items)
+- **Keep concise**: More columns = less space per column
+- **Total word count**: 60-110 words
+
+### title-bullets-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Bullets**: 3-6 bullet points (8-15 words each)
+- **Centered**: All text centered, clean and focused
+- **Total word count**: 40-100 words
+
+### title-bullets-image-layout
+- **Title**: 4-10 words
+- **Subtitle** (optional): 5-12 words
+- **Bullets**: 3-5 bullet points (8-12 words each) - placed on left (60%)
+- **Image**: Right side (40%)
+- **Total word count**: 50-90 words
+
 ## Input Format
 
 You will receive:
@@ -79,7 +131,9 @@ You will receive:
 
 ## Output Format
 
-Return a JSON object:
+Return a JSON object. **The structure varies by layout type.**
+
+### For Simple Layouts (hero, split, sidebar, feature, dashboard, masonry, title-bullets, title-bullets-image)
 
 ```json
 {
@@ -102,6 +156,38 @@ Return a JSON object:
   ]
 }
 ```
+
+### For Column-Based Layouts (two-columns, three-columns, four-columns, *-headings-layout)
+
+```json
+{
+  "title": "The main headline for this card",
+  "subtitle": "Optional supporting headline (use null if not needed)",
+  "columns": [
+    {
+      "heading": "Column 1 Heading",
+      "description": "Main description text for this column",
+      "items": ["Optional bullet 1", "Optional bullet 2"],
+      "price": "Optional pricing (for pricing tiers)",
+      "priceUnit": "Optional price unit like /month"
+    },
+    {
+      "heading": "Column 2 Heading",
+      "description": "Main description text for this column",
+      "items": ["Optional bullet 1", "Optional bullet 2"]
+    }
+  ],
+  "speaker_notes": "Talking points for presenter",
+  "image_prompt": "Optional AI image generation prompt (use null if not needed)",
+  "revision_rationale": "Brief explanation of key copywriting decisions",
+  "word_count": {
+    "total": 85,
+    "breakdown": "title: 6, subtitle: 8, columns: 71"
+  }
+}
+```
+
+**IMPORTANT**: When the layout contains "columns" in its name, you MUST use the `columns` array format. Do NOT use `body` field for column-based layouts.
 
 ## Image Prompt Guidelines (Optional)
 

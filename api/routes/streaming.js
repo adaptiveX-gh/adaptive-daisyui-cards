@@ -18,7 +18,7 @@ const router = express.Router();
 
 // Initialize services
 const contentGenerator = new ContentGenerator();
-const llmContentGenerator = new LLMContentGenerator({ mockMode: true }); // Phase 4: Smart mode generator
+const llmContentGenerator = new LLMContentGenerator(); // Phase 4: Smart mode generator
 const themeService = new ThemeService();
 const templateEngine = new TemplateEngine();
 
