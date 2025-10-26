@@ -2795,11 +2795,13 @@
 
     /**
      * Generate a single card preview
+     * Reuses the main rendering pipeline by temporarily redirecting card output to preview container
      */
     async function generateSingleCardPreview(params, container) {
       // Build the request body using the outline-based streaming format
       const requestBody = {
         cards: [{
+          id: `preview-${Date.now()}`,
           layout: params.layout,
           content: params.mainContent,
           copyPrompt: params.copyPrompt,
@@ -2808,60 +2810,84 @@
         includeImages: true,
         imageProvider: 'gemini',
         imageArtStyle: params.imageArtStyle,
-        streamDelay: 50
+        streamDelay: 0  // No delay for preview
       };
 
       console.log('[PREVIEW] Generating card with params:', requestBody);
 
-      // Make the streaming request using the outline endpoint
-      const response = await fetch('/api/presentations/stream-from-outline', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      // Read the SSE stream
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
+      // Clear container
       container.innerHTML = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      // Create a temporary card container in the preview area
+      const tempCardContainer = document.createElement('div');
+      tempCardContainer.id = 'preview-cardContainer';
+      tempCardContainer.className = 'preview-container';
+      tempCardContainer.style.width = '100%';
+      container.appendChild(tempCardContainer);
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+      // Temporarily swap the main card container
+      const originalContainer = document.getElementById('cardContainer');
+      const originalContainerId = originalContainer.id;
+      originalContainer.id = 'cardContainer-temp';
+      tempCardContainer.id = 'cardContainer';
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
+      try {
+        // Make the streaming request using the outline endpoint
+        const response = await fetch('/api/presentations/stream-from-outline', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream'
+          },
+          body: JSON.stringify(requestBody)
+        });
 
-            try {
-              const event = JSON.parse(data);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
 
-              if (event.type === 'card') {
-                // Render the card HTML
-                const cardHtml = event.data.html;
-                container.innerHTML = cardHtml;
-              } else if (event.type === 'error') {
-                throw new Error(event.data.message);
+        // Read the SSE stream and process it using the existing handleMessage function
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            // Skip comments and heartbeats
+            if (line.startsWith(':')) continue;
+
+            if (line.startsWith('data: ')) {
+              const rawData = line.slice(6).trim();
+              if (rawData === '[DONE]') continue;
+
+              try {
+                const data = JSON.parse(rawData);
+
+                // Handle stage-based events using the existing handleMessage function
+                if (data.stage) {
+                  console.log('[PREVIEW] Processing stage:', data.stage);
+                  handleMessage(data);
+                }
+              } catch (e) {
+                console.error('[PREVIEW] Error parsing SSE event:', e, rawData);
               }
-            } catch (e) {
-              console.error('[PREVIEW] Error parsing SSE event:', e);
             }
           }
         }
+
+        console.log('[PREVIEW] Stream complete');
+
+      } finally {
+        // Restore original container IDs
+        tempCardContainer.id = 'preview-cardContainer';
+        originalContainer.id = originalContainerId;
       }
     }
 
